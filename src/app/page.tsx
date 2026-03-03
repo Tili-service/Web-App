@@ -9,8 +9,8 @@ import Features from "@/components/Features";
 // IMPORTANT: Dans Next.js, les assets statiques doivent idéalement être placés 
 // dans le dossier /public (ex: /public/tili-mockup.png)
 // Si vous déplacez les images dans le dossier public, utilisez les chemins ainsi:
-const tiliMockup = "/tili-mockup.png";
-const tiliLogo = "/tiliLogo.png";
+const tiliMockup = "tili-mockup.png";
+const tiliLogo = "tiliLogo.png";
 
 const Navbar = () => (
   <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">

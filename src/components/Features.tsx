@@ -78,9 +78,9 @@ const Features = () => (
             Tili est conçu pour respecter la réglementation française et sécuriser vos transactions au quotidien.
           </p>
           <div className="flex items-center gap-4">
-            <img src="/logo-sumup.png" alt="SumUp" className="h-7 w-auto object-contain" />
-            <img src="/logo-mypos.png" alt="myPOS Go" className="h-7 w-auto object-contain" />
-            <img src="/logo-ingenico.png" alt="Ingenico" className="h-7 w-auto object-contain" />
+            <img src="logo-sumup.png" alt="SumUp" className="h-7 w-auto object-contain" />
+            <img src="logo-mypos.png" alt="myPOS Go" className="h-7 w-auto object-contain" />
+            <img src="logo-ingenico.png" alt="Ingenico" className="h-7 w-auto object-contain" />
           </div>
         </motion.div>
 
@@ -91,7 +91,7 @@ const Features = () => (
           className="relative"
         >
           <img
-            src="/tili-mockup-NF.png"
+            src="tili-mockup-NF.png"
             alt="Interface Tili"
             className="w-full max-w-xl mx-auto rounded-2xl shadow-warm"
           />
