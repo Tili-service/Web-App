@@ -19,7 +19,7 @@ export default async function loginAccount(data : {email: string, password: stri
     }
     const jsonData = await res.json();
 
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
 
     cookieStore.set("auth_token", jsonData.token, {
         httpOnly: true,

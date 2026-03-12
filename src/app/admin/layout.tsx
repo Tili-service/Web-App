@@ -29,7 +29,7 @@ export default function AdminLayout({
 ) {
   const pathname = usePathname();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const mainLinks = [
     { name: 'Mon Commerce', href: '/admin/shop', icon: Home },
@@ -117,6 +117,10 @@ export default function AdminLayout({
                 <button
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className="w-10 h-10 rounded-full bg-gray-200 border-2 border-white shadow-sm flex items-center justify-center hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  aria-label="Ouvrir le menu profil"
+                  aria-haspopup="menu"
+                  aria-expanded={isProfileMenuOpen}
+                  aria-controls="profile-menu"
                 >
                   <User size={20} className="text-gray-500" />
                 </button>

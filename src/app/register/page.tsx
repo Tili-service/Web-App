@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { toast } from "sonner"
 import Link from 'next/link';
 import createAccount from '@/lib/createAccount';
-import { redirect } from 'next/navigation';
 
 export default function RegisterPage() {
     const [hidePassword, sethidePassword] = useState(true);
@@ -27,11 +26,6 @@ export default function RegisterPage() {
                     description: "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
                 });
                 setTimeout(() => {window.location.href = "/login";}, 2000);
-            }).catch((e) => {
-                const message = e instanceof Error ? e.message : "Une erreur inconnue s'est produite";
-                toast("Erreur lors de l'inscription", {
-                    description: message,
-                });
             });
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : "Une erreur inconnue s'est produite";
@@ -82,7 +76,7 @@ export default function RegisterPage() {
                     </div>
 
                     {/* Formulaire */}
-                    <form className="space-y-4" method='?' onSubmit={(e) => {
+                    <form className="space-y-4" onSubmit={(e) => {
                         e.preventDefault();
                         const formData = new FormData(e.currentTarget);
                         submitForm(formData);

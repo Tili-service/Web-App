@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
+
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function middleware(request: NextRequest) {
     const token = request.cookies.get("auth_token")?.value;
@@ -8,14 +11,9 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    const res = await fetch(`${process.env.BACKEND_GO}/account`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    });
-
-    if (!res.ok) {
+    try {
+        await jwtVerify(token, JWT_SECRET);
+    } catch {
         return NextResponse.redirect(new URL("/login", request.url));
     }
 

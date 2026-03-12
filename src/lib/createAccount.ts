@@ -12,7 +12,6 @@ export default async function createAccount(data : {email: string, name: string,
     )
     if (!res.ok) {
         const errorData = await res.json();
-        console.log(errorData);
         throw new Error(errorData.error || "Failed to create account");
     }
     return { success: true };

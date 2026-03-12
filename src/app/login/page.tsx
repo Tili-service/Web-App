@@ -7,20 +7,15 @@ import Link from 'next/link';
 import { toast } from "sonner"
 import loginAccount from '@/lib/loginAccount';
 
-export default function RegisterPage() {
+export default function LoginPage() {
     const [hidePassword, sethidePassword] = useState(true);
 
-    const submitForm = (formData: FormData) => {
+    const submitForm = async (formData: FormData) => {
       try {
             const data = Object.fromEntries(formData.entries());
-            loginAccount({
+            await loginAccount({
                 email: data.email as string,
                 password: data.password as string,
-            }).catch((e) => {
-                const message = e instanceof Error ? e.message : "Une erreur inconnue s'est produite";
-                toast("Erreur lors de la connexion", {
-                    description: message,
-                });
             });
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : "Une erreur inconnue s'est produite";
