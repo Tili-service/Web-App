@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
-
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function middleware(request: NextRequest) {
     const token = request.cookies.get("auth_token")?.value;
@@ -12,7 +9,17 @@ export async function middleware(request: NextRequest) {
     }
 
     try {
-        await jwtVerify(token, JWT_SECRET);
+        await fetch(`${process.env.BACKEND_GO}/account`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        }).then((res) => {
+            if (!res.ok) {
+                throw new Error("Invalid token");
+            }
+        });
     } catch {
         return NextResponse.redirect(new URL("/login", request.url));
     }
