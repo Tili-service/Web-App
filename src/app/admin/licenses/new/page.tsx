@@ -1,9 +1,9 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { CheckCircle2, Store, CreditCard, Sparkles } from "lucide-react";
+import { CheckCircle2, CreditCard } from "lucide-react";
 import { plans } from "@/data/plans";
 
 export default function NewLicensePage() {

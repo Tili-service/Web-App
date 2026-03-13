@@ -10,9 +10,13 @@ export type License = {
 };
 
 export default async function getLicenses(): Promise<License[]> {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const authToken = cookieStore.get("auth_token")?.value;
 
+    if (!authToken) {
+        throw new Error("Unauthorized: missing auth token");
+    }
+    
     const res = await fetch(`${process.env.BACKEND_GO}/licences`, {
         headers: {
             "Authorization": `Bearer ${authToken}`

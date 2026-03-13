@@ -12,7 +12,7 @@ export default function ShopPage() {
         }, 5000); // Simule un chargement de 5 secondes
 
         return () => clearTimeout(timer);
-    }, []);
+    }, [setIsLoading]);
     return (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <h2 className="text-lg font-semibold mb-4">Aperçu de la caisse</h2>

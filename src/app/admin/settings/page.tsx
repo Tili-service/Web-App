@@ -12,7 +12,7 @@ export default function SettingsPage() {
         }, 1000); // Simule un chargement de 1 seconde
 
         return () => clearTimeout(timer);
-    }, []);
+    }, [setIsLoading]);
     return (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <h2 className="text-lg font-semibold mb-4">Paramètres de mon compte</h2>

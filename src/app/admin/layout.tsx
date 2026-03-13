@@ -39,7 +39,7 @@ export default function AdminLayout({
 
   const bottomLinks = [
     { name: 'Paramètres', href: '/admin/settings', icon: Settings },
-    { name: 'Support', href: 'tel:+330663397456', icon: Phone },
+    { name: 'Support', href: 'tel:+330000000000', icon: Phone },
   ];
 
   return (

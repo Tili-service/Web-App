@@ -17,7 +17,6 @@ export default function LicensesPage() {
         const fetchLicenses = async () => {
             try {
                 const data = await getLicenses();
-                console.log("Licenses fetched:", data);
                 setLicenses(data);
             } catch (error) {
                 console.error(error);
@@ -27,7 +26,7 @@ export default function LicensesPage() {
         };
         fetchLicenses();
 
-    }, [setLicenses]);
+    }, [setLicenses, setIsLoading]);
 
     return (
         <>
