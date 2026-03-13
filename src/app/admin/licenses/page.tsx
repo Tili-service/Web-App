@@ -31,7 +31,7 @@ export default function LicensesPage() {
 
     return (
         <>
-            {licences.length === 0 ? (
+            {!licences || licences.length === 0 ? (
                 <>
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                     Vous n'avez pas de licences pour le moment.

@@ -56,7 +56,7 @@ export default function AdminLayout({
           <nav className="flex-1 px-4 py-6 space-y-2">
             {mainLinks.map((link) => {
               const Icon = link.icon;
-              const isActive = pathname === link.href;
+              const isActive = pathname.startsWith(link.href);
 
               return (
                 <Link
@@ -79,7 +79,7 @@ export default function AdminLayout({
           <div className="p-4 border-t border-gray-100 space-y-2">
             {bottomLinks.map((link) => {
               const Icon = link.icon;
-              const isActive = pathname === link.href;
+              const isActive = pathname.startsWith(link.href);
 
               return (
                 <Link
@@ -105,7 +105,7 @@ export default function AdminLayout({
           {/* Topbar / Header */}
           <header className="h-20 bg-white/50 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-8 z-10">
             <h1 className="text-2xl font-bold">
-              {[...mainLinks, ...bottomLinks].find(link => link.href === pathname)?.name || 'Tableau de bord'}
+              {[...mainLinks, ...bottomLinks].find(link => pathname.startsWith(link.href))?.name || 'Tableau de bord'}
             </h1>
 
             <div className="flex items-center gap-4">
