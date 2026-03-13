@@ -2,7 +2,7 @@
 export const plans = [
     {
         name: "Mensuel",
-        price: "15",
+        price: "12.99",
         period: "/mois",
         desc: "Flexibilité maximale, sans engagement.",
         features: ["Toutes les fonctionnalités", "Support par email", "Mises à jour incluses", "1 point de vente"],
@@ -11,7 +11,7 @@ export const plans = [
     },
     {
         name: "Semestriel",
-        price: "85",
+        price: "69.99",
         period: "/sem",
         desc: "6 mois d'engagement. Économisez 6%.",
         features: ["Toutes les fonctionnalités", "Support prioritaire", "Mises à jour incluses", "Jusqu'à 3 points de vente", "Formation offerte"],
@@ -21,7 +21,7 @@ export const plans = [
     },
     {
         name: "Annuel",
-        price: "160",
+        price: "139.99",
         period: "/an",
         desc: "Le meilleur tarif. Économisez 11%.",
         features: ["Toutes les fonctionnalités", "Support prioritaire", "Mises à jour incluses", "Points de vente illimités", "Formation offerte", "Personnalisation incluse"],
