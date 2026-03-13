@@ -16,7 +16,10 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify({ offer }),
         });
         const session = await response.json();
-        return NextResponse.redirect(session!, 303);
+        if (!response.ok || !session.url) {
+            throw new Error(session.error || "Failed to create payment session");
+        }
+        return NextResponse.redirect(session.url, 303);
     } catch (error: any) {
         console.error("Erreur Stripe :", error);
         const origin = request.headers.get("origin") || "http://localhost:3000";
