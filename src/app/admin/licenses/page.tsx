@@ -108,16 +108,51 @@ export default function LicensesPage() {
                     {/* Liste des licences */}
                     <ul className="space-y-4">
                         {licences.map((licence) => (
-                            <li key={licence.licence_id} className="p-4 border rounded-lg hover:shadow-sm transition-shadow">
-                                <p className="mb-1"><strong>Licence ID:</strong> <span className="text-gray-600">{licence.licence_id}</span></p>
-                                <p className="mb-1"><strong>Expiration:</strong> <span className="text-gray-600">{new Date(licence.expiration).toLocaleDateString()}</span></p>
-                                <p className="mb-1"><strong>Transaction:</strong> <span className="text-gray-600">{licence.transaction}</span></p>
-                                <p>
-                                    <strong>Status:</strong> 
-                                    <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${licence.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                                        {licence.is_active ? "Active" : "Inactive"}
-                                    </span>
-                                </p>
+                            <li
+                                key={licence.licence_id}
+                                className="p-4 border rounded-lg hover:shadow-sm transition-shadow flex items-center justify-between bg-white"
+                            >
+                                {/* Partie Gauche : Informations de la licence */}
+                                <div className="space-y-1">
+                                    <p className="mb-1 text-sm">
+                                        <span className="font-semibold text-gray-900">Licence ID :</span> 
+                                        <span className="text-gray-600 ml-1">{licence.licence_id}</span>
+                                    </p>
+                                    <p className="mb-1 text-sm">
+                                        <span className="font-semibold text-gray-900">Expiration :</span> 
+                                        <span className="text-gray-600 ml-1">{new Date(licence.expiration).toLocaleDateString()}</span>
+                                    </p>
+
+                                    <p className="">
+                                        <span className="font-semibold text-sm text-gray-900">Statut :</span> 
+                                        <span className={`ml-2 px-2.5 py-0.5 text-xs font-semibold rounded-full ${
+                                            licence.is_active 
+                                                ? "bg-green-100 text-green-700" 
+                                                : "bg-red-100 text-red-700"
+                                        }`}>
+                                            {licence.is_active ? "Active" : "Inactive"}
+                                        </span>
+                                    </p>
+
+                                    {licence.store ? (
+                                        <p className="text-sm">
+                                            <span className="font-semibold text-gray-900">Boutique :</span> 
+                                            <span className="text-gray-600 ml-1">{licence.store.name}</span>
+                                        </p>
+                                    ) : (
+                                        <p className="text-md text-gray-900 font-bold">
+                                            Aucune boutique associée
+                                        </p>
+                                    )}
+                                </div>
+
+                                {!licence.store && (
+                                    <div className="ml-4 flex-shrink-0">
+                                        <Link href={`/admin/shop/new?licenceId=${licence.licence_id}`}className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                                            Créer mon store
+                                        </Link>
+                                    </div>
+                                )}
                             </li>
                         ))}
                     </ul>

@@ -1,17 +1,14 @@
 "use server";
 import { cookies } from "next/headers";
 
-export type License = {
-    licence_id: string,
-    account_id: string,
-    expiration: string,
-    store: {
-        name: string,
-    } | null,
-    is_active: boolean,
+export type Shop = {
+    name: string,
+    date_creation: string,
+    numero_tva: string,
+    siret: string,
 };
 
-export default async function getLicenses(): Promise<License[]> {
+export default async function getShops(): Promise<Shop[]> {
     const cookieStore = cookies();
     const authToken = cookieStore.get("auth_token")?.value;
 
@@ -19,7 +16,7 @@ export default async function getLicenses(): Promise<License[]> {
         throw new Error("Unauthorized: missing auth token");
     }
 
-    const res = await fetch(`${process.env.BACKEND_GO}/licences`, {
+    const res = await fetch(`${process.env.BACKEND_GO}/store/me`, {
         headers: {
             "Authorization": `Bearer ${authToken}`
         }
@@ -27,7 +24,7 @@ export default async function getLicenses(): Promise<License[]> {
 
     if (!res.ok) {
         const errorText = await res.text();
-        let errorMessage = "Failed to fetch licenses";
+        let errorMessage = "Failed to fetch shops";
 
         try {
             const errorData = JSON.parse(errorText);
