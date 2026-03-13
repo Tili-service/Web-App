@@ -5,10 +5,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import Features from "@/components/Features";
+import { plans } from "@/data/plans";
 
-// IMPORTANT: Dans Next.js, les assets statiques doivent idéalement être placés 
-// dans le dossier /public (ex: /public/tili-mockup.png)
-// Si vous déplacez les images dans le dossier public, utilisez les chemins ainsi:
 const tiliMockup = "tili-mockup.png";
 const tiliLogo = "tiliLogo.png";
 
@@ -23,9 +21,14 @@ const Navbar = () => (
         <a href="#pricing" className="text-foreground/70 hover:text-foreground transition-colors">Tarifs</a>
         <a href="#order" className="text-foreground/70 hover:text-foreground transition-colors">Commander</a>
       </div>
-      <Button variant="hero" size="default" onClick={() => document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' })}>
-        Commander
-      </Button>
+      <div className="flex gap-5">
+        <Button variant="hero" size="default" onClick={() => (window.location.href = "/register")}>
+          S'inscrire
+        </Button>
+        <Button variant="outline" size="default" onClick={() => (window.location.href = "/login")}>
+          Se connecter
+        </Button>
+      </div>
     </div>
   </nav>
 );
@@ -50,7 +53,7 @@ const Hero = () => (
           Simple, rapide et fiable. Encaissez, gérez vos stocks et suivez vos ventes en un clin d'œil.
         </p>
         <div className="flex gap-4 flex-wrap">
-          <Button variant="hero" size="xl" onClick={() => document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' })}>
+          <Button variant="hero" size="xl" onClick={() => (window.location.href = "/register")}>
             <ShoppingCart className="w-5 h-5" />
             Commander maintenant
           </Button>
@@ -76,34 +79,6 @@ const Hero = () => (
     </div>
   </section>
 );
-
-const plans = [
-  {
-    name: "Mensuel",
-    price: "29",
-    period: "/mois",
-    desc: "Flexibilité maximale, sans engagement.",
-    features: ["Toutes les fonctionnalités", "Support par email", "Mises à jour incluses", "1 point de vente"],
-    popular: false,
-  },
-  {
-    name: "Semestriel",
-    price: "24",
-    period: "/mois",
-    desc: "6 mois d'engagement. Économisez 17%.",
-    features: ["Toutes les fonctionnalités", "Support prioritaire", "Mises à jour incluses", "Jusqu'à 3 points de vente", "Formation offerte"],
-    popular: true,
-    badge: "Populaire",
-  },
-  {
-    name: "Annuel",
-    price: "19",
-    period: "/mois",
-    desc: "Le meilleur tarif. Économisez 35%.",
-    features: ["Toutes les fonctionnalités", "Support prioritaire 24/7", "Mises à jour incluses", "Points de vente illimités", "Formation offerte", "Personnalisation incluse"],
-    popular: false,
-  },
-];
 
 const Pricing = () => (
   <section id="pricing" className="py-24">
@@ -163,7 +138,7 @@ const Pricing = () => (
               variant={plan.popular ? "accent" : "hero"}
               size="lg"
               className="w-full"
-              onClick={() => document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => window.location.href="/login" }
             >
               Choisir {plan.name}
             </Button>
@@ -173,86 +148,6 @@ const Pricing = () => (
     </div>
   </section>
 );
-
-const OrderForm = () => {
-  const [selectedPlan, setSelectedPlan] = React.useState("semestriel");
-
-  return (
-    <section id="order" className="py-24 bg-card">
-        {/* ... Le contenu de votre formulaire reste identique ... */}
-      <div className="container max-w-2xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-4xl font-bold font-display mb-4">Commander Tili</h2>
-          <p className="text-muted-foreground text-lg">
-            Remplissez le formulaire ci-dessous pour démarrer.
-          </p>
-        </motion.div>
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className="bg-background rounded-2xl p-8 shadow-card space-y-6"
-          onSubmit={(e) => { e.preventDefault(); alert("Commande envoyée ! Nous vous contacterons sous 24h."); }}
-        >
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block font-display text-sm font-medium mb-2">Prénom</label>
-              <input type="text" required className="w-full h-11 px-4 rounded-lg border bg-background text-foreground focus:ring-2 focus:ring-ring outline-none transition-shadow" placeholder="Jean" />
-            </div>
-            <div>
-              <label className="block font-display text-sm font-medium mb-2">Nom</label>
-              <input type="text" required className="w-full h-11 px-4 rounded-lg border bg-background text-foreground focus:ring-2 focus:ring-ring outline-none transition-shadow" placeholder="Dupont" />
-            </div>
-          </div>
-          <div>
-            <label className="block font-display text-sm font-medium mb-2">Email</label>
-            <input type="email" required className="w-full h-11 px-4 rounded-lg border bg-background text-foreground focus:ring-2 focus:ring-ring outline-none transition-shadow" placeholder="jean@maboutique.fr" />
-          </div>
-          <div>
-            <label className="block font-display text-sm font-medium mb-2">Nom de la boutique</label>
-            <input type="text" required className="w-full h-11 px-4 rounded-lg border bg-background text-foreground focus:ring-2 focus:ring-ring outline-none transition-shadow" placeholder="Ma Boutique" />
-          </div>
-          <div>
-            <label className="block font-display text-sm font-medium mb-3">Formule</label>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { id: "mensuel", label: "Mensuel", price: "29€/mois" },
-                { id: "semestriel", label: "Semestriel", price: "24€/mois" },
-                { id: "annuel", label: "Annuel", price: "19€/mois" },
-              ].map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => setSelectedPlan(p.id)}
-                  className={`p-4 rounded-xl border-2 text-center transition-all duration-200 ${
-                    selectedPlan === p.id
-                      ? "border-primary bg-primary/5 shadow-warm"
-                      : "border-border hover:border-accent"
-                  }`}
-                >
-                  <span className="block font-display font-semibold text-sm">{p.label}</span>
-                  <span className="block text-xs text-muted-foreground mt-1">{p.price}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <Button variant="hero" size="xl" className="w-full" type="submit">
-            Valider ma commande
-          </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            En validant, vous acceptez nos conditions générales de vente.
-          </p>
-        </motion.form>
-      </div>
-    </section>
-  );
-};
 
 const Footer = () => (
   <footer className="py-12 bg-foreground text-background">
@@ -272,7 +167,6 @@ export default function Home() {
       <Hero />
       <Features />
       <Pricing />
-      <OrderForm />
       <Footer />
     </div>
   );
