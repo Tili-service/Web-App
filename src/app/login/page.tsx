@@ -4,19 +4,26 @@ import Image from 'next/image';
 import { Mail, Lock, EyeOff, Eye } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { toast } from "sonner"
 import loginAccount from '@/lib/loginAccount';
+import { useAuth } from '@/context/auth-context';
 
 export default function LoginPage() {
     const [hidePassword, sethidePassword] = useState(true);
+    const router = useRouter();
+    const { login } = useAuth();
 
     const submitForm = async (formData: FormData) => {
       try {
             const data = Object.fromEntries(formData.entries());
-            await loginAccount({
+            const res = await loginAccount({
                 email: data.email as string,
                 password: data.password as string,
             });
+            login(res);
+            toast.success("Connexion réussie");
+            router.push("/admin");
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : "Une erreur inconnue s'est produite";
             toast("Erreur lors de la connexion", {
@@ -37,20 +44,8 @@ export default function LoginPage() {
                 priority
             />
 
-            {/* 2. Logo en haut à gauche (style étiquette) */}
-            <Link
-                href="/" 
-                className="absolute top-0 left-8 bg-white p-5 rounded-b-[2rem] shadow-lg z-50 hover:bg-gray-50 hover:scale-[1.02] transition-all cursor-pointer"
-            >
-                <Image
-                    src="/tiliLogo.png"
-                    alt="Tili Logo"
-                    width={100}
-                    height={100}
-                    priority
-                    className="object-contain"
-                />
-            </Link>
+            {/* 2. Logo en haut à gauche (style étiquette) - SUPPRIMÉ */}
+
 
             {/* 3. Conteneur central pour le formulaire */}
             <div className="absolute inset-0 flex items-center justify-center z-10 p-4">
