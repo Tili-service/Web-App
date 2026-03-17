@@ -4,6 +4,8 @@ import "./globals.css"; // Votre ancien CSS global
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Providers } from "@/components/providers";
+import { Navbar } from "@/components/Navbar";
+import { AuthProvider } from "@/context/auth-context";
 
 // Configuration des polices par défaut si nécessaire
 const inter = Inter({ subsets: ["latin"] });
@@ -21,11 +23,14 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>
-          {children}
-          <Toaster />
-          <Sonner />
-        </Providers>
+        <AuthProvider>
+          <Providers>
+            <Navbar />
+            {children}
+            <Toaster />
+            <Sonner />
+          </Providers>
+        </AuthProvider>
       </body>
     </html>
   );

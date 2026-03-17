@@ -10,28 +10,7 @@ import { plans } from "@/data/plans";
 const tiliMockup = "tili-mockup.png";
 const tiliLogo = "tiliLogo.png";
 
-const Navbar = () => (
-  <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-    <div className="container flex items-center justify-between h-16">
-      <a href="#" className="flex items-center gap-2">
-        <img src={tiliLogo} alt="Tili" className="h-10 w-auto" />
-      </a>
-      <div className="hidden md:flex items-center gap-8 font-display text-sm font-medium">
-        <a href="#features" className="text-foreground/70 hover:text-foreground transition-colors">Fonctionnalités</a>
-        <a href="#pricing" className="text-foreground/70 hover:text-foreground transition-colors">Tarifs</a>
-        <a href="#order" className="text-foreground/70 hover:text-foreground transition-colors">Commander</a>
-      </div>
-      <div className="flex gap-5">
-        <Button variant="hero" size="default" onClick={() => (window.location.href = "/register")}>
-          S'inscrire
-        </Button>
-        <Button variant="outline" size="default" onClick={() => (window.location.href = "/login")}>
-          Se connecter
-        </Button>
-      </div>
-    </div>
-  </nav>
-);
+
 
 const Hero = () => (
   <section className="pt-32 pb-20 gradient-hero overflow-hidden">
@@ -163,7 +142,6 @@ const Footer = () => (
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <Navbar />
       <Hero />
       <Features />
       <Pricing />
