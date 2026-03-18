@@ -1,37 +1,14 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import Features from "@/components/Features";
 import { plans } from "@/data/plans";
 
-const tiliMockup = "tili-mockup.png";
-const tiliLogo = "tiliLogo.png";
 
-const Navbar = () => (
-  <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-    <div className="container flex items-center justify-between h-16">
-      <a href="#" className="flex items-center gap-2">
-        <img src={tiliLogo} alt="Tili" className="h-10 w-auto" />
-      </a>
-      <div className="hidden md:flex items-center gap-8 font-display text-sm font-medium">
-        <a href="#features" className="text-foreground/70 hover:text-foreground transition-colors">Fonctionnalités</a>
-        <a href="#pricing" className="text-foreground/70 hover:text-foreground transition-colors">Tarifs</a>
-        <a href="#order" className="text-foreground/70 hover:text-foreground transition-colors">Commander</a>
-      </div>
-      <div className="flex gap-5">
-        <Button variant="hero" size="default" onClick={() => (window.location.href = "/register")}>
-          S'inscrire
-        </Button>
-        <Button variant="outline" size="default" onClick={() => (window.location.href = "/login")}>
-          Se connecter
-        </Button>
-      </div>
-    </div>
-  </nav>
-);
 
 const Hero = () => (
   <section className="pt-32 pb-20 gradient-hero overflow-hidden">
@@ -69,9 +46,12 @@ const Hero = () => (
         className="relative"
       >
         <div className="animate-float">
-          <img
-            src={tiliMockup}
+          <Image
+            src="/tili-mockup.png"
             alt="Tili - Interface"
+            width={600}
+            height={400}
+            priority
             className="w-full rounded-2xl shadow-warm"
           />
         </div>
@@ -82,7 +62,6 @@ const Hero = () => (
 
 const Pricing = () => (
   <section id="pricing" className="py-24">
-    {/* ... Le contenu de votre fonction Pricing reste inchangé ... */}
     <div className="container">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -152,7 +131,14 @@ const Pricing = () => (
 const Footer = () => (
   <footer className="py-12 bg-foreground text-background">
     <div className="container text-center">
-      <img src={tiliLogo} alt="Tili" className="h-12 w-auto mx-auto mb-2 brightness-0 invert" />
+      <Image 
+        src="/tiliLogo.png" 
+        alt="Tili" 
+        width={48}
+        height={48}
+        priority
+        className="h-12 w-auto mx-auto mb-2 brightness-0 invert" 
+      />
       <p className="text-background/60 text-sm">
         © 2026 Tili. Le logiciel de caisse pour les petits commerces.
       </p>
@@ -163,7 +149,6 @@ const Footer = () => (
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <Navbar />
       <Hero />
       <Features />
       <Pricing />

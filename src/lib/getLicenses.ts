@@ -12,7 +12,7 @@ export type License = {
 };
 
 export default async function getLicenses(): Promise<License[]> {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const authToken = cookieStore.get("auth_token")?.value;
 
     if (!authToken) {
@@ -45,7 +45,7 @@ export default async function getLicenses(): Promise<License[]> {
         const jsonData = await res.json();
         return jsonData;
     } catch (e) {
-        console.error("La réponse du serveur n'est pas un JSON valide:", await res.text());
+        console.error("error", await res.text());
         throw new Error("Invalid format received from server");
     }
 }

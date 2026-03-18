@@ -9,7 +9,7 @@ export default function UsersPage() {
         setIsLoading(true);
         const timer = setTimeout(() => {
             setIsLoading(false);
-        }, 5000); // Simule un chargement de 5 secondes
+        }, 5000);
 
         return () => clearTimeout(timer);
     }, [setIsLoading]);
