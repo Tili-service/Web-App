@@ -51,7 +51,7 @@
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
-    "react-dom": "^18.3.1",
+    "react-dom": "^19.2.4",
     "react-hook-form": "^7.61.1",
     "react-resizable-panels": "^2.1.9",
     "recharts": "^2.15.4",
@@ -65,7 +65,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^18.3.23",
-    "@types/react-dom": "^18.3.7",
+    "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.21",
     "eslint": "^8.0.0",
     "eslint-config-next": "16.1.7",
