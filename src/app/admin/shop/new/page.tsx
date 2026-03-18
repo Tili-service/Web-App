@@ -11,7 +11,6 @@ export default function NewShopPage() {
     const licenseID = params.get("licenceId");
     const [isChecking, setIsChecking] = useState(true);
 
-    // Redirection propre côté client si pas de licence
     useEffect(() => {
         if (!licenseID) {
             router.push("/admin/licenses");
@@ -20,7 +19,6 @@ export default function NewShopPage() {
         }
     }, [licenseID, router]);
 
-    // Évite un flash visuel avant la redirection
     if (isChecking) {
         return (
             <div className="flex justify-center items-center h-[60vh]">

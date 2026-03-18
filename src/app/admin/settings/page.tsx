@@ -13,7 +13,6 @@ import { useAuth } from "@/context/auth-context";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-// Define the shape of the form data
 type AccountData = {
     name: string;
 };
@@ -29,10 +28,8 @@ export default function SettingsPage() {
         formState: { isSubmitting },
     } = useForm<AccountData>();
 
-    // Initial loading state
     const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-    // Charge les données du compte au montage
     useEffect(() => {
         setIsLoading(true);
         getAccount()
@@ -69,7 +66,7 @@ export default function SettingsPage() {
         ) {
             try {
                 await deleteAccount();
-                logout(); // Déconnexion via le context pour mettre à jour l'UI immédiatement
+                logout();
             } catch (error: any) {
                 console.error(error);
                 toast.error(error.message || "Impossible de supprimer le compte.");
@@ -78,7 +75,7 @@ export default function SettingsPage() {
     };
 
     if (isInitialLoading) {
-        return null; // The global loader from layout takes over visually, or just empty
+        return null;
     }
 
     return (

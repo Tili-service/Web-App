@@ -23,7 +23,7 @@ export default function ShopPage() {
         };
         fetchShops();
 
-    }, [setIsLoading]); // Corrigé: setShops n'a pas besoin d'être dans les dépendances
+    }, [setIsLoading]);
 
     return (
         <div className="space-y-4">
