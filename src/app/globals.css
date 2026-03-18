@@ -2,7 +2,6 @@
 
 @import "tailwindcss";
 
-/* 👇 AJOUT INDISPENSABLE POUR RECENTRER LE CONTENU DANS TAILWIND V4 👇 */
 @utility container {
   margin-inline: auto;
   padding-inline: 1rem;
