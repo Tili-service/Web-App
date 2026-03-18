@@ -4,19 +4,26 @@ import Image from 'next/image';
 import { Mail, Lock, EyeOff, Eye } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { toast } from "sonner"
 import loginAccount from '@/lib/loginAccount';
+import { useAuth } from '@/context/auth-context';
 
 export default function LoginPage() {
     const [hidePassword, sethidePassword] = useState(true);
+    const router = useRouter();
+    const { login } = useAuth();
 
     const submitForm = async (formData: FormData) => {
       try {
             const data = Object.fromEntries(formData.entries());
-            await loginAccount({
+            const res = await loginAccount({
                 email: data.email as string,
                 password: data.password as string,
             });
+            login(res);
+            toast.success("Connexion réussie");
+            router.push("/admin");
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : "Une erreur inconnue s'est produite";
             toast("Erreur lors de la connexion", {
@@ -28,7 +35,6 @@ export default function LoginPage() {
     return (
         <div className="relative w-screen h-screen overflow-hidden bg-gray-100">
 
-            {/* 1. Image de fond floutée (scale-105 évite les bords blancs dus au flou) */}
             <Image
                 src="/logPicture.png"
                 alt="Arrière-plan Tili"
@@ -37,39 +43,20 @@ export default function LoginPage() {
                 priority
             />
 
-            {/* 2. Logo en haut à gauche (style étiquette) */}
-            <Link
-                href="/" 
-                className="absolute top-0 left-8 bg-white p-5 rounded-b-[2rem] shadow-lg z-50 hover:bg-gray-50 hover:scale-[1.02] transition-all cursor-pointer"
-            >
-                <Image
-                    src="/tiliLogo.png"
-                    alt="Tili Logo"
-                    width={100}
-                    height={100}
-                    priority
-                    className="object-contain"
-                />
-            </Link>
 
-            {/* 3. Conteneur central pour le formulaire */}
+
             <div className="absolute inset-0 flex items-center justify-center z-10 p-4">
 
-                {/* Carte du formulaire */}
                 <div className="bg-white p-8 sm:p-10 rounded-[2rem] shadow-2xl w-full max-w-[420px]">
-                    {/* En-tête de la carte */}
                     <div className="text-center mb-8 flex flex-col items-center">
                         <h1 className="text-2xl font-bold text-gray-900 mb-2">Connexion</h1>
                     </div>
 
-                    {/* Formulaire */}
                     <form className="space-y-4" onSubmit={(e) => {
                         e.preventDefault();
                         const formData = new FormData(e.currentTarget);
                         submitForm(formData);
                     }}>
-                        
-                        {/* Email */}
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                                 <Mail size={18} />
@@ -83,7 +70,6 @@ export default function LoginPage() {
                             />
                         </div>
 
-                        {/* Groupe Mot de passe + Lien "Mot de passe oublié" */}
                         <div className="space-y-2">
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
@@ -103,7 +89,6 @@ export default function LoginPage() {
                                 </div>
                             </div>
                             
-                            {/* Le lien Mot de passe oublié poussé à droite */}
                             <div className="flex justify-end">
                                 <a href="#" className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-all">
                                     Mot de passe oublié ?
@@ -111,7 +96,6 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        {/* Bouton Se connecter / S'inscrire */}
                         <button
                             type="submit"
                             className="w-full bg-[#1e1e24] text-white py-3 px-4 rounded-xl hover:bg-black transition-colors font-medium text-sm mt-4 shadow-md"

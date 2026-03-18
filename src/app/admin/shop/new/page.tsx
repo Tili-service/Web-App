@@ -11,7 +11,6 @@ export default function NewShopPage() {
     const licenseID = params.get("licenceId");
     const [isChecking, setIsChecking] = useState(true);
 
-    // Redirection propre côté client si pas de licence
     useEffect(() => {
         if (!licenseID) {
             router.push("/admin/licenses");
@@ -20,7 +19,6 @@ export default function NewShopPage() {
         }
     }, [licenseID, router]);
 
-    // Évite un flash visuel avant la redirection
     if (isChecking) {
         return (
             <div className="flex justify-center items-center h-[60vh]">
@@ -36,10 +34,8 @@ export default function NewShopPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 space-y-8 relative overflow-hidden"
             >
-                {/* Petit élément de décoration en arrière-plan */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-full -z-10 opacity-50" />
 
-                {/* Header du formulaire */}
                 <div className="text-center space-y-2">
                     <h2 className="text-2xl font-bold text-gray-900">Créer votre boutique</h2>
                     <p className="text-gray-500 text-sm">
@@ -48,7 +44,6 @@ export default function NewShopPage() {
                 </div>
 
                 <form action="/api/createShop" method="POST" className="space-y-6">
-                    {/* Section Nom du shop */}
                     <div className="space-y-2">
                         <label htmlFor="shopName" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                             <Store size={16} className="text-orange-500" />
@@ -64,7 +59,6 @@ export default function NewShopPage() {
                         />
                     </div>
 
-                    {/* Section TVA & SIRET (Grille 2 colonnes) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <label htmlFor="vatNumber" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
@@ -80,7 +74,6 @@ export default function NewShopPage() {
                                 className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all placeholder:text-gray-400"
                             />
                         </div>
-                        
                         <div className="space-y-2">
                             <label htmlFor="siret" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                                 <Hash size={16} className="text-orange-500" />
@@ -99,7 +92,6 @@ export default function NewShopPage() {
 
                     <input type="hidden" name="licenseID" value={licenseID as string} />
 
-                    {/* Footer & Validation */}
                     <div className="pt-6 space-y-4 border-t border-gray-100">
                         <Button 
                             variant="default" 
