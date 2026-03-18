@@ -18,20 +18,17 @@ export default function NewLicensePage() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 space-y-8"
       >
-        {/* Header du formulaire */}
         <div className="text-center space-y-2">
           <h2 className="text-2xl font-bold text-gray-900">Nouvelle Licence</h2>
           <p className="text-gray-500">Propulsez votre boutique grâce à Tili</p>
         </div>
 
         <form action="/api/createPayment" method="POST" className="space-y-8">
-          {/* Section Choix de l'offre */}
           <div className="space-y-4">
             <label className="flex items-center gap-2 font-semibold text-sm text-gray-700">
               <CreditCard size={18} className="text-orange-500" />
               Choisissez votre formule
             </label>
-            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {plans.map((p) => {
                 const isSelected = selectedPlan === p.param;
@@ -46,7 +43,6 @@ export default function NewLicensePage() {
                         : "border-gray-100 hover:border-orange-200 bg-white"
                     }`}
                   >
-                    {/* Badge Petit Tag */}
                     {p.name && (
                       <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-orange-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm">
                         {p.name}
@@ -78,7 +74,6 @@ export default function NewLicensePage() {
 
           <input type="hidden" name="offer" value={selectedPlan} />
 
-          {/* Footer & Validation */}
           <div className="pt-4 space-y-4">
             <Button 
               variant="default" 

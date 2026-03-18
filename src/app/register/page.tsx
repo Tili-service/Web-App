@@ -38,7 +38,6 @@ export default function RegisterPage() {
     return (
         <div className="relative w-screen h-screen overflow-hidden bg-gray-100">
 
-            {/* 1. Image de fond floutée (scale-105 évite les bords blancs dus au flou) */}
             <Image
                 src="/logPicture.png"
                 alt="Arrière-plan Tili"
@@ -47,15 +46,11 @@ export default function RegisterPage() {
                 priority
             />
 
-        {/* 2. Logo en haut à gauche (style étiquette) - SUPPRIME */}
 
 
-        {/* 3. Conteneur central pour le formulaire */}
             <div className="absolute inset-0 flex items-center justify-center z-10 p-4">
 
-            {/* Carte du formulaire */}
                 <div className="bg-white p-8 sm:p-10 rounded-[2rem] shadow-2xl w-full max-w-[420px]">
-                    {/* En-tête de la carte */}
                     <div className="text-center mb-8 flex flex-col items-center">
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">Inscription</h1>
                     <p className="text-sm text-gray-500 leading-relaxed px-4">
@@ -63,13 +58,11 @@ export default function RegisterPage() {
                     </p>
                     </div>
 
-                    {/* Formulaire */}
                     <form className="space-y-4" onSubmit={(e) => {
                         e.preventDefault();
                         const formData = new FormData(e.currentTarget);
                         submitForm(formData);
                     }}>
-                        {/* Nom */}
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                             <User size={18} />
@@ -83,7 +76,6 @@ export default function RegisterPage() {
                             />
                         </div>
 
-                        {/* Email */}
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                             <Mail size={18} />
@@ -97,7 +89,6 @@ export default function RegisterPage() {
                             />
                         </div>
 
-                        {/* Mot de passe */}
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                             <Lock size={18} />
@@ -116,7 +107,6 @@ export default function RegisterPage() {
                             </div>
                         </div>
 
-                        {/* Confirmation mot de passe */}
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                             <Lock size={18} />
@@ -140,7 +130,6 @@ export default function RegisterPage() {
                             J'accepte les <a href="#" className="text-[#1e1e24] hover:underline">conditions d'utilisation</a>
                         </label>
 
-                        {/* Bouton S'inscrire */}
                         <button
                             type="submit"
                             className="w-full bg-[#1e1e24] text-white py-3 px-4 rounded-xl hover:bg-black transition-colors font-medium text-sm mt-4 shadow-md"

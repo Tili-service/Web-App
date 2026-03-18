@@ -62,7 +62,6 @@ const Hero = () => (
 
 const Pricing = () => (
   <section id="pricing" className="py-24">
-    {/* ... Le contenu de votre fonction Pricing reste inchangé ... */}
     <div className="container">
       <motion.div
         initial={{ opacity: 0, y: 20 }}

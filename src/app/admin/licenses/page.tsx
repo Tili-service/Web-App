@@ -91,11 +91,10 @@ export default function LicensesPage() {
             ) :
             (
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    {/* En-tête avec le titre et le bouton */}
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-2xl font-bold text-gray-900">Vos licences</h2>
                         <Button
-                            asChild 
+                            asChild
                             variant="default"
                             className="bg-[#548687] hover:bg-[#426a6b] text-white"
                         >
@@ -105,29 +104,27 @@ export default function LicensesPage() {
                         </Button>
                     </div>
 
-                    {/* Liste des licences */}
                     <ul className="space-y-4">
                         {licences.map((licence) => (
                             <li
                                 key={licence.licence_id}
                                 className="p-4 border rounded-lg hover:shadow-sm transition-shadow flex items-center justify-between bg-white"
                             >
-                                {/* Partie Gauche : Informations de la licence */}
                                 <div className="space-y-1">
                                     <p className="mb-1 text-sm">
-                                        <span className="font-semibold text-gray-900">Licence ID :</span> 
+                                        <span className="font-semibold text-gray-900">Licence ID :</span>
                                         <span className="text-gray-600 ml-1">{licence.licence_id}</span>
                                     </p>
                                     <p className="mb-1 text-sm">
-                                        <span className="font-semibold text-gray-900">Expiration :</span> 
+                                        <span className="font-semibold text-gray-900">Expiration :</span>
                                         <span className="text-gray-600 ml-1">{new Date(licence.expiration).toLocaleDateString()}</span>
                                     </p>
 
                                     <p className="">
-                                        <span className="font-semibold text-sm text-gray-900">Statut :</span> 
+                                        <span className="font-semibold text-sm text-gray-900">Statut :</span>
                                         <span className={`ml-2 px-2.5 py-0.5 text-xs font-semibold rounded-full ${
-                                            licence.is_active 
-                                                ? "bg-green-100 text-green-700" 
+                                            licence.is_active
+                                                ? "bg-green-100 text-green-700"
                                                 : "bg-red-100 text-red-700"
                                         }`}>
                                             {licence.is_active ? "Active" : "Inactive"}
@@ -136,7 +133,7 @@ export default function LicensesPage() {
 
                                     {licence.store ? (
                                         <p className="text-sm">
-                                            <span className="font-semibold text-gray-900">Boutique :</span> 
+                                            <span className="font-semibold text-gray-900">Boutique :</span>
                                             <span className="text-gray-600 ml-1">{licence.store.name}</span>
                                         </p>
                                     ) : (
