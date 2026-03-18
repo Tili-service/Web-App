@@ -1,14 +1,12 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import Features from "@/components/Features";
 import { plans } from "@/data/plans";
-
-const tiliMockup = "tili-mockup.png";
-const tiliLogo = "tiliLogo.png";
 
 
 
@@ -48,9 +46,12 @@ const Hero = () => (
         className="relative"
       >
         <div className="animate-float">
-          <img
-            src={tiliMockup}
+          <Image
+            src="/tili-mockup.png"
             alt="Tili - Interface"
+            width={600}
+            height={400}
+            priority
             className="w-full rounded-2xl shadow-warm"
           />
         </div>
@@ -131,7 +132,14 @@ const Pricing = () => (
 const Footer = () => (
   <footer className="py-12 bg-foreground text-background">
     <div className="container text-center">
-      <img src={tiliLogo} alt="Tili" className="h-12 w-auto mx-auto mb-2 brightness-0 invert" />
+      <Image 
+        src="/tiliLogo.png" 
+        alt="Tili" 
+        width={48}
+        height={48}
+        priority
+        className="h-12 w-auto mx-auto mb-2 brightness-0 invert" 
+      />
       <p className="text-background/60 text-sm">
         © 2026 Tili. Le logiciel de caisse pour les petits commerces.
       </p>

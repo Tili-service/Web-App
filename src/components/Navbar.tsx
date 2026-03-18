@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/UserMenu";
@@ -13,7 +14,7 @@ export const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
       <div className="container flex items-center justify-between h-16">
         <Link href="/" className="flex items-center gap-2">
-          <img src="/tiliLogo.png" alt="Tili" className="h-10 w-auto" />
+          <Image src="/tiliLogo.png" alt="Tili" width={40} height={40} priority className="h-10 w-auto" />
         </Link>
         <div className="hidden md:flex items-center gap-8 font-display text-sm font-medium">
           <Link href="/#features" className="text-foreground/70 hover:text-foreground transition-colors">Fonctionnalités</Link>
