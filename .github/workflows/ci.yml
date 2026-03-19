@@ -43,9 +43,12 @@ jobs:
 
       - name: Preparre artefact
         run: |
-          cp public  ./.next/standalone/public -R
-          cp .next/static  ./.next/standalone/.next/static -R
-          cp .env.example  ./.next/standalone/.env.example
+          ls -la -R .next
+          mkdir -p ./.next/standalone/.next/
+
+          cp -R public ./.next/standalone/public
+          cp -R .next/static ./.next/standalone/.next/static
+          cp .env.example ./.next/standalone/.env.example
 
       - name: Deploy artefact
         uses: actions/upload-artifact@v4
@@ -53,5 +56,3 @@ jobs:
           name: build-artifact
           path: |
             ./.next/standalone/
-            ./.next/standalone/.env.example
-            ./.next/standalone/.next/
