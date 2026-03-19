@@ -13,7 +13,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: 'npm'
 
       - name: Install dependencies
@@ -32,7 +32,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: 'npm'
 
       - name: Install dependencies
@@ -45,9 +45,13 @@ jobs:
         run: |
           cp public  ./.next/standalone/public -R
           cp .next/static  ./.next/standalone/.next/static -R
+          cp .env.example  ./.next/standalone/.env.example
 
       - name: Deploy artefact
         uses: actions/upload-artifact@v4
         with:
           name: build-artifact
-          path: ./.next/standalone/
+          path: |
+            ./.next/standalone/
+            ./.next/standalone/.env.example
+            ./.next/standalone/.next/
