@@ -1,32 +1,17 @@
-
-"use client";
-import { useLoading } from "../layout";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
 import { plans } from "@/data/plans";
 import getLicenses, { License } from "@/lib/getLicenses";
 import Link from "next/link";
 
-export default function LicensesPage() {
-    const { setIsLoading } = useLoading();
-    const [licences, setLicenses] = useState<License[]>([]);
+export const dynamic = "force-dynamic";
 
-    useEffect(() => {
-        setIsLoading(true);
-        const fetchLicenses = async () => {
-            try {
-                const data = await getLicenses();
-                setLicenses(data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchLicenses();
-
-    }, [setLicenses, setIsLoading]);
+export default async function LicensesPage() {
+    let licences: License[] = [];
+    try {
+        licences = await getLicenses();
+    } catch (error) {
+        console.error(error);
+    }
 
     return (
         <>
@@ -38,13 +23,9 @@ export default function LicensesPage() {
                     <section id="pricing" className="py-24">
                         <div className="container">
                         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                            {plans.map((plan, i) => (
-                            <motion.div
+                            {plans.map((plan) => (
+                            <div
                                 key={plan.name}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.15 }}
                                 className={`relative p-8 rounded-2xl transition-shadow duration-300 ${
                                 plan.popular
                                     ? "bg-foreground text-background shadow-warm scale-105"
@@ -74,15 +55,10 @@ export default function LicensesPage() {
                                     </li>
                                 ))}
                                 </ul>
-                                <Button
-                                    variant={plan.popular ? "accent" : "hero"}
-                                    size="lg"
-                                    className="w-full "
-                                    onClick={() => (window.location.href = `/admin/licenses/new?plan=${plan.param}`)}
-                                    >
-                                    Choisir {plan.name}
+                                <Button asChild variant={plan.popular ? "accent" : "hero"} size="lg" className="w-full ">
+                                    <Link href={`/admin/licenses/new?plan=${plan.param}`}>Choisir {plan.name}</Link>
                                 </Button>
-                            </motion.div>
+                            </div>
                             ))}
                         </div>
                         </div>
@@ -144,7 +120,7 @@ export default function LicensesPage() {
                                 </div>
 
                                 {!licence.store && (
-                                    <div className="ml-4 flex-shrink-0">
+                                    <div className="ml-4 shrink-0">
                                         <Link href={`/admin/shop/new?licenceId=${licence.licence_id}`}className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
                                             Créer mon store
                                         </Link>

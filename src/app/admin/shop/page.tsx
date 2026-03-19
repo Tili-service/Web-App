@@ -1,29 +1,16 @@
-"use client";
-import { useLoading } from "../layout";
-import { useEffect, useState } from "react";
 import getShops, { Shop } from "@/lib/getShop";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export default function ShopPage() {
-    const { setIsLoading } = useLoading();
-    const [shops, setShops] = useState<Shop[]>([]);
+export const dynamic = "force-dynamic";
 
-    useEffect(() => {
-        setIsLoading(true);
-        const fetchShops = async () => {
-            try {
-                const data = await getShops();
-                setShops(data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchShops();
-
-    }, [setIsLoading]);
+export default async function ShopPage() {
+    let shops: Shop[] = [];
+    try {
+        shops = await getShops();
+    } catch (error) {
+        console.error(error);
+    }
 
     return (
         <div className="space-y-4">
@@ -80,7 +67,7 @@ export default function ShopPage() {
                                     </div>
                                 </div>
 
-                                <div className="flex-shrink-0">
+                                <div className="shrink-0">
                                     <Button variant="outline" size="sm" className="w-full md:w-auto text-gray-600 hover:text-white hover:border-orange-200">
                                         Voir les détails
                                     </Button>
