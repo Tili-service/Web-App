@@ -43,11 +43,11 @@ jobs:
 
       - name: Preparre artefact
         run: |
-          cp public  ./.next/standalone/Tili/Web-App/public -R
-          cp .next/static  ./.next/standalone/Tili/Web-App/.next/static -R
+          cp public  ./.next/standalone/public -R
+          cp .next/static  ./.next/standalone/.next/static -R
 
       - name: Deploy artefact
         uses: actions/upload-artifact@v4
         with:
           name: build-artifact
-          path: ./.next/standalone/Tili/Web-App
+          path: ./.next/standalone/
