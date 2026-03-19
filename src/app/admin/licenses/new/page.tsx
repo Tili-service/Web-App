@@ -2,11 +2,11 @@
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { CheckCircle2, CreditCard } from "lucide-react";
 import { plans } from "@/data/plans";
 
-export default function NewLicensePage() {
+function NewLicenseContent() {
   const searchParams = useSearchParams();
   const plan = searchParams.get("plan");
   const [selectedPlan, setSelectedPlan] = useState(plan || "mensuel");
@@ -72,7 +72,7 @@ export default function NewLicensePage() {
             </div>
           </div>
 
-          <input type="hidden" name="offer" value={selectedPlan} />
+                <input type="hidden" name="offer" value={selectedPlan} />
 
           <div className="pt-4 space-y-4">
             <Button 
@@ -95,4 +95,13 @@ export default function NewLicensePage() {
       </motion.div>
     </div>
   );
+}
+
+export default function NewLicensePage() {
+    return (
+        //TODO(Marin): Check Suspence modification
+        <Suspense fallback={<div className="max-w-2xl mx-auto py-8">Chargement...</div>}>
+            <NewLicenseContent />
+        </Suspense>
+    );
 }
