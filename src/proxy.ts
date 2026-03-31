@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
     const token = request.cookies.get("auth_token")?.value;
 
     if (!token) {
@@ -9,17 +9,17 @@ export async function proxy(request: NextRequest) {
     }
 
     try {
-        await fetch(`${process.env.BACKEND_GO}/account`, {
+        const res = await fetch(`${process.env.BACKEND_GO}/account`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-        }).then((res) => {
-            if (!res.ok) {
-                throw new Error("Invalid token");
-            }
         });
+
+        if (!res.ok) {
+            throw new Error("Invalid token");
+        }
     } catch {
         return NextResponse.redirect(new URL("/login", request.url));
     }
