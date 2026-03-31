@@ -2,7 +2,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState, Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Store, Building2, Hash, ShieldCheck, Loader2 } from "lucide-react";
 
 function NewShopContent() {

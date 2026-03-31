@@ -2,7 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useState, Suspense } from "react";
+import { Suspense, useState } from "react";
 import { CheckCircle2, CreditCard, Loader2 } from "lucide-react";
 import { plans } from "@/data/plans";
 
