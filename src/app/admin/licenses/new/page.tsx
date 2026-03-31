@@ -23,7 +23,7 @@ function NewLicenseContent() {
           <p className="text-gray-500">Propulsez votre boutique grâce à Tili</p>
         </div>
 
-        <form action="/api/createPayment" method="POST" className="space-y-8">
+        <form action="/api/protected/createPayment" method="POST" className="space-y-8">
           <div className="space-y-4">
             <label className="flex items-center gap-2 font-semibold text-sm text-gray-700">
               <CreditCard size={18} className="text-orange-500" />
