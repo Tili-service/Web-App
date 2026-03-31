@@ -2,6 +2,7 @@
 import { cookies } from "next/headers";
 
 export type Shop = {
+    store_id: number;
     name: string,
     date_creation: string,
     numero_tva: string,
