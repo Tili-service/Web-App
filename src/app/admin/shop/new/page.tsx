@@ -2,10 +2,10 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Store, Building2, Hash, ShieldCheck, Loader2 } from "lucide-react";
 
-export default function NewShopPage() {
+function NewShopContent() {
     const params = useSearchParams();
     const router = useRouter();
     const licenseID = params.get("licenceId");
@@ -101,7 +101,7 @@ export default function NewShopPage() {
                         >
                             Finaliser ma boutique
                         </Button>
-                        
+
                         <div className="flex items-center justify-center gap-2 text-gray-400">
                             <ShieldCheck size={16} />
                             <p className="text-xs">
@@ -112,5 +112,14 @@ export default function NewShopPage() {
                 </form>
             </motion.div>
         </div>
+    );
+}
+
+export default function NewShopPage() {
+    return (
+        //TODO(Marin): Check Suspence modification
+        <Suspense fallback={<div className="max-w-2xl mx-auto py-8">Chargement...</div>}>
+            <NewShopContent />
+        </Suspense>
     );
 }
