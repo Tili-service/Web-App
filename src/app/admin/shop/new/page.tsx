@@ -2,10 +2,10 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Store, Building2, Hash, ShieldCheck, Loader2 } from "lucide-react";
 
-export default function NewShopPage() {
+function NewShopContent() {
     const params = useSearchParams();
     const router = useRouter();
     const licenseID = params.get("licenceId");
@@ -93,15 +93,15 @@ export default function NewShopPage() {
                     <input type="hidden" name="licenseID" value={licenseID as string} />
 
                     <div className="pt-6 space-y-4 border-t border-gray-100">
-                        <Button 
-                            variant="default" 
-                            size="lg" 
+                        <Button
+                            variant="default"
+                            size="lg"
                             className="w-full h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-lg font-bold shadow-lg shadow-orange-500/20 transition-transform active:scale-[0.98]" 
                             type="submit"
                         >
                             Finaliser ma boutique
                         </Button>
-                        
+
                         <div className="flex items-center justify-center gap-2 text-gray-400">
                             <ShieldCheck size={16} />
                             <p className="text-xs">
@@ -112,5 +112,17 @@ export default function NewShopPage() {
                 </form>
             </motion.div>
         </div>
+    );
+}
+
+export default function NewShopPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex justify-center items-center h-[60vh]">
+                <Loader2 className="animate-spin text-orange-500" size={32} />
+            </div>
+        }>
+            <NewShopContent />
+        </Suspense>
     );
 }
