@@ -93,9 +93,9 @@ function NewShopContent() {
                     <input type="hidden" name="licenseID" value={licenseID as string} />
 
                     <div className="pt-6 space-y-4 border-t border-gray-100">
-                        <Button 
-                            variant="default" 
-                            size="lg" 
+                        <Button
+                            variant="default"
+                            size="lg"
                             className="w-full h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-lg font-bold shadow-lg shadow-orange-500/20 transition-transform active:scale-[0.98]" 
                             type="submit"
                         >
@@ -117,8 +117,11 @@ function NewShopContent() {
 
 export default function NewShopPage() {
     return (
-        //TODO(Marin): Check Suspence modification
-        <Suspense fallback={<div className="max-w-2xl mx-auto py-8">Chargement...</div>}>
+        <Suspense fallback={
+            <div className="flex justify-center items-center h-[60vh]">
+                <Loader2 className="animate-spin text-orange-500" size={32} />
+            </div>
+        }>
             <NewShopContent />
         </Suspense>
     );
