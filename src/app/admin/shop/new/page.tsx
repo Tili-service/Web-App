@@ -43,7 +43,7 @@ function NewShopContent() {
                     </p>
                 </div>
 
-                <form action="/api/createShop" method="POST" className="space-y-6">
+                <form action="/api/protected/createShop" method="POST" className="space-y-6">
                     <div className="space-y-2">
                         <label htmlFor="shopName" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                             <Store size={16} className="text-orange-500" />
