@@ -21,7 +21,7 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
     getShops()
       .then(shops => {
         const names: Record<string, string> = {};
-        shops.forEach(s => { names[s.store_id.toString()] = s.name; });
+        (shops ?? []).forEach(s => { names[s.store_id.toString()] = s.name; });
         setShopNames(names);
       })
       .catch(err => console.error("Erreur lors de la récupération des magasins", err));
