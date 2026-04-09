@@ -3,30 +3,31 @@
 import { useLoading } from "../layout";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { plans } from "@/data/plans";
 import getLicenses, { License } from "@/lib/getLicenses";
+import { handleRefundLicense } from "@/lib/refundLicense";
 import Link from "next/link";
 
 export default function LicensesPage() {
     const { setIsLoading } = useLoading();
     const [licences, setLicenses] = useState<License[]>([]);
 
-    useEffect(() => {
+    const loadLicenses = useCallback(async () => {
         setIsLoading(true);
-        const fetchLicenses = async () => {
-            try {
-                const data = await getLicenses();
-                setLicenses(data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchLicenses();
+        try {
+            const data = await getLicenses();
+            setLicenses(data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [setIsLoading]);
 
-    }, [setLicenses, setIsLoading]);
+    useEffect(() => {
+        loadLicenses();
+    }, [loadLicenses]);
 
     return (
         <>
@@ -143,13 +144,31 @@ export default function LicensesPage() {
                                     )}
                                 </div>
 
-                                {!licence.store && (
-                                    <div className="ml-4 flex-shrink-0">
-                                        <Link href={`/admin/shop/new?licenceId=${licence.licence_id}`}className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                                <div className="ml-4 flex-shrink-0 flex gap-2">
+                                    {!licence.store && (
+                                        <Link href={`/admin/shop/new?licenceId=${licence.licence_id}`} className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
                                             Créer mon store
                                         </Link>
-                                    </div>
-                                )}
+                                    )}
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={async () => {
+                                            if (confirm("Êtes-vous sûr de vouloir rembourser cette licence ?")) {
+                                                setIsLoading(true);
+                                                try {
+                                                    await handleRefundLicense(licence.licence_id);
+                                                    await loadLicenses();
+                                                } catch (error) {
+                                                    console.error("Erreur lors du remboursement:", error);
+                                                    setIsLoading(false);
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        Rembourser
+                                    </Button>
+                                </div>
                             </li>
                         ))}
                     </ul>

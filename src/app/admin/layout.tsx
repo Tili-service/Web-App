@@ -21,6 +21,10 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
     getShops()
       .then(shops => {
         const names: Record<string, string> = {};
+        if (!shops || shops.length === 0) {
+          console.warn("Aucun magasin trouvé pour l'utilisateur.");
+          return;
+        }
         shops.forEach(s => { names[s.store_id.toString()] = s.name; });
         setShopNames(names);
       })
