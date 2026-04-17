@@ -17,7 +17,7 @@ export const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-      <div className="container flex items-center justify-between h-16">
+      <div className="w-full px-4 md:px-8 flex items-center justify-between h-16">
         <Link href="/" className="flex items-center gap-2" onClick={closeMenu}>
           <Image src="/tiliLogo.png" alt="Tili" width={40} height={40} priority className="h-10 w-auto" />
         </Link>
@@ -64,7 +64,7 @@ export const Navbar = () => {
 
       {isOpen && (
         <div className="md:hidden bg-background/95 backdrop-blur-md border-t animate-in slide-in-from-top-2">
-          <div className="container py-4 flex flex-col gap-4">
+          <div className="px-4 py-4 flex flex-col gap-4">
             <Link
               href="/#features"
               className="text-foreground/70 hover:text-foreground transition-colors font-display text-sm font-medium py-2"

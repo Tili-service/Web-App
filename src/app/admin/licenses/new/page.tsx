@@ -2,11 +2,11 @@
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { CheckCircle2, CreditCard } from "lucide-react";
+import { Suspense, useState } from "react";
+import { CheckCircle2, CreditCard, Loader2 } from "lucide-react";
 import { plans } from "@/data/plans";
 
-export default function NewLicensePage() {
+function NewLicenseContent() {
   const searchParams = useSearchParams();
   const plan = searchParams.get("plan");
   const [selectedPlan, setSelectedPlan] = useState(plan || "mensuel");
@@ -23,7 +23,7 @@ export default function NewLicensePage() {
           <p className="text-gray-500">Propulsez votre boutique grâce à Tili</p>
         </div>
 
-        <form action="/api/createPayment" method="POST" className="space-y-8">
+        <form action="/api/protected/createPayment" method="POST" className="space-y-8">
           <div className="space-y-4">
             <label className="flex items-center gap-2 font-semibold text-sm text-gray-700">
               <CreditCard size={18} className="text-orange-500" />
@@ -75,15 +75,15 @@ export default function NewLicensePage() {
           <input type="hidden" name="offer" value={selectedPlan} />
 
           <div className="pt-4 space-y-4">
-            <Button 
-              variant="default" 
-              size="lg" 
+            <Button
+              variant="default"
+              size="lg"
               className="w-full h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-lg font-bold shadow-lg shadow-orange-500/20 transition-transform active:scale-[0.98]" 
               type="submit"
             >
               Passer au paiement sécurisé
             </Button>
-            
+
             <div className="flex items-center justify-center gap-2 text-gray-400">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -94,5 +94,17 @@ export default function NewLicensePage() {
         </form>
       </motion.div>
     </div>
+  );
+}
+
+export default function NewLicensePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center h-[60vh]">
+        <Loader2 className="animate-spin text-orange-500" size={32} />
+      </div>
+    }>
+      <NewLicenseContent />
+    </Suspense>
   );
 }

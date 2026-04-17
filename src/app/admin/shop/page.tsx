@@ -53,38 +53,42 @@ export default function ShopPage() {
 
                     <ul className="space-y-4">
                         {shops.map((shop, index) => (
-                            <li
-                                key={index}
-                                className="p-5 border border-gray-100 rounded-xl hover:shadow-md transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between bg-white gap-4"
-                            >
-                                <div className="space-y-2 flex-1">
-                                    <div className="flex items-center gap-3">
-                                        <h3 className="text-lg font-bold text-gray-900">{shop.name}</h3>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 mt-2">
-                                        <p className="text-sm">
-                                            <span className="font-semibold text-gray-700">SIRET :</span>
-                                            <span className="text-gray-600 ml-2">{shop.siret}</span>
-                                        </p>
-                                        <p className="text-sm">
-                                            <span className="font-semibold text-gray-700">N° TVA :</span>
-                                            <span className="text-gray-600 ml-2">{shop.numero_tva}</span>
-                                        </p>
-                                        <p className="text-sm text-gray-500 mt-1">
-                                            Créée le {new Date(shop.date_creation).toLocaleDateString('fr-FR', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            })}
-                                        </p>
-                                    </div>
-                                </div>
+                            <li key={index}>
+                                <Link
+                                    href={`/admin/shop/${shop.store_id}/dashboard`}
+                                    className="block p-5 border border-gray-100 rounded-xl hover:shadow-md hover:border-orange-200 transition-all duration-200 bg-white cursor-pointer group"
+                                >
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div className="space-y-2 flex-1">
+                                            <div className="flex items-center gap-3">
+                                                <h3 className="text-lg font-bold text-gray-900 group-hover:text-orange-600 transition-colors">{shop.name}</h3>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 mt-2">
+                                                <p className="text-sm">
+                                                    <span className="font-semibold text-gray-700">SIRET :</span>
+                                                    <span className="text-gray-600 ml-2">{shop.siret || 'N/A'}</span>
+                                                </p>
+                                                <p className="text-sm">
+                                                    <span className="font-semibold text-gray-700">N° TVA :</span>
+                                                    <span className="text-gray-600 ml-2">{shop.numero_tva || 'N/A'}</span>
+                                                </p>
+                                                <p className="text-sm text-gray-500 mt-1">
+                                                    Créée le {new Date(shop.date_creation).toLocaleDateString('fr-FR', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                    })}
+                                                </p>
+                                            </div>
+                                        </div>
 
-                                <div className="flex-shrink-0">
-                                    <Button variant="outline" size="sm" className="w-full md:w-auto text-gray-600 hover:text-white hover:border-orange-200">
-                                        Voir les détails
-                                    </Button>
-                                </div>
+                                        <div className="flex-shrink-0">
+                                            <span className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 group-hover:text-orange-600 group-hover:border-orange-200 transition-colors bg-gray-50 group-hover:bg-orange-50">
+                                                Voir les détails
+                                            </span>
+                                        </div>
+                                    </div>
+                                </Link>
                             </li>
                         ))}
                     </ul>
