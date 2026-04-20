@@ -1,32 +1,44 @@
 "use client";
 
 import Image from 'next/image';
-import { User, Mail, Lock, EyeOff, Eye } from 'lucide-react';
+import { User, Mail, Lock, EyeOff, Eye, X } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from "sonner"
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import createAccount from '@/lib/createAccount';
+import loginAccount from '@/lib/loginAccount';
+import { useAuth } from '@/context/auth-context';
+import { hashPassword } from '@/lib/utils';
 
 export default function RegisterPage() {
     const [hidePassword, sethidePassword] = useState(true);
     const [hideConfirmPassword, sethideConfirmPassword] = useState(true);
+    const [showCGU, setShowCGU] = useState(false);
+    const router = useRouter();
+    const { login } = useAuth();
 
-    const submitForm = (formData: FormData) => {
+    const submitForm = async (formData: FormData) => {
         try {
             const data = Object.fromEntries(formData.entries());
             if (data.password !== data.confirmPassword) {
                 throw Error("Les mots de passe ne correspondent pas");
             }
-            createAccount({
+            const hashedPassword = await hashPassword(data.password as string);
+            await createAccount({
                 email: data.email as string,
                 name: data.name as string,
-                password: data.password as string,
-            }).then(async () => {
-                toast("Inscription réussie", {
-                    description: "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
-                });
-                setTimeout(() => {window.location.href = "/login";}, 2000);
+                password: hashedPassword,
             });
+            const res = await loginAccount({
+                email: data.email as string,
+                password: hashedPassword,
+            });
+            login(res);
+            toast.success("Inscription réussie", {
+                description: "Votre compte a été créé avec succès.",
+            });
+            router.push("/admin");
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : "Une erreur inconnue s'est produite";
             toast("Erreur lors de l'inscription", {
@@ -127,8 +139,33 @@ export default function RegisterPage() {
 
                         <label htmlFor="terms" className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
                             <input type="checkbox" id="terms" className="w-4 h-4 text-[#1e1e24] border-gray-300 rounded focus:ring-[#1e1e24] focus:ring-2" required />
-                            J'accepte les <a href="#" className="text-[#1e1e24] hover:underline">conditions d'utilisation</a>
+                            J'accepte les{" "}
+                            <button type="button" onClick={() => setShowCGU(true)} className="text-[#1e1e24] hover:underline">
+                                conditions d'utilisation
+                            </button>
                         </label>
+
+                        {showCGU && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowCGU(false)}>
+                                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+                                    <div className="flex items-center justify-between px-6 py-4 border-b">
+                                        <h2 className="text-lg font-bold text-gray-900">Conditions Générales d'Utilisation</h2>
+                                        <button type="button" onClick={() => setShowCGU(false)} className="text-gray-400 hover:text-gray-600">
+                                            <X size={20} />
+                                        </button>
+                                    </div>
+                                    <div className="overflow-y-auto px-6 py-4 text-sm text-gray-700 space-y-4">
+                                        {/* tmp to change with real CGU, for now just to have something in place */}
+                                        <p> Condition d'utilisation de Tili </p>
+                                    </div>
+                                    <div className="px-6 py-4 border-t">
+                                        <button type="button" onClick={() => setShowCGU(false)} className="w-full bg-[#1e1e24] text-white py-2 rounded-xl text-sm font-medium hover:bg-black transition-colors">
+                                            Fermer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         <button
                             type="submit"

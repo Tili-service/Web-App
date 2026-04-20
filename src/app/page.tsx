@@ -19,14 +19,14 @@ const Hero = () => (
         transition={{ duration: 0.7 }}
       >
         <span className="inline-block px-4 py-1.5 rounded-full bg-accent/20 text-accent-foreground font-display text-sm font-semibold mb-6">
-          🛒 Logiciel de caisse nouvelle génération
+          Logiciel de caisse nouvelle génération
         </span>
         <h1 className="text-5xl lg:text-6xl font-bold font-display leading-tight mb-6">
           Gérez votre boutique avec{" "}
           <span className="text-primary">simplicité</span>
         </h1>
         <p className="text-lg text-muted-foreground mb-8 max-w-lg">
-          Tili est le logiciel de caisse pensé pour les petits commerces. 
+          Tili est le logiciel de caisse pensé pour les petits commerces.
           Simple, rapide et fiable. Encaissez, gérez vos stocks et suivez vos ventes en un clin d'œil.
         </p>
         <div className="flex gap-4 flex-wrap">

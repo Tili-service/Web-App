@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from "sonner"
 import loginAccount from '@/lib/loginAccount';
 import { useAuth } from '@/context/auth-context';
+import { hashPassword } from '@/lib/utils';
 
 export default function LoginPage() {
     const [hidePassword, sethidePassword] = useState(true);
@@ -17,9 +18,10 @@ export default function LoginPage() {
     const submitForm = async (formData: FormData) => {
       try {
             const data = Object.fromEntries(formData.entries());
+            const hashedPassword = await hashPassword(data.password as string);
             const res = await loginAccount({
                 email: data.email as string,
-                password: data.password as string,
+                password: hashedPassword,
             });
             login(res);
             toast.success("Connexion réussie");
