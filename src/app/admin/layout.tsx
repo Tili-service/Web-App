@@ -25,7 +25,7 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
           console.warn("Aucun magasin trouvé pour l'utilisateur.");
           return;
         }
-        shops.forEach(s => { names[s.store_id.toString()] = s.name; });
+        (shops ?? []).forEach(s => { names[s.store_id.toString()] = s.name; });
         setShopNames(names);
       })
       .catch(err => console.error("Erreur lors de la récupération des magasins", err));

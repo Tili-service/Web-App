@@ -46,7 +46,8 @@ export default function PinForm() {
                             onChange={(e) => setPin(e.target.value)}
                             className="w-full text-center text-3xl tracking-[0.5em] font-mono border-b-2 border-slate-200 focus:border-slate-800 focus:outline-none bg-transparent py-2 transition-colors"
                             autoFocus
-                            placeholder="••••"
+                            placeholder="••••••"
+                            maxLength={6}
                         />
                     </div>
                     {error && (
@@ -54,7 +55,7 @@ export default function PinForm() {
                     )}
                     <button
                         type="submit"
-                        disabled={loading || pin.length < 4}
+                        disabled={loading || pin.length < 6}
                         className="w-full bg-slate-900 text-white rounded-xl py-3 font-semibold hover:bg-slate-800 transition-colors disabled:opacity-50 flex justify-center items-center"
                     >
                         {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Déverrouiller"}
