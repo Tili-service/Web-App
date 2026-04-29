@@ -5,6 +5,11 @@ export type License = {
     licence_id: string,
     account_id: string,
     expiration: string,
+    stripe: {
+        next_payment_at: string,
+        price_amount: number,
+        price_interval: string,
+    }
     store: {
         name: string,
     } | null,
