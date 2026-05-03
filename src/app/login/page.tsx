@@ -1,22 +1,25 @@
 "use client";
 
 import Image from 'next/image';
-import { Mail, Lock, EyeOff, Eye } from 'lucide-react';
+import { Mail, Lock, EyeOff, Eye, ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { toast } from "sonner"
+import { toast } from "sonner";
 import loginAccount from '@/lib/loginAccount';
 import { useAuth } from '@/context/auth-context';
 import { hashPassword } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 export default function LoginPage() {
-    const [hidePassword, sethidePassword] = useState(true);
+    const [hidePassword, setHidePassword] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
     const { login } = useAuth();
 
     const submitForm = async (formData: FormData) => {
-      try {
+        setIsSubmitting(true);
+        try {
             const data = Object.fromEntries(formData.entries());
             const hashedPassword = await hashPassword(data.password as string);
             const res = await loginAccount({
@@ -28,86 +31,170 @@ export default function LoginPage() {
             router.push("/admin");
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : "Une erreur inconnue s'est produite";
-            toast("Erreur lors de la connexion", {
-                description: message,
-            });
+            toast.error("Erreur lors de la connexion", { description: message });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <div className="relative w-screen h-screen overflow-hidden bg-gray-100">
+        <div className="h-screen flex overflow-hidden">
+            {/* Left brand panel */}
+            <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative bg-[hsl(355,16%,20%)] flex-col justify-between p-12 overflow-hidden">
+                {/* Decorative circles */}
+                <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/5" />
+                <div className="absolute top-1/2 -right-40 w-96 h-96 rounded-full bg-white/5" />
+                <div className="absolute -bottom-24 left-1/4 w-72 h-72 rounded-full bg-white/5" />
 
-            <Image
-                src="/logPicture.png"
-                alt="Arrière-plan Tili"
-                fill
-                className="object-cover blur-md scale-105"
-                priority
-            />
+                {/* Logo */}
+                <div className="relative z-10 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                        <Image src="/tiliLogo.png" alt="Tili" width={28} height={28} className="w-7 h-7 object-contain" />
+                    </div>
+                    <span className="text-white font-bold text-xl font-display">Tili</span>
+                </div>
 
+                {/* Main content */}
+                <motion.div
+                    className="relative z-10"
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15, duration: 0.5 }}
+                >
+                    <div className="flex items-center gap-2 mb-6">
+                        <Sparkles size={14} className="text-orange-300" />
+                        <span className="text-orange-300 text-xs font-semibold uppercase tracking-widest">Logiciel de caisse</span>
+                    </div>
+                    <h1 className="text-4xl xl:text-5xl font-display font-bold text-white leading-tight mb-5">
+                        Gérez vos<br />commerces<br />simplement.
+                    </h1>
+                    <p className="text-white/50 text-base max-w-sm leading-relaxed">
+                        Tili est la solution tout-en-un pour vos points de vente. Inventaire, caisse, profils — tout en un seul endroit.
+                    </p>
 
+                </motion.div>
 
-            <div className="absolute inset-0 flex items-center justify-center z-10 p-4">
+                {/* Bottom tagline */}
+                <p className="relative z-10 text-white/30 text-xs">
+                    © 2026 Tili — Logiciel de caisse
+                </p>
+            </div>
 
-                <div className="bg-white p-8 sm:p-10 rounded-[2rem] shadow-2xl w-full max-w-[420px]">
-                    <div className="text-center mb-8 flex flex-col items-center">
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Connexion</h1>
+            {/* Right form panel */}
+            <div className="flex-1 flex flex-col bg-white overflow-y-auto">
+                {/* Mobile header */}
+                <div className="lg:hidden relative bg-[hsl(355,16%,20%)] px-5 pt-2.5 pb-4 overflow-hidden">
+                    {/* Decorative circles */}
+                    <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
+                    <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-orange-500/15" />
+                    <div className="absolute top-1/2 right-8 w-16 h-16 rounded-full bg-white/5" />
+                    {/* Back arrow */}
+                    <Link href="/" className="relative z-10 inline-flex text-white/50 hover:text-white transition-colors">
+                        <ArrowLeft size={20} />
+                    </Link>
+                    {/* Logo centered */}
+                    <div className="relative z-10 flex justify-center mt-2">
+                        <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center">
+                            <Image src="/tiliLogo.png" alt="Tili" width={28} height={28} className="w-7 h-7 object-contain" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Desktop back arrow */}
+                <div className="hidden lg:block px-6 sm:px-12 lg:px-14 xl:px-20 pt-6">
+                    <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors">
+                        <ArrowLeft size={15} /> Retour
+                    </Link>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-14 xl:px-20">
+                <motion.div
+                    className="w-full max-w-md mx-auto"
+                    initial={{ opacity: 0, x: 16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4 }}
+                >
+
+                    <div className="mb-8">
+                        <h2 className="text-3xl font-bold font-display text-gray-900">Connexion</h2>
+                        <p className="text-gray-500 mt-2 text-sm">Entrez vos identifiants pour accéder à votre espace.</p>
                     </div>
 
-                    <form className="space-y-4" onSubmit={(e) => {
+                    <form className="space-y-5" onSubmit={(e) => {
                         e.preventDefault();
                         const formData = new FormData(e.currentTarget);
                         submitForm(formData);
                     }}>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                                <Mail size={18} />
-                            </div>
-                            <input
-                                type="email"
-                                name='email'
-                                placeholder="Email"
-                                className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-gray-300 focus:ring-2 focus:ring-gray-100 outline-none transition-all text-sm text-gray-800" 
-                                required
-                            />
-                        </div>
-
-                        <div className="space-y-2">
+                        {/* Email */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                                    <Lock size={18} />
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                                    <Mail size={16} />
                                 </div>
                                 <input
-                                    type={hidePassword ? "password" : "text"}
-                                    name='password'
-                                    placeholder="Mot de passe"
-                                    className="w-full pl-11 pr-11 py-3 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-gray-300 focus:ring-2 focus:ring-gray-100 outline-none transition-all text-sm text-gray-800" 
+                                    type="email"
+                                    name="email"
+                                    placeholder="vous@exemple.com"
+                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all text-sm text-gray-800"
                                     required
                                 />
-                                <div className="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-gray-400 hover:text-gray-600 transition-colors">
-                                    <button type="button" onClick={() => sethidePassword(!hidePassword)} className="">
-                                        {hidePassword ? <Eye size={18} /> : <EyeOff size={18} />}
-                                    </button>
-                                </div>
                             </div>
-                            
-                            <div className="flex justify-end">
-                                <a href="#" className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-all">
+                        </div>
+
+                        {/* Password */}
+                        <div>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className="block text-sm font-medium text-gray-700">Mot de passe</label>
+                                <a href="#" className="text-xs text-orange-600 hover:text-orange-700 font-medium transition-colors">
                                     Mot de passe oublié ?
                                 </a>
                             </div>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                                    <Lock size={16} />
+                                </div>
+                                <input
+                                    type={hidePassword ? "password" : "text"}
+                                    name="password"
+                                    placeholder="••••••••"
+                                    className="w-full pl-10 pr-11 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all text-sm text-gray-800"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setHidePassword(!hidePassword)}
+                                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    {hidePassword ? <Eye size={16} /> : <EyeOff size={16} />}
+                                </button>
+                            </div>
                         </div>
 
+                        {/* Submit */}
                         <button
                             type="submit"
-                            className="w-full bg-[#1e1e24] text-white py-3 px-4 rounded-xl hover:bg-black transition-colors font-medium text-sm mt-4 shadow-md"
+                            disabled={isSubmitting}
+                            className="w-full bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] disabled:opacity-60 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-sm mt-2 cursor-pointer"
                         >
-                            Se connecter
+                            {isSubmitting ? (
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : (
+                                <>
+                                    Se connecter
+                                    <ArrowRight size={16} />
+                                </>
+                            )}
                         </button>
                     </form>
-                    <p className="text-center text-sm text-gray-600 mt-6">
-                        Vous n'avez pas de compte ? <Link href="/register" className="text-[#1e1e24] hover:underline">S'inscrire</Link>
+
+                    <p className="mt-6 text-center text-sm text-gray-500">
+                        Vous n'avez pas de compte ?{' '}
+                        <Link href="/register" className="text-orange-600 hover:text-orange-700 font-semibold transition-colors">
+                            S'inscrire
+                        </Link>
                     </p>
+                </motion.div>
                 </div>
             </div>
         </div>
