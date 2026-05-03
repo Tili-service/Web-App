@@ -11,7 +11,7 @@ type Props = {
 
 export default function NavLinks({ pathname, shopNames, onItemClick }: Props) {
   return (
-    <>
+    <div className="space-y-0.5">
       {MAIN_LINKS.map((link) => {
         const Icon = link.icon;
         const isShopLink = link.href === '/admin/shop';
@@ -22,21 +22,21 @@ export default function NavLinks({ pathname, shopNames, onItemClick }: Props) {
           : pathname === link.href || pathname === `${link.href}/new`;
 
         return (
-          <div key={link.name} className="flex flex-col mb-1">
+          <div key={link.name} className="flex flex-col">
             <Link
               href={link.href}
               onClick={onItemClick}
-              className={`flex items-center justify-between px-4 py-3 rounded-xl font-medium transition-colors ${
+              className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
                 isActive
-                  ? "bg-orange-50 text-orange-600"
-                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                  ? 'bg-[hsl(27,97%,69%)]/15 text-[hsl(27,97%,69%)]'
+                  : 'text-white/60 hover:bg-[hsl(355,16%,28%)] hover:text-white'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Icon size={20} />
+                <Icon size={18} />
                 {link.name}
               </div>
-              {isShopLink && shopId && <ChevronDown size={18} className="opacity-60" />}
+              {isShopLink && shopId && <ChevronDown size={15} className="opacity-50" />}
             </Link>
 
             {isShopLink && shopId && (
@@ -50,6 +50,6 @@ export default function NavLinks({ pathname, shopNames, onItemClick }: Props) {
           </div>
         );
       })}
-    </>
+    </div>
   );
 }
