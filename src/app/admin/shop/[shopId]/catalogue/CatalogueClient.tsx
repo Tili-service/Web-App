@@ -3,7 +3,12 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Tag, Package, Search, X, Euro, Percent, ShoppingBag } from "lucide-react";
+import {
+    Plus, Pencil, Trash2, Tag, Package, Search, X, Euro, Percent,
+    ArrowLeft, FolderOpen, MoveRight, Coffee, BookOpen, Shirt, Laptop,
+    Utensils, Music, Gift, Zap, Star, Dumbbell,
+    Pizza, ShoppingBag, ChevronUp, ChevronDown,
+} from "lucide-react";
 import { Categorie } from "@/lib/getCategories";
 import { Item } from "@/lib/getItems";
 import createCategorie from "@/lib/createCategorie";
@@ -13,19 +18,70 @@ import createItem from "@/lib/createItem";
 import updateItem from "@/lib/updateItem";
 import deleteItem from "@/lib/deleteItem";
 
+/* ══════════════════════════════════════════════════════════════════════════
+   ICON / COLOR PALETTE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const ICON_OPTIONS: { id: string; Icon: React.ElementType; label: string }[] = [
+    { id: "tag",      Icon: Tag,         label: "Tag"         },
+    { id: "package",  Icon: Package,     label: "Package"     },
+    { id: "coffee",   Icon: Coffee,      label: "Café"        },
+    { id: "utensils", Icon: Utensils,    label: "Restauration" },
+    { id: "pizza",    Icon: Pizza,       label: "Pizza"       },
+    { id: "shirt",    Icon: Shirt,       label: "Vêtements"   },
+    { id: "laptop",   Icon: Laptop,      label: "Électronique" },
+    { id: "book",     Icon: BookOpen,    label: "Livre"       },
+    { id: "music",    Icon: Music,       label: "Musique"     },
+    { id: "gift",     Icon: Gift,        label: "Cadeau"      },
+    { id: "zap",      Icon: Zap,         label: "Sport"       },
+    { id: "dumbbell", Icon: Dumbbell,    label: "Fitness"     },
+    { id: "star",     Icon: Star,        label: "Favori"      },
+    { id: "bag",      Icon: ShoppingBag, label: "Boutique"    },
+];
+
+const COLOR_OPTIONS = [
+    { id: "orange",  bg: "bg-orange-100",  text: "text-orange-500",  active: "bg-orange-500" },
+    { id: "blue",    bg: "bg-blue-100",    text: "text-blue-500",    active: "bg-blue-500"   },
+    { id: "emerald", bg: "bg-emerald-100", text: "text-emerald-500", active: "bg-emerald-500"},
+    { id: "violet",  bg: "bg-violet-100",  text: "text-violet-500",  active: "bg-violet-500" },
+    { id: "rose",    bg: "bg-rose-100",    text: "text-rose-500",    active: "bg-rose-500"   },
+    { id: "amber",   bg: "bg-amber-100",   text: "text-amber-500",   active: "bg-amber-500"  },
+    { id: "sky",     bg: "bg-sky-100",     text: "text-sky-500",     active: "bg-sky-500"    },
+    { id: "gray",    bg: "bg-gray-100",    text: "text-gray-500",    active: "bg-gray-500"   },
+];
+
+function getIconById(id: string): React.ElementType {
+    return ICON_OPTIONS.find((o) => o.id === id)?.Icon ?? Tag;
+}
+
+function getColorById(id: string) {
+    return COLOR_OPTIONS.find((c) => c.id === id) ?? COLOR_OPTIONS[0];
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TYPES
+   ══════════════════════════════════════════════════════════════════════════ */
+
 type Tab = "categories" | "articles";
 
-type CategoryModal =
+type CatWithMeta = Categorie & { icon?: string; color?: string };
+
+type CategoryPanel =
     | { type: "closed" }
     | { type: "add" }
-    | { type: "edit"; categorie: Categorie }
+    | { type: "edit"; categorie: CatWithMeta }
     | { type: "delete"; categorie: Categorie };
 
-type ItemModal =
+type ItemPanel =
     | { type: "closed" }
-    | { type: "add" }
+    | { type: "add"; categoryId?: number }
     | { type: "edit"; item: Item }
-    | { type: "delete"; item: Item };
+    | { type: "delete"; item: Item }
+    | { type: "move"; item: Item };
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ROOT COMPONENT
+   ══════════════════════════════════════════════════════════════════════════ */
 
 export default function CatalogueClient({
     categories,
@@ -37,51 +93,72 @@ export default function CatalogueClient({
     storeId: number;
 }) {
     const [activeTab, setActiveTab] = useState<Tab>("categories");
+    // category drill-down (categories tab)
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+
+    const selectedCategory = categories.find((c) => c.id === selectedCategoryId) as CatWithMeta | undefined
+        ?? categories.find((c) => c.categorie_id === selectedCategoryId) as CatWithMeta | undefined;
 
     return (
         <>
             {/* ── Header ── */}
             <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-slate-900 flex items-center justify-center text-white flex-shrink-0">
-                        <ShoppingBag size={24} />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Catalogue</h1>
-                        <p className="text-sm text-slate-600">
-                            Gérez vos catégories et articles
-                        </p>
-                    </div>
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Catalogue</h2>
+                    <p className="text-sm text-gray-400 mt-0.5">
+                        {categories.length} catégorie{categories.length !== 1 ? "s" : ""} · {items.length} article{items.length !== 1 ? "s" : ""}
+                    </p>
                 </div>
             </div>
 
+            {/* ── Stats strip ── */}
+            <div className="grid grid-cols-2 gap-3 mt-4">
+                {[
+                    { label: "Catégories", value: categories.length, Icon: Tag,     cls: "text-orange-500" },
+                    { label: "Articles",   value: items.length,      Icon: Package, cls: "text-gray-900"   },
+                ].map(({ label, value, Icon, cls }) => (
+                    <div key={label} className="bg-white border border-gray-100 rounded-2xl px-5 py-4 shadow-sm flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0">
+                            <Icon size={18} className={cls} />
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-gray-900">{value}</p>
+                            <p className="text-xs text-gray-400">{label}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
             {/* ── Tabs ── */}
-            <div className="border-b border-slate-200">
+            <div className="border-b border-gray-100 mt-4">
                 <div className="flex gap-1">
-                    <TabButton
-                        active={activeTab === "categories"}
-                        onClick={() => setActiveTab("categories")}
-                        icon={Tag}
-                        label="Catégories"
-                        count={categories.length}
-                    />
-                    <TabButton
-                        active={activeTab === "articles"}
-                        onClick={() => setActiveTab("articles")}
-                        icon={Package}
-                        label="Articles"
-                        count={items.length}
-                    />
+                    <TabButton active={activeTab === "categories"} onClick={() => { setActiveTab("categories"); setSelectedCategoryId(null); }} icon={Tag}     label="Catégories" count={categories.length} />
+                    <TabButton active={activeTab === "articles"}   onClick={() => setActiveTab("articles")}   icon={Package} label="Tous les articles" count={items.length} />
                 </div>
             </div>
 
             {/* ── Content ── */}
             <div className="pb-8">
                 {activeTab === "categories" && (
-                    <CategoriesSection categories={categories} storeId={storeId} />
+                    selectedCategoryId !== null ? (
+                        <CategoryDrillDown
+                            category={selectedCategory as CatWithMeta}
+                            items={items.filter((i) => i.categorie_id === selectedCategoryId)}
+                            categories={categories}
+                            storeId={storeId}
+                            onBack={() => setSelectedCategoryId(null)}
+                        />
+                    ) : (
+                        <CategoriesSection
+                            categories={categories}
+                            items={items}
+                            storeId={storeId}
+                            onDrillDown={setSelectedCategoryId}
+                        />
+                    )
                 )}
                 {activeTab === "articles" && (
-                    <ItemsSection items={items} categories={categories} storeId={storeId} />
+                    <AllItemsSection items={items} categories={categories} storeId={storeId} />
                 )}
             </div>
         </>
@@ -89,38 +166,50 @@ export default function CatalogueClient({
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   CATEGORIES SECTION
+   CATEGORIES SECTION (grid of category cards)
    ══════════════════════════════════════════════════════════════════════════ */
 
-function CategoriesSection({ categories, storeId }: { categories: Categorie[]; storeId: number }) {
+function CategoriesSection({
+    categories,
+    items,
+    storeId,
+    onDrillDown,
+}: {
+    categories: Categorie[];
+    items: Item[];
+    storeId: number;
+    onDrillDown: (id: number) => void;
+}) {
     const router = useRouter();
-    const [modal, setModal] = useState<CategoryModal>({ type: "closed" });
+    const [panel, setPanel] = useState<CategoryPanel>({ type: "closed" });
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
 
+    // Add form state
     const [addType, setAddType] = useState("");
+    const [addIcon, setAddIcon] = useState("tag");
+    const [addColor, setAddColor] = useState("orange");
+
+    // Edit form state
     const [editType, setEditType] = useState("");
+    const [editIcon, setEditIcon] = useState("tag");
+    const [editColor, setEditColor] = useState("orange");
 
     const filtered = useMemo(() => {
-        const rows = categories || [];
         const q = search.trim().toLowerCase();
-        if (!q) return rows;
-        return rows.filter((c) => c.type.toLowerCase().includes(q));
+        if (!q) return categories;
+        return categories.filter((c) => c.type.toLowerCase().includes(q));
     }, [categories, search]);
 
-    const openAdd = () => {
-        setAddType("");
-        setModal({ type: "add" });
-    };
-
-    const openEdit = (c: Categorie) => {
+    const openAdd = () => { setAddType(""); setAddIcon("tag"); setAddColor("orange"); setPanel({ type: "add" }); };
+    const openEdit = (c: CatWithMeta) => {
         setEditType(c.type);
-        setModal({ type: "edit", categorie: c });
+        setEditIcon(c.icon ?? "tag");
+        setEditColor(c.color ?? "orange");
+        setPanel({ type: "edit", categorie: c });
     };
-
-    const openDelete = (c: Categorie) => {
-        setModal({ type: "delete", categorie: c });
-    };
+    const openDelete = (c: Categorie) => setPanel({ type: "delete", categorie: c });
+    const close = () => setPanel({ type: "closed" });
 
     const handleAdd = async () => {
         if (!addType.trim()) return;
@@ -128,200 +217,197 @@ function CategoriesSection({ categories, storeId }: { categories: Categorie[]; s
         try {
             await createCategorie(storeId, { type: addType.trim() });
             toast.success("Catégorie créée");
-            setModal({ type: "closed" });
+            close();
             router.refresh();
-        } catch (e: unknown) {
-            toast.error(e instanceof Error ? e.message : "Erreur lors de la création");
-        } finally {
-            setLoading(false);
-        }
+        } catch (e: unknown) { toast.error(e instanceof Error ? e.message : "Erreur"); }
+        finally { setLoading(false); }
     };
 
     const handleEdit = async () => {
-        if (modal.type !== "edit") return;
+        if (panel.type !== "edit") return;
         if (!editType.trim()) return;
         setLoading(true);
         try {
-            await updateCategorie(modal.categorie.categorie_id, storeId, { type: editType.trim() });
+            await updateCategorie(panel.categorie.categorie_id, storeId, { type: editType.trim() });
             toast.success("Catégorie mise à jour");
-            setModal({ type: "closed" });
+            close();
             router.refresh();
-        } catch (e: unknown) {
-            toast.error(e instanceof Error ? e.message : "Erreur lors de la modification");
-        } finally {
-            setLoading(false);
-        }
+        } catch (e: unknown) { toast.error(e instanceof Error ? e.message : "Erreur"); }
+        finally { setLoading(false); }
     };
 
     const handleDelete = async () => {
-        if (modal.type !== "delete") return;
+        if (panel.type !== "delete") return;
         setLoading(true);
         try {
-            await deleteCategorie(modal.categorie.categorie_id, storeId);
+            await deleteCategorie(panel.categorie.categorie_id, storeId);
             toast.success("Catégorie supprimée");
-            setModal({ type: "closed" });
+            close();
             router.refresh();
-        } catch (e: unknown) {
-            toast.error(e instanceof Error ? e.message : "Erreur lors de la suppression");
-        } finally {
-            setLoading(false);
-        }
+        } catch (e: unknown) { toast.error(e instanceof Error ? e.message : "Erreur"); }
+        finally { setLoading(false); }
     };
-
-    const close = () => setModal({ type: "closed" });
 
     return (
         <>
-            <div className="space-y-4">
-                {/* ── Toolbar ── */}
+            <div className="space-y-4 pt-4">
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="relative flex-1 min-w-[200px]">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input
-                            type="text"
-                            placeholder="Rechercher une catégorie…"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-300"
-                        />
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                        <input type="text" placeholder="Rechercher une catégorie…" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
                     </div>
-                    <button
-                        onClick={openAdd}
-                        className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
-                    >
-                        <Plus size={16} /> Ajouter une catégorie
+                    <button onClick={openAdd} className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                        <Plus size={16} /> Nouvelle catégorie
                     </button>
                 </div>
 
-                {/* ── Grid ── */}
-                 {filtered.length === 0 ? (
-                    <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-10 text-center text-slate-400">
+                {filtered.length === 0 ? (
+                    <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-10 text-center text-gray-400">
                         <Tag size={40} className="mx-auto mb-3 opacity-30" />
-                        <p className="text-sm">
-                            {categories.length === 0 ? "Aucune catégorie disponible." : "Aucun résultat pour cette recherche."}
-                        </p>
+                        <p className="text-sm">{categories.length === 0 ? "Aucune catégorie. Créez-en une !" : "Aucun résultat."}</p>
+                        {categories.length === 0 && (
+                            <button onClick={openAdd} className="mt-4 inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors hover:bg-[hsl(355,16%,16%)]">
+                                <Plus size={15} /> Créer la première catégorie
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filtered.map((c) => (
-                            <div
-                                key={c.categorie_id}
-                                className="bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-5 group"
-                            >
-                                <div className="flex items-start justify-between gap-3 mb-3">
-                                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                                        <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0 group-hover:bg-slate-900 group-hover:text-white transition-colors">
-                                            <Tag size={18} />
+                        {filtered.map((c) => {
+                            const cat = c as CatWithMeta;
+                            const color = getColorById(cat.color ?? "orange");
+                            const CatIcon = getIconById(cat.icon ?? "tag");
+                            const itemCount = items.filter((i) => i.categorie_id === c.categorie_id).length;
+                            return (
+                                <div key={c.categorie_id} className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group flex flex-col">
+                                    {/* Clickable top area */}
+                                    <button
+                                        onClick={() => onDrillDown(c.categorie_id)}
+                                        className="flex items-center gap-4 p-5 text-left flex-1 hover:bg-gray-50/60 rounded-t-xl transition-colors"
+                                    >
+                                        <div className={`h-12 w-12 rounded-xl ${color.bg} flex items-center justify-center flex-shrink-0`}>
+                                            <CatIcon size={22} className={color.text} />
                                         </div>
-                                        <h3 className="text-base font-semibold text-slate-900 truncate">{c.type}</h3>
+                                        <div className="min-w-0">
+                                            <p className="font-semibold text-gray-900 truncate">{c.type}</p>
+                                            <p className="text-xs text-gray-400 mt-0.5">{itemCount} article{itemCount !== 1 ? "s" : ""}</p>
+                                        </div>
+                                        <div className="ml-auto text-gray-300 group-hover:text-gray-500 transition-colors">
+                                            <FolderOpen size={18} />
+                                        </div>
+                                    </button>
+                                    {/* Actions */}
+                                    <div className="flex items-center gap-1 px-4 py-3 border-t border-gray-50">
+                                        <button onClick={() => openEdit(cat)} className="flex-1 inline-flex items-center justify-center gap-1.5 text-gray-500 hover:text-gray-900 text-xs font-medium py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+                                            <Pencil size={12} /> Modifier
+                                        </button>
+                                        <button onClick={() => openDelete(c)} className="flex-1 inline-flex items-center justify-center gap-1.5 text-red-400 hover:text-red-600 text-xs font-medium py-1.5 rounded-lg hover:bg-red-50 transition-colors">
+                                            <Trash2 size={12} /> Supprimer
+                                        </button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
-                                    <button
-                                        onClick={() => openEdit(c)}
-                                        className="flex-1 inline-flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 text-xs font-medium px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
-                                    >
-                                        <Pencil size={12} /> Modifier
-                                    </button>
-                                    <button
-                                        onClick={() => openDelete(c)}
-                                        className="flex-1 inline-flex items-center justify-center gap-1.5 text-red-500 hover:text-red-700 text-xs font-medium px-3 py-2 rounded-lg hover:bg-red-50 transition-colors"
-                                    >
-                                        <Trash2 size={12} /> Supprimer
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
 
-            {/* ── Modals ── */}
-            {modal.type === "add" && (
-                <Overlay onClose={close}>
-                    <ModalCard title="Nouvelle catégorie" onClose={close}>
-                        <div className="space-y-4">
-                            <Field label="Nom de la catégorie">
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    value={addType}
-                                    onChange={(e) => setAddType(e.target.value)}
-                                    placeholder="Ex : Électronique, Vêtements, Alimentation..."
-                                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
-                                />
-                            </Field>
+            {/* Add Panel */}
+            <SidePanel
+                open={panel.type === "add"}
+                onClose={close}
+                title="Nouvelle catégorie"
+                footer={
+                    <>
+                        <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
+                        <button onClick={handleAdd} disabled={loading || !addType.trim()} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                            {loading ? "Création…" : "Créer"}
+                        </button>
+                    </>
+                }
+            >
+                <div className="space-y-5">
+                    <Field label="Nom de la catégorie">
+                        <input type="text" value={addType} onChange={(e) => setAddType(e.target.value)} placeholder="Ex : Boissons, Snacks…" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
+                    </Field>
+                    <Field label="Icône">
+                        <div className="grid grid-cols-7 gap-1.5">
+                            {ICON_OPTIONS.map((opt) => (
+                                <button key={opt.id} type="button" onClick={() => setAddIcon(opt.id)} title={opt.label} className={`h-9 w-9 rounded-lg flex items-center justify-center transition-colors ${addIcon === opt.id ? "bg-[hsl(355,16%,20%)] text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}>
+                                    <opt.Icon size={15} />
+                                </button>
+                            ))}
                         </div>
-                        <ModalFooter>
-                            <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
-                                Annuler
-                            </button>
-                            <button
-                                onClick={handleAdd}
-                                disabled={loading || !addType.trim()}
-                                className="px-4 py-2 text-sm rounded-xl bg-slate-900 text-white hover:bg-slate-700 transition-colors disabled:opacity-50"
-                            >
-                                {loading ? "Création…" : "Créer"}
-                            </button>
-                        </ModalFooter>
-                    </ModalCard>
-                </Overlay>
-            )}
+                    </Field>
+                    <Field label="Couleur">
+                        <div className="flex gap-2 flex-wrap">
+                            {COLOR_OPTIONS.map((c) => (
+                                <button key={c.id} type="button" onClick={() => setAddColor(c.id)} className={`w-8 h-8 rounded-full ${c.active} transition-all ${addColor === c.id ? "ring-2 ring-offset-2 ring-gray-400 scale-110" : "opacity-70 hover:opacity-100"}`} />
+                            ))}
+                        </div>
+                    </Field>
+                    {/* Preview */}
+                    <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
+                        <div className={`h-12 w-12 rounded-xl ${getColorById(addColor).bg} flex items-center justify-center`}>
+                            {(() => { const I = getIconById(addIcon); return <I size={22} className={getColorById(addColor).text} />; })()}
+                        </div>
+                        <div>
+                            <p className="font-semibold text-gray-900 text-sm">{addType || "Nom de la catégorie"}</p>
+                            <p className="text-xs text-gray-400">0 article</p>
+                        </div>
+                    </div>
+                </div>
+            </SidePanel>
 
-            {modal.type === "edit" && (
-                <Overlay onClose={close}>
-                    <ModalCard title="Modifier la catégorie" onClose={close}>
-                        <div className="space-y-4">
-                            <Field label="Nom de la catégorie">
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    value={editType}
-                                    onChange={(e) => setEditType(e.target.value)}
-                                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
-                                />
-                            </Field>
+            {/* Edit Panel */}
+            <SidePanel
+                open={panel.type === "edit"}
+                onClose={close}
+                title="Modifier la catégorie"
+                footer={
+                    <>
+                        <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
+                        <button onClick={handleEdit} disabled={loading || !editType.trim()} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                            {loading ? "Enregistrement…" : "Enregistrer"}
+                        </button>
+                    </>
+                }
+            >
+                <div className="space-y-5">
+                    <Field label="Nom de la catégorie">
+                        <input type="text" value={editType} onChange={(e) => setEditType(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
+                    </Field>
+                    <Field label="Icône">
+                        <div className="grid grid-cols-7 gap-1.5">
+                            {ICON_OPTIONS.map((opt) => (
+                                <button key={opt.id} type="button" onClick={() => setEditIcon(opt.id)} title={opt.label} className={`h-9 w-9 rounded-lg flex items-center justify-center transition-colors ${editIcon === opt.id ? "bg-[hsl(355,16%,20%)] text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}>
+                                    <opt.Icon size={15} />
+                                </button>
+                            ))}
                         </div>
-                        <ModalFooter>
-                            <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
-                                Annuler
-                            </button>
-                            <button
-                                onClick={handleEdit}
-                                disabled={loading || !editType.trim()}
-                                className="px-4 py-2 text-sm rounded-xl bg-slate-900 text-white hover:bg-slate-700 transition-colors disabled:opacity-50"
-                            >
-                                {loading ? "Enregistrement…" : "Enregistrer"}
-                            </button>
-                        </ModalFooter>
-                    </ModalCard>
-                </Overlay>
-            )}
+                    </Field>
+                    <Field label="Couleur">
+                        <div className="flex gap-2 flex-wrap">
+                            {COLOR_OPTIONS.map((c) => (
+                                <button key={c.id} type="button" onClick={() => setEditColor(c.id)} className={`w-8 h-8 rounded-full ${c.active} transition-all ${editColor === c.id ? "ring-2 ring-offset-2 ring-gray-400 scale-110" : "opacity-70 hover:opacity-100"}`} />
+                            ))}
+                        </div>
+                    </Field>
+                    <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
+                        <div className={`h-12 w-12 rounded-xl ${getColorById(editColor).bg} flex items-center justify-center`}>
+                            {(() => { const I = getIconById(editIcon); return <I size={22} className={getColorById(editColor).text} />; })()}
+                        </div>
+                        <div>
+                            <p className="font-semibold text-gray-900 text-sm">{editType || "Nom"}</p>
+                        </div>
+                    </div>
+                </div>
+            </SidePanel>
 
-            {modal.type === "delete" && (
+            {/* Delete confirm */}
+            {panel.type === "delete" && (
                 <Overlay onClose={close}>
-                    <ModalCard title="Supprimer la catégorie" onClose={close}>
-                        <div className="space-y-4">
-                            <p className="text-sm text-slate-600">
-                                Êtes-vous sûr de vouloir supprimer la catégorie <span className="font-semibold text-slate-900">{modal.categorie.type}</span> ?
-                            </p>
-                            <p className="text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg">
-                                ⚠️ Cette action est irréversible et peut affecter les articles liés.
-                            </p>
-                        </div>
-                        <ModalFooter>
-                            <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
-                                Annuler
-                            </button>
-                            <button
-                                onClick={handleDelete}
-                                disabled={loading}
-                                className="px-4 py-2 text-sm rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
-                            >
-                                {loading ? "Suppression…" : "Supprimer"}
-                            </button>
-                        </ModalFooter>
-                    </ModalCard>
+                    <ConfirmCard title="Supprimer la catégorie" description={<>Supprimer <span className="font-semibold text-gray-900">{panel.categorie.type}</span> ?</>} warning="⚠️ Cette action est irréversible et peut affecter les articles liés." onClose={close} onConfirm={handleDelete} loading={loading} confirmLabel="Supprimer" confirmCls="bg-red-600 hover:bg-red-700" />
                 </Overlay>
             )}
         </>
@@ -329,10 +415,245 @@ function CategoriesSection({ categories, storeId }: { categories: Categorie[]; s
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   ITEMS SECTION
+   CATEGORY DRILL-DOWN  (items within one category)
    ══════════════════════════════════════════════════════════════════════════ */
 
-function ItemsSection({
+function CategoryDrillDown({
+    category,
+    items,
+    categories,
+    storeId,
+    onBack,
+}: {
+    category: CatWithMeta;
+    items: Item[];
+    categories: Categorie[];
+    storeId: number;
+    onBack: () => void;
+}) {
+    const router = useRouter();
+    const [panel, setPanel] = useState<ItemPanel>({ type: "closed" });
+    const [loading, setLoading] = useState(false);
+
+    const [addName, setAddName] = useState("");
+    const [addPrice, setAddPrice] = useState("");
+    const [addTax, setAddTax] = useState("0.20");
+
+    const [editName, setEditName] = useState("");
+    const [editPrice, setEditPrice] = useState("");
+    const [editTax, setEditTax] = useState("");
+    const [editCategoryId, setEditCategoryId] = useState<number>(0);
+
+    const color = getColorById(category?.color ?? "orange");
+    const CatIcon = getIconById(category?.icon ?? "tag");
+
+    const openAdd = () => { setAddName(""); setAddPrice(""); setAddTax("0.20"); setPanel({ type: "add", categoryId: category?.categorie_id }); };
+    const openEdit = (item: Item) => { setEditName(item.name); setEditPrice(item.price.toString()); setEditTax(item.tax.toString()); setEditCategoryId(item.categorie_id); setPanel({ type: "edit", item }); };
+    const openDelete = (item: Item) => setPanel({ type: "delete", item });
+    const openMove = (item: Item) => { setEditCategoryId(item.categorie_id); setPanel({ type: "move", item }); };
+    const close = () => setPanel({ type: "closed" });
+
+    const handleAdd = async () => {
+        if (!addName.trim() || !addPrice) return;
+        setLoading(true);
+        try {
+            await createItem(storeId, { name: addName.trim(), price: parseFloat(addPrice), tax: parseFloat(addTax), categorie_id: category.categorie_id });
+            toast.success("Article créé");
+            close();
+            router.refresh();
+        } catch (e: unknown) { toast.error(e instanceof Error ? e.message : "Erreur"); }
+        finally { setLoading(false); }
+    };
+
+    const handleEdit = async () => {
+        if (panel.type !== "edit") return;
+        setLoading(true);
+        try {
+            await updateItem(panel.item.item_id, storeId, { name: editName.trim(), price: parseFloat(editPrice), tax: parseFloat(editTax), categorie_id: editCategoryId });
+            toast.success("Article mis à jour");
+            close();
+            router.refresh();
+        } catch (e: unknown) { toast.error(e instanceof Error ? e.message : "Erreur"); }
+        finally { setLoading(false); }
+    };
+
+    const handleMove = async () => {
+        if (panel.type !== "move") return;
+        setLoading(true);
+        try {
+            await updateItem(panel.item.item_id, storeId, { categorie_id: editCategoryId });
+            toast.success("Article déplacé");
+            close();
+            router.refresh();
+        } catch (e: unknown) { toast.error(e instanceof Error ? e.message : "Erreur"); }
+        finally { setLoading(false); }
+    };
+
+    const handleDelete = async () => {
+        if (panel.type !== "delete") return;
+        setLoading(true);
+        try {
+            await deleteItem(panel.item.item_id, storeId);
+            toast.success("Article supprimé");
+            close();
+            router.refresh();
+        } catch (e: unknown) { toast.error(e instanceof Error ? e.message : "Erreur"); }
+        finally { setLoading(false); }
+    };
+
+    return (
+        <>
+            <div className="space-y-4 pt-4">
+                {/* Breadcrumb */}
+                <div className="flex items-center justify-between">
+                    <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                        <ArrowLeft size={15} /> Toutes les catégories
+                    </button>
+                    <button onClick={openAdd} className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                        <Plus size={16} /> Ajouter un article
+                    </button>
+                </div>
+
+                {/* Category header */}
+                <div className={`flex items-center gap-4 p-5 rounded-2xl ${color.bg}`}>
+                    <div className={`h-12 w-12 rounded-xl bg-white/50 flex items-center justify-center`}>
+                        <CatIcon size={24} className={color.text} />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-gray-900 text-lg">{category?.type}</h3>
+                        <p className="text-sm text-gray-500">{items.length} article{items.length !== 1 ? "s" : ""}</p>
+                    </div>
+                </div>
+
+                {/* Items */}
+                {items.length === 0 ? (
+                    <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-10 text-center text-gray-400">
+                        <Package size={40} className="mx-auto mb-3 opacity-30" />
+                        <p className="text-sm mb-4">Aucun article dans cette catégorie.</p>
+                        <button onClick={openAdd} className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors hover:bg-[hsl(355,16%,16%)]">
+                            <Plus size={15} /> Ajouter le premier article
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {items.map((item) => {
+                            const priceHT = Number(item.price);
+                            const tax = Number(item.tax);
+                            const priceTTC = priceHT * (1 + tax);
+                            return (
+                                <div key={item.item_id} className="bg-white border border-gray-100 rounded-xl shadow-sm p-5 flex flex-col gap-4 hover:shadow-md transition-shadow">
+                                    <div className="flex items-start gap-3">
+                                        <div className={`h-9 w-9 rounded-lg ${color.bg} flex items-center justify-center flex-shrink-0`}>
+                                            <Package size={16} className={color.text} />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-1 text-center bg-gray-50 rounded-xl py-3">
+                                        <div>
+                                            <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-0.5">HT</p>
+                                            <p className="text-sm font-semibold text-gray-700">{priceHT.toFixed(2)} €</p>
+                                        </div>
+                                        <div className="border-x border-gray-100">
+                                            <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-0.5">TVA</p>
+                                            <p className="text-sm font-semibold text-gray-700">{(tax * 100).toFixed(0)}%</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-0.5">TTC</p>
+                                            <p className="text-sm font-bold text-gray-900">{priceTTC.toFixed(2)} €</p>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-1 pt-1 border-t border-gray-50">
+                                        <button onClick={() => openEdit(item)} className="inline-flex items-center justify-center gap-1 text-gray-500 hover:text-gray-900 text-xs font-medium py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+                                            <Pencil size={11} /> Modifier
+                                        </button>
+                                        <button onClick={() => openMove(item)} className="inline-flex items-center justify-center gap-1 text-blue-400 hover:text-blue-600 text-xs font-medium py-1.5 rounded-lg hover:bg-blue-50 transition-colors">
+                                            <MoveRight size={11} /> Déplacer
+                                        </button>
+                                        <button onClick={() => openDelete(item)} className="inline-flex items-center justify-center gap-1 text-red-400 hover:text-red-600 text-xs font-medium py-1.5 rounded-lg hover:bg-red-50 transition-colors">
+                                            <Trash2 size={11} /> Supprimer
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
+            {/* Add Panel */}
+            <SidePanel open={panel.type === "add"} onClose={close} title="Nouvel article" footer={
+                <>
+                    <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
+                    <button onClick={handleAdd} disabled={loading || !addName.trim() || !addPrice} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                        {loading ? "Création…" : "Créer"}
+                    </button>
+                </>
+            }>
+                <ItemForm name={addName} onNameChange={setAddName} price={addPrice} onPriceChange={setAddPrice} tax={addTax} onTaxChange={setAddTax} />
+            </SidePanel>
+
+            {/* Edit Panel */}
+            <SidePanel open={panel.type === "edit"} onClose={close} title="Modifier l'article" footer={
+                <>
+                    <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
+                    <button onClick={handleEdit} disabled={loading || !editName.trim() || !editPrice} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                        {loading ? "Enregistrement…" : "Enregistrer"}
+                    </button>
+                </>
+            }>
+                <ItemForm name={editName} onNameChange={setEditName} price={editPrice} onPriceChange={setEditPrice} tax={editTax} onTaxChange={setEditTax} />
+            </SidePanel>
+
+            {/* Move Panel */}
+            <SidePanel open={panel.type === "move"} onClose={close} title="Déplacer l'article" footer={
+                <>
+                    <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
+                    <button onClick={handleMove} disabled={loading} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                        {loading ? "Déplacement…" : "Déplacer"}
+                    </button>
+                </>
+            }>
+                <div className="space-y-4">
+                    {panel.type === "move" && <p className="text-sm text-gray-500">Déplacer <span className="font-semibold text-gray-900">{panel.item.name}</span> vers :</p>}
+                    <Field label="Catégorie de destination">
+                        <div className="space-y-2">
+                            {categories.map((cat) => {
+                                const c = cat as CatWithMeta;
+                                const col = getColorById(c.color ?? "orange");
+                                const CI = getIconById(c.icon ?? "tag");
+                                const isCurrent = c.categorie_id === (panel.type === "move" ? panel.item.categorie_id : 0);
+                                return (
+                                    <button key={c.categorie_id} type="button" onClick={() => setEditCategoryId(c.categorie_id)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm transition-colors ${editCategoryId === c.categorie_id ? "border-[hsl(355,16%,20%)] bg-[hsl(355,16%,20%)]/5" : "border-gray-200 hover:border-gray-300"} ${isCurrent ? "opacity-50 cursor-default" : ""}`} disabled={isCurrent}>
+                                        <div className={`h-7 w-7 rounded-lg ${col.bg} flex items-center justify-center flex-shrink-0`}>
+                                            <CI size={13} className={col.text} />
+                                        </div>
+                                        <span className="font-medium text-gray-700">{c.type}</span>
+                                        {isCurrent && <span className="ml-auto text-xs text-gray-400">actuelle</span>}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </Field>
+                </div>
+            </SidePanel>
+
+            {/* Delete confirm */}
+            {panel.type === "delete" && (
+                <Overlay onClose={close}>
+                    <ConfirmCard title="Supprimer l'article" description={<>Supprimer <span className="font-semibold text-gray-900">{panel.item.name}</span> ?</>} warning="⚠️ Cette action est irréversible." onClose={close} onConfirm={handleDelete} loading={loading} confirmLabel="Supprimer" confirmCls="bg-red-600 hover:bg-red-700" />
+                </Overlay>
+            )}
+        </>
+    );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ALL ITEMS SECTION (second tab — full list with filters)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function AllItemsSection({
     items,
     categories,
     storeId,
@@ -342,15 +663,12 @@ function ItemsSection({
     storeId: number;
 }) {
     const router = useRouter();
-    const [modal, setModal] = useState<ItemModal>({ type: "closed" });
+    const [panel, setPanel] = useState<ItemPanel>({ type: "closed" });
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
     const [filterCategory, setFilterCategory] = useState<number | "all">("all");
-
-    const [addName, setAddName] = useState("");
-    const [addPrice, setAddPrice] = useState("");
-    const [addTax, setAddTax] = useState("0.20");
-    const [addCategoryId, setAddCategoryId] = useState<number | "">("");
+    const [sortKey, setSortKey] = useState<"name" | "price" | "category">("name");
+    const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
     const [editName, setEditName] = useState("");
     const [editPrice, setEditPrice] = useState("");
@@ -358,210 +676,150 @@ function ItemsSection({
     const [editCategoryId, setEditCategoryId] = useState<number>(0);
 
     const filtered = useMemo(() => {
-        const rows = items || [];
-        let result = rows;
-
+        let result = items;
         const q = search.trim().toLowerCase();
-        if (q) result = result.filter((item) => item.name.toLowerCase().includes(q));
+        if (q) result = result.filter((i) => i.name.toLowerCase().includes(q));
+        if (filterCategory !== "all") result = result.filter((i) => i.categorie_id === filterCategory);
+        return [...result].sort((a, b) => {
+            let cmp = 0;
+            if (sortKey === "name") cmp = a.name.localeCompare(b.name);
+            else if (sortKey === "price") cmp = Number(a.price) - Number(b.price);
+            else if (sortKey === "category") cmp = a.categorie_id - b.categorie_id;
+            return sortDir === "asc" ? cmp : -cmp;
+        });
+    }, [items, search, filterCategory, sortKey, sortDir]);
 
-        if (filterCategory !== "all") {
-            result = result.filter((item) => item.categorie_id === filterCategory);
-        }
-
-        return result;
-    }, [items, search, filterCategory]);
-
-    const getCategoryName = (categoryId: number) => {
-        const cat = categories.find((c) => c.categorie_id === categoryId);
-        return cat?.type || "Sans catégorie";
+    const toggleSort = (k: typeof sortKey) => {
+        if (sortKey === k) setSortDir((d) => d === "asc" ? "desc" : "asc");
+        else { setSortKey(k); setSortDir("asc"); }
     };
 
-    const openAdd = () => {
-        setAddName("");
-        setAddPrice("");
-        setAddTax("0.20");
-        setAddCategoryId(categories.length > 0 ? categories[0].categorie_id : "");
-        setModal({ type: "add" });
-    };
+    const getCategoryName = (id: number) => categories.find((c) => c.categorie_id === id)?.type ?? "—";
+    const getCat = (id: number) => categories.find((c) => c.categorie_id === id) as CatWithMeta | undefined;
 
-    const openEdit = (item: Item) => {
-        setEditName(item.name);
-        setEditPrice(item.price.toString());
-        setEditTax(item.tax.toString());
-        setEditCategoryId(item.categorie_id);
-        setModal({ type: "edit", item });
-    };
-
-    const openDelete = (item: Item) => {
-        setModal({ type: "delete", item });
-    };
-
-    const handleAdd = async () => {
-        if (!addName.trim() || !addPrice || addCategoryId === "") return;
-        setLoading(true);
-        try {
-            await createItem(storeId, {
-                name: addName.trim(),
-                price: parseFloat(addPrice),
-                tax: parseFloat(addTax),
-                categorie_id: addCategoryId as number,
-            });
-            toast.success("Article créé");
-            setModal({ type: "closed" });
-            router.refresh();
-        } catch (e: unknown) {
-            toast.error(e instanceof Error ? e.message : "Erreur lors de la création");
-        } finally {
-            setLoading(false);
-        }
-    };
+    const openEdit = (item: Item) => { setEditName(item.name); setEditPrice(item.price.toString()); setEditTax(item.tax.toString()); setEditCategoryId(item.categorie_id); setPanel({ type: "edit", item }); };
+    const openDelete = (item: Item) => setPanel({ type: "delete", item });
+    const openMove = (item: Item) => { setEditCategoryId(item.categorie_id); setPanel({ type: "move", item }); };
+    const close = () => setPanel({ type: "closed" });
 
     const handleEdit = async () => {
-        if (modal.type !== "edit") return;
-        if (!editName.trim() || !editPrice) return;
+        if (panel.type !== "edit") return;
         setLoading(true);
         try {
-            await updateItem(modal.item.item_id, storeId, {
-                name: editName.trim(),
-                price: parseFloat(editPrice),
-                tax: parseFloat(editTax),
-                categorie_id: editCategoryId,
-            });
+            await updateItem(panel.item.item_id, storeId, { name: editName.trim(), price: parseFloat(editPrice), tax: parseFloat(editTax), categorie_id: editCategoryId });
             toast.success("Article mis à jour");
-            setModal({ type: "closed" });
+            close();
             router.refresh();
-        } catch (e: unknown) {
-            toast.error(e instanceof Error ? e.message : "Erreur lors de la modification");
-        } finally {
-            setLoading(false);
-        }
+        } catch (e: unknown) { toast.error(e instanceof Error ? e.message : "Erreur"); }
+        finally { setLoading(false); }
+    };
+
+    const handleMove = async () => {
+        if (panel.type !== "move") return;
+        setLoading(true);
+        try {
+            await updateItem(panel.item.item_id, storeId, { categorie_id: editCategoryId });
+            toast.success("Article déplacé");
+            close();
+            router.refresh();
+        } catch (e: unknown) { toast.error(e instanceof Error ? e.message : "Erreur"); }
+        finally { setLoading(false); }
     };
 
     const handleDelete = async () => {
-        if (modal.type !== "delete") return;
+        if (panel.type !== "delete") return;
         setLoading(true);
         try {
-            await deleteItem(modal.item.item_id, storeId);
+            await deleteItem(panel.item.item_id, storeId);
             toast.success("Article supprimé");
-            setModal({ type: "closed" });
+            close();
             router.refresh();
-        } catch (e: unknown) {
-            toast.error(e instanceof Error ? e.message : "Erreur lors de la suppression");
-        } finally {
-            setLoading(false);
-        }
+        } catch (e: unknown) { toast.error(e instanceof Error ? e.message : "Erreur"); }
+        finally { setLoading(false); }
     };
 
-    const close = () => setModal({ type: "closed" });
+    const SortBtn = ({ k, label }: { k: typeof sortKey; label: string }) => (
+        <button onClick={() => toggleSort(k)} className="inline-flex items-center gap-1 group hover:text-gray-900 transition-colors">
+            {label}
+            <span className="text-gray-300 group-hover:text-gray-500">
+                {sortKey === k ? (sortDir === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />) : <ChevronUp size={12} className="opacity-30" />}
+            </span>
+        </button>
+    );
 
     return (
         <>
-            <div className="space-y-4">
-                {/* ── Toolbar ── */}
+            <div className="space-y-4 pt-4">
+                {/* Toolbar */}
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="relative flex-1 min-w-[200px]">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input
-                            type="text"
-                            placeholder="Rechercher un article…"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-300"
-                        />
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                        <input type="text" placeholder="Rechercher un article…" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
                     </div>
-                    <select
-                        value={filterCategory}
-                        onChange={(e) => setFilterCategory(e.target.value === "all" ? "all" : Number(e.target.value))}
-                        className="text-sm border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-300 bg-white"
-                    >
+                    <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value === "all" ? "all" : Number(e.target.value))} className="text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-200 bg-white">
                         <option value="all">Toutes les catégories</option>
-                        {categories.map((cat) => (
-                            <option key={cat.categorie_id} value={cat.categorie_id}>
-                                {cat.type}
-                            </option>
-                        ))}
+                        {categories.map((c) => <option key={c.categorie_id} value={c.categorie_id}>{c.type}</option>)}
                     </select>
-                    <button
-                        onClick={openAdd}
-                        disabled={categories.length === 0}
-                        className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        title={categories.length === 0 ? "Créez d'abord une catégorie" : ""}
-                    >
-                        <Plus size={16} /> Ajouter un article
-                    </button>
                 </div>
 
-                {/* ── List ── */}
-                {categories.length === 0 ? (
-                    <div className="bg-amber-50 border border-amber-200 rounded-2xl shadow-sm p-10 text-center">
-                        <Tag size={40} className="mx-auto mb-3 text-amber-600 opacity-60" />
-                        <p className="text-sm text-amber-900 font-medium mb-1">Aucune catégorie disponible</p>
-                        <p className="text-xs text-amber-700">Créez d'abord des catégories avant d'ajouter des articles</p>
-                    </div>
-                ) : filtered.length === 0 ? (
-                    <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-10 text-center text-slate-400">
+                {/* Summary */}
+                <p className="text-xs text-gray-400">{filtered.length} article{filtered.length !== 1 ? "s" : ""}{filterCategory !== "all" ? ` dans "${getCategoryName(filterCategory as number)}"` : ""}</p>
+
+                {/* Table */}
+                {filtered.length === 0 ? (
+                    <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-10 text-center text-gray-400">
                         <Package size={40} className="mx-auto mb-3 opacity-30" />
-                        <p className="text-sm">
-                            {items.length === 0 ? "Aucun article disponible." : "Aucun résultat pour cette recherche."}
-                        </p>
+                        <p className="text-sm">{items.length === 0 ? "Aucun article." : "Aucun résultat."}</p>
                     </div>
                 ) : (
-                    <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="border-b border-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                                    <th className="px-5 py-3 text-left font-medium">Article</th>
-                                    <th className="px-5 py-3 text-left font-medium">Catégorie</th>
-                                    <th className="px-5 py-3 text-right font-medium">Prix HT</th>
-                                    <th className="px-5 py-3 text-right font-medium">TVA</th>
-                                    <th className="px-5 py-3 text-right font-medium">Prix TTC</th>
-                                    <th className="px-5 py-3 text-right font-medium">Actions</th>
+                                <tr className="border-b border-gray-100 text-gray-400 text-xs bg-gray-50/60">
+                                    <th className="px-4 py-3 text-left font-medium"><SortBtn k="name" label="Article" /></th>
+                                    <th className="px-4 py-3 text-left font-medium"><SortBtn k="category" label="Catégorie" /></th>
+                                    <th className="px-4 py-3 text-right font-medium"><SortBtn k="price" label="HT" /></th>
+                                    <th className="px-4 py-3 text-right font-medium">TVA</th>
+                                    <th className="px-4 py-3 text-right font-medium">TTC</th>
+                                    <th className="px-4 py-3 text-right font-medium">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-50">
+                            <tbody className="divide-y divide-gray-50">
                                 {filtered.map((item) => {
                                     const priceHT = Number(item.price);
                                     const tax = Number(item.tax);
-                                    const priceTTC = priceHT * (1 + tax);
-
+                                    const cat = getCat(item.categorie_id);
+                                    const col = getColorById(cat?.color ?? "orange");
+                                    const CI = getIconById(cat?.icon ?? "tag");
                                     return (
-                                        <tr key={item.item_id} className="hover:bg-slate-50 transition-colors">
-                                            <td className="px-5 py-3.5">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0">
-                                                        <Package size={14} />
+                                        <tr key={item.item_id} className="hover:bg-gray-50/40 transition-colors">
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-2.5">
+                                                    <div className={`h-7 w-7 rounded-lg ${col.bg} flex items-center justify-center flex-shrink-0`}>
+                                                        <Package size={13} className={col.text} />
                                                     </div>
-                                                    <span className="font-medium text-slate-900">{item.name}</span>
+                                                    <span className="font-medium text-gray-900">{item.name}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-5 py-3.5">
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
-                                                    <Tag size={11} />
+                                            <td className="px-4 py-3">
+                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${col.bg} ${col.text}`}>
+                                                    <CI size={10} />
                                                     {getCategoryName(item.categorie_id)}
                                                 </span>
                                             </td>
-                                            <td className="px-5 py-3.5 text-right font-medium text-slate-700">
-                                                {priceHT.toFixed(2)} €
-                                            </td>
-                                            <td className="px-5 py-3.5 text-right text-slate-600">
-                                                {(tax * 100).toFixed(0)}%
-                                            </td>
-                                            <td className="px-5 py-3.5 text-right font-semibold text-slate-900">
-                                                {priceTTC.toFixed(2)} €
-                                            </td>
-                                            <td className="px-5 py-3.5 text-right">
-                                                <div className="inline-flex items-center gap-1">
-                                                    <button
-                                                        onClick={() => openEdit(item)}
-                                                        className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-900 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
-                                                    >
-                                                        <Pencil size={12} /> Modifier
+                                            <td className="px-4 py-3 text-right text-gray-600 font-medium">{priceHT.toFixed(2)} €</td>
+                                            <td className="px-4 py-3 text-right text-gray-400">{(tax * 100).toFixed(0)}%</td>
+                                            <td className="px-4 py-3 text-right font-bold text-gray-900">{(priceHT * (1 + tax)).toFixed(2)} €</td>
+                                            <td className="px-4 py-3 text-right">
+                                                <div className="inline-flex items-center gap-0.5">
+                                                    <button onClick={() => openEdit(item)} className="p-1.5 text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors" title="Modifier">
+                                                        <Pencil size={13} />
                                                     </button>
-                                                    <button
-                                                        onClick={() => openDelete(item)}
-                                                        className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
-                                                    >
-                                                        <Trash2 size={12} /> Supprimer
+                                                    <button onClick={() => openMove(item)} className="p-1.5 text-blue-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors" title="Déplacer">
+                                                        <MoveRight size={13} />
+                                                    </button>
+                                                    <button onClick={() => openDelete(item)} className="p-1.5 text-red-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors" title="Supprimer">
+                                                        <Trash2 size={13} />
                                                     </button>
                                                 </div>
                                             </td>
@@ -574,206 +832,62 @@ function ItemsSection({
                 )}
             </div>
 
-            {/* ── Add Modal ── */}
-            {modal.type === "add" && (
-                <Overlay onClose={close}>
-                    <ModalCard title="Nouvel article" onClose={close}>
-                        <div className="space-y-4">
-                            <Field label="Nom de l'article">
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    value={addName}
-                                    onChange={(e) => setAddName(e.target.value)}
-                                    placeholder="Ex : Laptop Pro 15"
-                                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
-                                />
-                            </Field>
+            {/* Edit Panel */}
+            <SidePanel open={panel.type === "edit"} onClose={close} title="Modifier l'article" footer={
+                <>
+                    <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
+                    <button onClick={handleEdit} disabled={loading || !editName.trim() || !editPrice} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                        {loading ? "Enregistrement…" : "Enregistrer"}
+                    </button>
+                </>
+            }>
+                <div className="space-y-5">
+                    <ItemForm name={editName} onNameChange={setEditName} price={editPrice} onPriceChange={setEditPrice} tax={editTax} onTaxChange={setEditTax} />
+                    <Field label="Catégorie">
+                        <select value={editCategoryId} onChange={(e) => setEditCategoryId(Number(e.target.value))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400 bg-white">
+                            {categories.map((c) => <option key={c.categorie_id} value={c.categorie_id}>{c.type}</option>)}
+                        </select>
+                    </Field>
+                </div>
+            </SidePanel>
 
-                            <Field label="Catégorie">
-                                <select
-                                    value={addCategoryId}
-                                    onChange={(e) => setAddCategoryId(Number(e.target.value))}
-                                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300 bg-white"
-                                >
-                                    {categories.map((cat) => (
-                                        <option key={cat.categorie_id} value={cat.categorie_id}>
-                                            {cat.type}
-                                        </option>
-                                    ))}
-                                </select>
-                            </Field>
-
-                            <div className="grid grid-cols-2 gap-3">
-                                <Field label="Prix HT (€)">
-                                    <div className="relative">
-                                        <Euro size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            value={addPrice}
-                                            onChange={(e) => setAddPrice(e.target.value)}
-                                            placeholder="0.00"
-                                            className="w-full pl-8 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-300"
-                                        />
-                                    </div>
-                                </Field>
-
-                                <Field label="TVA (décimal)">
-                                    <div className="relative">
-                                        <Percent size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            max="1"
-                                            value={addTax}
-                                            onChange={(e) => setAddTax(e.target.value)}
-                                            placeholder="0.20"
-                                            className="w-full pl-8 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-300"
-                                        />
-                                    </div>
-                                </Field>
-                            </div>
-
-                            {addPrice && addTax && (
-                                <div className="bg-slate-50 rounded-lg px-3 py-2 text-sm">
-                                    <span className="text-slate-600">Prix TTC : </span>
-                                    <span className="font-semibold text-slate-900">
-                                        {(parseFloat(addPrice || "0") * (1 + parseFloat(addTax || "0"))).toFixed(2)} €
-                                    </span>
-                                    <span className="text-xs text-slate-500 ml-2">(TVA : {(parseFloat(addTax || "0") * 100).toFixed(0)}%)</span>
-                                </div>
-                            )}
+            {/* Move Panel */}
+            <SidePanel open={panel.type === "move"} onClose={close} title="Déplacer l'article" footer={
+                <>
+                    <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
+                    <button onClick={handleMove} disabled={loading} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                        {loading ? "Déplacement…" : "Déplacer"}
+                    </button>
+                </>
+            }>
+                <div className="space-y-4">
+                    {panel.type === "move" && <p className="text-sm text-gray-500">Déplacer <span className="font-semibold text-gray-900">{panel.item.name}</span> vers :</p>}
+                    <Field label="Catégorie de destination">
+                        <div className="space-y-2">
+                            {categories.map((cat) => {
+                                const c = cat as CatWithMeta;
+                                const col = getColorById(c.color ?? "orange");
+                                const CI = getIconById(c.icon ?? "tag");
+                                const isCurrent = c.categorie_id === (panel.type === "move" ? panel.item.categorie_id : 0);
+                                return (
+                                    <button key={c.categorie_id} type="button" onClick={() => setEditCategoryId(c.categorie_id)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm transition-colors ${editCategoryId === c.categorie_id ? "border-[hsl(355,16%,20%)] bg-[hsl(355,16%,20%)]/5" : "border-gray-200 hover:border-gray-300"} ${isCurrent ? "opacity-50 cursor-default" : ""}`} disabled={isCurrent}>
+                                        <div className={`h-7 w-7 rounded-lg ${col.bg} flex items-center justify-center flex-shrink-0`}>
+                                            <CI size={13} className={col.text} />
+                                        </div>
+                                        <span className="font-medium text-gray-700">{c.type}</span>
+                                        {isCurrent && <span className="ml-auto text-xs text-gray-400">actuelle</span>}
+                                    </button>
+                                );
+                            })}
                         </div>
-                        <ModalFooter>
-                            <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
-                                Annuler
-                            </button>
-                            <button
-                                onClick={handleAdd}
-                                disabled={loading || !addName.trim() || !addPrice || addCategoryId === ""}
-                                className="px-4 py-2 text-sm rounded-xl bg-slate-900 text-white hover:bg-slate-700 transition-colors disabled:opacity-50"
-                            >
-                                {loading ? "Création…" : "Créer l'article"}
-                            </button>
-                        </ModalFooter>
-                    </ModalCard>
-                </Overlay>
-            )}
+                    </Field>
+                </div>
+            </SidePanel>
 
-            {/* ── Edit Modal ── */}
-            {modal.type === "edit" && (
+            {/* Delete confirm */}
+            {panel.type === "delete" && (
                 <Overlay onClose={close}>
-                    <ModalCard title="Modifier l'article" onClose={close}>
-                        <div className="space-y-4">
-                            <Field label="Nom de l'article">
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    value={editName}
-                                    onChange={(e) => setEditName(e.target.value)}
-                                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
-                                />
-                            </Field>
-
-                            <Field label="Catégorie">
-                                <select
-                                    value={editCategoryId}
-                                    onChange={(e) => setEditCategoryId(Number(e.target.value))}
-                                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300 bg-white"
-                                >
-                                    {categories.map((cat) => (
-                                        <option key={cat.categorie_id} value={cat.categorie_id}>
-                                            {cat.type}
-                                        </option>
-                                    ))}
-                                </select>
-                            </Field>
-
-                            <div className="grid grid-cols-2 gap-3">
-                                <Field label="Prix HT (€)">
-                                    <div className="relative">
-                                        <Euro size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            value={editPrice}
-                                            onChange={(e) => setEditPrice(e.target.value)}
-                                            className="w-full pl-8 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-300"
-                                        />
-                                    </div>
-                                </Field>
-
-                                <Field label="TVA (décimal)">
-                                    <div className="relative">
-                                        <Percent size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            max="1"
-                                            value={editTax}
-                                            onChange={(e) => setEditTax(e.target.value)}
-                                            className="w-full pl-8 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-300"
-                                        />
-                                    </div>
-                                </Field>
-                            </div>
-
-                            {editPrice && editTax && (
-                                <div className="bg-slate-50 rounded-lg px-3 py-2 text-sm">
-                                    <span className="text-slate-600">Prix TTC : </span>
-                                    <span className="font-semibold text-slate-900">
-                                        {(parseFloat(editPrice || "0") * (1 + parseFloat(editTax || "0"))).toFixed(2)} €
-                                    </span>
-                                    <span className="text-xs text-slate-500 ml-2">(TVA : {(parseFloat(editTax || "0") * 100).toFixed(0)}%)</span>
-                                </div>
-                            )}
-                        </div>
-                        <ModalFooter>
-                            <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
-                                Annuler
-                            </button>
-                            <button
-                                onClick={handleEdit}
-                                disabled={loading || !editName.trim() || !editPrice}
-                                className="px-4 py-2 text-sm rounded-xl bg-slate-900 text-white hover:bg-slate-700 transition-colors disabled:opacity-50"
-                            >
-                                {loading ? "Enregistrement…" : "Enregistrer"}
-                            </button>
-                        </ModalFooter>
-                    </ModalCard>
-                </Overlay>
-            )}
-
-            {/* ── Delete Modal ── */}
-            {modal.type === "delete" && (
-                <Overlay onClose={close}>
-                    <ModalCard title="Supprimer l'article" onClose={close}>
-                        <div className="space-y-4">
-                            <p className="text-sm text-slate-600">
-                                Êtes-vous sûr de vouloir supprimer l'article <span className="font-semibold text-slate-900">{modal.item.name}</span> ?
-                            </p>
-                            <p className="text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg">
-                                ⚠️ Cette action est irréversible.
-                            </p>
-                        </div>
-                        <ModalFooter>
-                            <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
-                                Annuler
-                            </button>
-                            <button
-                                onClick={handleDelete}
-                                disabled={loading}
-                                className="px-4 py-2 text-sm rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
-                            >
-                                {loading ? "Suppression…" : "Supprimer"}
-                            </button>
-                        </ModalFooter>
-                    </ModalCard>
+                    <ConfirmCard title="Supprimer l'article" description={<>Supprimer <span className="font-semibold text-gray-900">{panel.item.name}</span> ?</>} warning="⚠️ Cette action est irréversible." onClose={close} onConfirm={handleDelete} loading={loading} confirmLabel="Supprimer" confirmCls="bg-red-600 hover:bg-red-700" />
                 </Overlay>
             )}
         </>
@@ -781,41 +895,35 @@ function ItemsSection({
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   HELPERS
+   SHARED HELPERS
    ══════════════════════════════════════════════════════════════════════════ */
 
-function TabButton({
-    active,
-    onClick,
-    icon: Icon,
-    label,
-    count,
-}: {
-    active: boolean;
-    onClick: () => void;
-    icon: React.ElementType;
-    label: string;
-    count: number;
+function TabButton({ active, onClick, icon: Icon, label, count }: {
+    active: boolean; onClick: () => void; icon: React.ElementType; label: string; count: number;
 }) {
     return (
-        <button
-            onClick={onClick}
-            className={`inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                active
-                    ? "border-slate-900 text-slate-900"
-                    : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
-            }`}
-        >
-            <Icon size={16} />
-            {label}
-            <span
-                className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                    active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600"
-                }`}
-            >
-                {count}
-            </span>
+        <button onClick={onClick} className={`inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${active ? "border-orange-500 text-orange-600" : "border-transparent text-gray-400 hover:text-gray-700 hover:border-gray-200"}`}>
+            <Icon size={16} />{label}
+            <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${active ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-500"}`}>{count}</span>
         </button>
+    );
+}
+
+function SidePanel({ open, onClose, title, footer, children }: {
+    open: boolean; onClose: () => void; title: string; footer: React.ReactNode; children: React.ReactNode;
+}) {
+    return (
+        <div className={`fixed inset-0 z-50 ${open ? "" : "pointer-events-none"}`}>
+            <div className={`absolute inset-0 bg-black/30 transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
+            <div className={`absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"}`}>
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
+                    <h2 className="text-base font-bold text-gray-900">{title}</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-700 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"><X size={18} /></button>
+                </div>
+                <div className="flex-1 overflow-y-auto px-6 py-6">{children}</div>
+                <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-2 flex-shrink-0">{footer}</div>
+            </div>
+        </div>
     );
 }
 
@@ -827,29 +935,69 @@ function Overlay({ children, onClose }: { children: React.ReactNode; onClose: ()
     );
 }
 
-function ModalCard({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+function ConfirmCard({ title, description, warning, onClose, onConfirm, loading, confirmLabel, confirmCls }: {
+    title: string; description: React.ReactNode; warning: string; onClose: () => void; onConfirm: () => void; loading: boolean; confirmLabel: string; confirmCls: string;
+}) {
     return (
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-5 p-6">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm flex flex-col gap-5 p-6">
             <div className="flex items-center justify-between">
-                <h2 className="text-base font-bold text-slate-900">{title}</h2>
-                <button onClick={onClose} className="text-slate-400 hover:text-slate-700 transition-colors">
-                    <X size={18} />
-                </button>
+                <h2 className="text-base font-bold text-gray-900">{title}</h2>
+                <button onClick={onClose} className="text-gray-400 hover:text-gray-700 transition-colors"><X size={18} /></button>
             </div>
-            {children}
+            <div className="space-y-3">
+                <p className="text-sm text-gray-600">{description}</p>
+                <p className="text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-100">{warning}</p>
+            </div>
+            <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+                <button onClick={onClose} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
+                <button onClick={onConfirm} disabled={loading} className={`px-4 py-2 text-sm rounded-xl text-white transition-colors disabled:opacity-50 ${confirmCls}`}>{loading ? "Suppression…" : confirmLabel}</button>
+            </div>
         </div>
     );
-}
-
-function ModalFooter({ children }: { children: React.ReactNode }) {
-    return <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">{children}</div>;
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">{label}</label>
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{label}</label>
             {children}
+        </div>
+    );
+}
+
+function ItemForm({ name, onNameChange, price, onPriceChange, tax, onTaxChange }: {
+    name: string; onNameChange: (v: string) => void;
+    price: string; onPriceChange: (v: string) => void;
+    tax: string; onTaxChange: (v: string) => void;
+}) {
+    return (
+        <div className="space-y-4">
+            <Field label="Nom de l'article">
+                <input type="text" value={name} onChange={(e) => onNameChange(e.target.value)} placeholder="Ex : Café Espresso" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
+            </Field>
+            <div className="grid grid-cols-2 gap-3">
+                <Field label="Prix HT (€)">
+                    <div className="relative">
+                        <Euro size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input type="number" step="0.01" min="0" value={price} onChange={(e) => onPriceChange(e.target.value)} placeholder="0.00" className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
+                    </div>
+                </Field>
+                <Field label="TVA (décimal)">
+                    <div className="relative">
+                        <Percent size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input type="number" step="0.01" min="0" max="1" value={tax} onChange={(e) => onTaxChange(e.target.value)} placeholder="0.20" className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
+                    </div>
+                </Field>
+            </div>
+            {price && tax && (
+                <div className="bg-gray-50 rounded-xl px-4 py-3 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Prix TTC</span>
+                    <span className="font-bold text-gray-900">
+                        {(parseFloat(price || "0") * (1 + parseFloat(tax || "0"))).toFixed(2)} €
+                        <span className="text-xs text-gray-400 font-normal ml-1">(TVA {(parseFloat(tax || "0") * 100).toFixed(0)}%)</span>
+                    </span>
+                </div>
+            )}
         </div>
     );
 }
