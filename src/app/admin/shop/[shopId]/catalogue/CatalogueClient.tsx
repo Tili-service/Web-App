@@ -96,8 +96,7 @@ export default function CatalogueClient({
     // category drill-down (categories tab)
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
-    const selectedCategory = categories.find((c) => c.id === selectedCategoryId) as CatWithMeta | undefined
-        ?? categories.find((c) => c.categorie_id === selectedCategoryId) as CatWithMeta | undefined;
+    const selectedCategory = categories.find((c) => c.categorie_id === selectedCategoryId) as CatWithMeta | undefined;
 
     return (
         <>

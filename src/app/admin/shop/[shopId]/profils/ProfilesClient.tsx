@@ -125,7 +125,7 @@ export default function ProfilesClient({
     };
 
     const handleEdit = async () => {
-        if (modal.type !== "edit") return;
+        if (panel.type !== "edit") return;
         if (!editName.trim()) return;
         setLoading(true);
         try {
@@ -135,7 +135,7 @@ export default function ProfilesClient({
                 is_active: editActive,
             };
             if (generatedPin) payload.pin = generatedPin;
-            await updateProfile(modal.profile.profile_id, storeId, payload);
+            await updateProfile(panel.profile.profile_id, storeId, payload);
             router.refresh();
             if (generatedPin) {
                 const fake: ProfileWithPin = {
