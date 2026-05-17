@@ -36,7 +36,6 @@ function NewLicenseContent() {
                 <input type="hidden" name="offer" value={selectedPlan} />
 
                 <div className="grid lg:grid-cols-3 gap-6">
-                    {/* Left — plan selector */}
                     <div className="lg:col-span-2 space-y-4">
                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Formule</p>
                         <div className="grid sm:grid-cols-3 gap-3">

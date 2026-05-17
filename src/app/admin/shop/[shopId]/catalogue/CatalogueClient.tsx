@@ -18,10 +18,6 @@ import createItem from "@/lib/createItem";
 import updateItem from "@/lib/updateItem";
 import deleteItem from "@/lib/deleteItem";
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ICON / COLOR PALETTE
-   ══════════════════════════════════════════════════════════════════════════ */
-
 const ICON_OPTIONS: { id: string; Icon: React.ElementType; label: string }[] = [
     { id: "tag",      Icon: Tag,         label: "Tag"         },
     { id: "package",  Icon: Package,     label: "Package"     },
@@ -58,10 +54,6 @@ function getColorById(id: string) {
     return COLOR_OPTIONS.find((c) => c.id === id) ?? COLOR_OPTIONS[0];
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   TYPES
-   ══════════════════════════════════════════════════════════════════════════ */
-
 type Tab = "categories" | "articles";
 
 type CatWithMeta = Categorie & { icon?: string; color?: string };
@@ -79,9 +71,6 @@ type ItemPanel =
     | { type: "delete"; item: Item }
     | { type: "move"; item: Item };
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ROOT COMPONENT
-   ══════════════════════════════════════════════════════════════════════════ */
 
 export default function CatalogueClient({
     categories,
@@ -93,14 +82,12 @@ export default function CatalogueClient({
     storeId: number;
 }) {
     const [activeTab, setActiveTab] = useState<Tab>("categories");
-    // category drill-down (categories tab)
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
     const selectedCategory = categories.find((c) => c.categorie_id === selectedCategoryId) as CatWithMeta | undefined;
 
     return (
         <>
-            {/* ── Header ── */}
             <div className="flex items-start justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Catalogue</h2>
@@ -110,7 +97,6 @@ export default function CatalogueClient({
                 </div>
             </div>
 
-            {/* ── Stats strip ── */}
             <div className="grid grid-cols-2 gap-3 mt-4">
                 {[
                     { label: "Catégories", value: categories.length, Icon: Tag,     cls: "text-orange-500" },
@@ -128,7 +114,6 @@ export default function CatalogueClient({
                 ))}
             </div>
 
-            {/* ── Tabs ── */}
             <div className="border-b border-gray-100 mt-4">
                 <div className="flex gap-1">
                     <TabButton active={activeTab === "categories"} onClick={() => { setActiveTab("categories"); setSelectedCategoryId(null); }} icon={Tag}     label="Catégories" count={categories.length} />
@@ -136,7 +121,6 @@ export default function CatalogueClient({
                 </div>
             </div>
 
-            {/* ── Content ── */}
             <div className="pb-8">
                 {activeTab === "categories" && (
                     selectedCategoryId !== null ? (
@@ -164,9 +148,6 @@ export default function CatalogueClient({
     );
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   CATEGORIES SECTION (grid of category cards)
-   ══════════════════════════════════════════════════════════════════════════ */
 
 function CategoriesSection({
     categories,
@@ -279,7 +260,6 @@ function CategoriesSection({
                             const itemCount = items.filter((i) => i.categorie_id === c.categorie_id).length;
                             return (
                                 <div key={c.categorie_id} className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group flex flex-col">
-                                    {/* Clickable top area */}
                                     <button
                                         onClick={() => onDrillDown(c.categorie_id)}
                                         className="flex items-center gap-4 p-5 text-left flex-1 hover:bg-gray-50/60 rounded-t-xl transition-colors"
@@ -295,7 +275,6 @@ function CategoriesSection({
                                             <FolderOpen size={18} />
                                         </div>
                                     </button>
-                                    {/* Actions */}
                                     <div className="flex items-center gap-1 px-4 py-3 border-t border-gray-50">
                                         <button onClick={() => openEdit(cat)} className="flex-1 inline-flex items-center justify-center gap-1.5 text-gray-500 hover:text-gray-900 text-xs font-medium py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
                                             <Pencil size={12} /> Modifier
@@ -311,7 +290,6 @@ function CategoriesSection({
                 )}
             </div>
 
-            {/* Add Panel */}
             <SidePanel
                 open={panel.type === "add"}
                 onClose={close}
@@ -345,7 +323,6 @@ function CategoriesSection({
                             ))}
                         </div>
                     </Field>
-                    {/* Preview */}
                     <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
                         <div className={`h-12 w-12 rounded-xl ${getColorById(addColor).bg} flex items-center justify-center`}>
                             {(() => { const I = getIconById(addIcon); return <I size={22} className={getColorById(addColor).text} />; })()}
@@ -358,7 +335,6 @@ function CategoriesSection({
                 </div>
             </SidePanel>
 
-            {/* Edit Panel */}
             <SidePanel
                 open={panel.type === "edit"}
                 onClose={close}
@@ -403,7 +379,6 @@ function CategoriesSection({
                 </div>
             </SidePanel>
 
-            {/* Delete confirm */}
             {panel.type === "delete" && (
                 <Overlay onClose={close}>
                     <ConfirmCard title="Supprimer la catégorie" description={<>Supprimer <span className="font-semibold text-gray-900">{panel.categorie.type}</span> ?</>} warning="⚠️ Cette action est irréversible et peut affecter les articles liés." onClose={close} onConfirm={handleDelete} loading={loading} confirmLabel="Supprimer" confirmCls="bg-red-600 hover:bg-red-700" />
@@ -412,10 +387,6 @@ function CategoriesSection({
         </>
     );
 }
-
-/* ══════════════════════════════════════════════════════════════════════════
-   CATEGORY DRILL-DOWN  (items within one category)
-   ══════════════════════════════════════════════════════════════════════════ */
 
 function CategoryDrillDown({
     category,
@@ -503,7 +474,6 @@ function CategoryDrillDown({
     return (
         <>
             <div className="space-y-4 pt-4">
-                {/* Breadcrumb */}
                 <div className="flex items-center justify-between">
                     <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
                         <ArrowLeft size={15} /> Toutes les catégories
@@ -513,7 +483,6 @@ function CategoryDrillDown({
                     </button>
                 </div>
 
-                {/* Category header */}
                 <div className={`flex items-center gap-4 p-5 rounded-2xl ${color.bg}`}>
                     <div className={`h-12 w-12 rounded-xl bg-white/50 flex items-center justify-center`}>
                         <CatIcon size={24} className={color.text} />
@@ -524,7 +493,6 @@ function CategoryDrillDown({
                     </div>
                 </div>
 
-                {/* Items */}
                 {items.length === 0 ? (
                     <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-10 text-center text-gray-400">
                         <Package size={40} className="mx-auto mb-3 opacity-30" />
@@ -581,7 +549,6 @@ function CategoryDrillDown({
                 )}
             </div>
 
-            {/* Add Panel */}
             <SidePanel open={panel.type === "add"} onClose={close} title="Nouvel article" footer={
                 <>
                     <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
@@ -593,7 +560,6 @@ function CategoryDrillDown({
                 <ItemForm name={addName} onNameChange={setAddName} price={addPrice} onPriceChange={setAddPrice} tax={addTax} onTaxChange={setAddTax} />
             </SidePanel>
 
-            {/* Edit Panel */}
             <SidePanel open={panel.type === "edit"} onClose={close} title="Modifier l'article" footer={
                 <>
                     <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
@@ -605,7 +571,6 @@ function CategoryDrillDown({
                 <ItemForm name={editName} onNameChange={setEditName} price={editPrice} onPriceChange={setEditPrice} tax={editTax} onTaxChange={setEditTax} />
             </SidePanel>
 
-            {/* Move Panel */}
             <SidePanel open={panel.type === "move"} onClose={close} title="Déplacer l'article" footer={
                 <>
                     <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
@@ -638,7 +603,6 @@ function CategoryDrillDown({
                 </div>
             </SidePanel>
 
-            {/* Delete confirm */}
             {panel.type === "delete" && (
                 <Overlay onClose={close}>
                     <ConfirmCard title="Supprimer l'article" description={<>Supprimer <span className="font-semibold text-gray-900">{panel.item.name}</span> ?</>} warning="⚠️ Cette action est irréversible." onClose={close} onConfirm={handleDelete} loading={loading} confirmLabel="Supprimer" confirmCls="bg-red-600 hover:bg-red-700" />
@@ -648,9 +612,6 @@ function CategoryDrillDown({
     );
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ALL ITEMS SECTION (second tab — full list with filters)
-   ══════════════════════════════════════════════════════════════════════════ */
 
 function AllItemsSection({
     items,
@@ -749,7 +710,6 @@ function AllItemsSection({
     return (
         <>
             <div className="space-y-4 pt-4">
-                {/* Toolbar */}
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="relative flex-1 min-w-[200px]">
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -761,10 +721,8 @@ function AllItemsSection({
                     </select>
                 </div>
 
-                {/* Summary */}
                 <p className="text-xs text-gray-400">{filtered.length} article{filtered.length !== 1 ? "s" : ""}{filterCategory !== "all" ? ` dans "${getCategoryName(filterCategory as number)}"` : ""}</p>
 
-                {/* Table */}
                 {filtered.length === 0 ? (
                     <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-10 text-center text-gray-400">
                         <Package size={40} className="mx-auto mb-3 opacity-30" />
@@ -831,7 +789,6 @@ function AllItemsSection({
                 )}
             </div>
 
-            {/* Edit Panel */}
             <SidePanel open={panel.type === "edit"} onClose={close} title="Modifier l'article" footer={
                 <>
                     <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
@@ -850,7 +807,6 @@ function AllItemsSection({
                 </div>
             </SidePanel>
 
-            {/* Move Panel */}
             <SidePanel open={panel.type === "move"} onClose={close} title="Déplacer l'article" footer={
                 <>
                     <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
@@ -883,7 +839,6 @@ function AllItemsSection({
                 </div>
             </SidePanel>
 
-            {/* Delete confirm */}
             {panel.type === "delete" && (
                 <Overlay onClose={close}>
                     <ConfirmCard title="Supprimer l'article" description={<>Supprimer <span className="font-semibold text-gray-900">{panel.item.name}</span> ?</>} warning="⚠️ Cette action est irréversible." onClose={close} onConfirm={handleDelete} loading={loading} confirmLabel="Supprimer" confirmCls="bg-red-600 hover:bg-red-700" />
@@ -892,10 +847,6 @@ function AllItemsSection({
         </>
     );
 }
-
-/* ══════════════════════════════════════════════════════════════════════════
-   SHARED HELPERS
-   ══════════════════════════════════════════════════════════════════════════ */
 
 function TabButton({ active, onClick, icon: Icon, label, count }: {
     active: boolean; onClick: () => void; icon: React.ElementType; label: string; count: number;

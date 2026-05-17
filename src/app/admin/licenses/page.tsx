@@ -34,7 +34,6 @@ export default function LicensesPage() {
 
     return (
         <div className="space-y-8">
-            {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Mes licences</h2>
@@ -51,7 +50,6 @@ export default function LicensesPage() {
 
             {licences.length > 0 && (
                 <>
-                    {/* Stats */}
                     <div className="grid grid-cols-3 gap-4">
                         {[
                             { label: "Total", value: licences.length, icon: CreditCard, color: "bg-gray-50 text-gray-500" },
@@ -70,7 +68,6 @@ export default function LicensesPage() {
                         ))}
                     </div>
 
-                    {/* Licence list */}
                     <div className="space-y-3">
                         {licences.map((licence, i) => {
                             const expired = isExpired(licence.expiration);
@@ -84,14 +81,12 @@ export default function LicensesPage() {
                                     transition={{ delay: i * 0.05 }}
                                     className="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"
                                 >
-                                    {/* Icon */}
                                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                                         status === "active" ? "bg-green-50" : "bg-gray-50"
                                     }`}>
                                         <CreditCard size={18} className={status === "active" ? "text-green-600" : "text-gray-400"} />
                                     </div>
 
-                                    {/* Info */}
                                     <div className="flex-1 min-w-0 space-y-1">
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <span className="font-semibold text-gray-900 text-sm font-mono">
@@ -132,7 +127,6 @@ export default function LicensesPage() {
                                         </div>
                                     </div>
 
-                                    {/* CTA */}
                                     {!licence.store && licence.is_active && (
                                         <Link
                                             href={`/admin/shop/new?licenceId=${licence.licence_id}`}
@@ -149,7 +143,6 @@ export default function LicensesPage() {
                 </>
             )}
 
-            {/* Pricing section */}
             <div>
                 <div className="mb-6">
                     <div className="flex items-center gap-2 mb-2">

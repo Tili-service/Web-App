@@ -39,14 +39,11 @@ export default function LoginPage() {
 
     return (
         <div className="h-screen flex overflow-hidden">
-            {/* Left brand panel */}
             <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative bg-[hsl(355,16%,20%)] flex-col justify-between p-12 overflow-hidden">
-                {/* Decorative circles */}
                 <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/5" />
                 <div className="absolute top-1/2 -right-40 w-96 h-96 rounded-full bg-white/5" />
                 <div className="absolute -bottom-24 left-1/4 w-72 h-72 rounded-full bg-white/5" />
 
-                {/* Logo */}
                 <div className="relative z-10 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
                         <Image src="/tiliLogo.png" alt="Tili" width={28} height={28} className="w-7 h-7 object-contain" />
@@ -54,7 +51,6 @@ export default function LoginPage() {
                     <span className="text-white font-bold text-xl font-display">Tili</span>
                 </div>
 
-                {/* Main content */}
                 <motion.div
                     className="relative z-10"
                     initial={{ opacity: 0, y: 24 }}
@@ -74,25 +70,19 @@ export default function LoginPage() {
 
                 </motion.div>
 
-                {/* Bottom tagline */}
                 <p className="relative z-10 text-white/30 text-xs">
                     © 2026 Tili — Logiciel de caisse
                 </p>
             </div>
 
-            {/* Right form panel */}
             <div className="flex-1 flex flex-col bg-white overflow-y-auto">
-                {/* Mobile header */}
                 <div className="lg:hidden relative bg-[hsl(355,16%,20%)] px-5 pt-2.5 pb-4 overflow-hidden">
-                    {/* Decorative circles */}
                     <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
                     <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-orange-500/15" />
                     <div className="absolute top-1/2 right-8 w-16 h-16 rounded-full bg-white/5" />
-                    {/* Back arrow */}
                     <Link href="/" className="relative z-10 inline-flex text-white/50 hover:text-white transition-colors">
                         <ArrowLeft size={20} />
                     </Link>
-                    {/* Logo centered */}
                     <div className="relative z-10 flex justify-center mt-2">
                         <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center">
                             <Image src="/tiliLogo.png" alt="Tili" width={28} height={28} className="w-7 h-7 object-contain" />
@@ -100,7 +90,6 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                {/* Desktop back arrow */}
                 <div className="hidden lg:block px-6 sm:px-12 lg:px-14 xl:px-20 pt-6">
                     <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors">
                         <ArrowLeft size={15} /> Retour
@@ -125,7 +114,6 @@ export default function LoginPage() {
                         const formData = new FormData(e.currentTarget);
                         submitForm(formData);
                     }}>
-                        {/* Email */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
                             <div className="relative">
@@ -142,7 +130,6 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        {/* Password */}
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
                                 <label className="block text-sm font-medium text-gray-700">Mot de passe</label>
@@ -171,7 +158,6 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        {/* Submit */}
                         <button
                             type="submit"
                             disabled={isSubmitting}

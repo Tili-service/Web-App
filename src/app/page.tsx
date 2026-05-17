@@ -9,15 +9,12 @@ import {
     Zap, ShieldCheck, BarChart3, Users, ChevronRight,
 } from "lucide-react";
 
-/* ─────────────────────── HERO ─────────────────────── */
 function Hero() {
     return (
         <section className="relative overflow-hidden bg-white pt-24 pb-0">
-            {/* Soft tinted blob */}
             <div className="pointer-events-none absolute -top-40 right-0 w-[600px] h-[600px] rounded-full bg-orange-50 opacity-70 blur-3xl" />
 
             <div className="container relative z-10 grid lg:grid-cols-2 gap-12 items-center pb-0">
-                {/* Text column */}
                 <motion.div
                     initial={{ opacity: 0, y: 28 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -52,7 +49,6 @@ function Hero() {
                         </a>
                     </div>
 
-                    {/* Social proof */}
                     <div className="flex items-center gap-5 mt-8 pt-6 border-t border-gray-100">
                         {[
                             { value: "500+", label: "commerces actifs" },
@@ -67,7 +63,6 @@ function Hero() {
                     </div>
                 </motion.div>
 
-                {/* Image column */}
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -93,7 +88,6 @@ function Hero() {
     );
 }
 
-/* ─────────────────────── FEATURES ─────────────────────── */
 const FEATURES = [
     { Icon: Puzzle,           title: "Solution adaptable",     desc: "Pensée pour tous les commerces, de la petite boutique aux points de vente multi-caisses." },
     { Icon: Clock3,           title: "Déploiement rapide",     desc: "Installation en quelques minutes avec prise en main immédiate pour toute votre équipe." },
@@ -150,7 +144,6 @@ function Features() {
     );
 }
 
-/* ─────────────────────── PRICING ─────────────────────── */
 function Pricing() {
     return (
         <section id="pricing" className="bg-gray-50 py-24">
@@ -233,7 +226,6 @@ function Pricing() {
     );
 }
 
-/* ─────────────────────── CTA ─────────────────────── */
 function CTA() {
     return (
         <section className="bg-white py-20">
@@ -274,7 +266,6 @@ function CTA() {
     );
 }
 
-/* ─────────────────────── FOOTER ─────────────────────── */
 function Footer() {
     return (
         <footer className="bg-[hsl(355,16%,20%)] py-10">
@@ -294,7 +285,6 @@ function Footer() {
     );
 }
 
-/* ─────────────────────── PAGE ─────────────────────── */
 export default function Home() {
     return (
         <div className="min-h-screen">

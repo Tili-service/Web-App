@@ -48,7 +48,6 @@ export default function ShopPage() {
 
     return (
         <div className="space-y-6">
-            {/* Page header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Vos boutiques</h2>
@@ -68,7 +67,6 @@ export default function ShopPage() {
                 </Button>
             </div>
 
-            {/* Shop cards grid */}
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {shops.map((shop, index) => (
                     <motion.div
@@ -81,7 +79,6 @@ export default function ShopPage() {
                             href={`/admin/shop/${shop.store_id}/dashboard`}
                             className="group flex flex-col bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-lg hover:border-orange-100 transition-all duration-200 cursor-pointer h-full"
                         >
-                            {/* Card header */}
                             <div className="flex items-start justify-between mb-4">
                                 <div className="w-11 h-11 bg-gray-50 group-hover:bg-orange-50 rounded-xl flex items-center justify-center transition-colors">
                                     <Store size={20} className="text-gray-400 group-hover:text-orange-500 transition-colors" />
@@ -92,12 +89,10 @@ export default function ShopPage() {
                                 </span>
                             </div>
 
-                            {/* Shop name */}
                             <h3 className="text-base font-bold text-gray-900 mb-4 group-hover:text-orange-600 transition-colors">
                                 {shop.name}
                             </h3>
 
-                            {/* Info */}
                             <div className="mt-auto pt-4 border-t border-gray-50 space-y-2">
                                 <div className="flex items-center gap-2 text-xs">
                                     <Hash size={12} className="text-gray-300 shrink-0" />

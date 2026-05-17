@@ -163,7 +163,6 @@ export default function ProfilesClient({
 
     return (
         <>
-            {/* ── Header ── */}
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Profils</h2>
@@ -179,7 +178,6 @@ export default function ProfilesClient({
                 </button>
             </div>
 
-            {/* ── Stats strip ── */}
             {profiles.length > 0 && (
                 <div className="grid grid-cols-3 gap-3 mt-4">
                     {[
@@ -195,7 +193,6 @@ export default function ProfilesClient({
                 </div>
             )}
 
-            {/* ── Filters ── */}
             <div className="flex flex-wrap gap-2 mt-4">
                 <div className="relative flex-1 min-w-[160px]">
                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -226,7 +223,6 @@ export default function ProfilesClient({
                 </select>
             </div>
 
-            {/* ── Content ── */}
             {profiles.length === 0 ? (
                 <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-12 text-center mt-2">
                     <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
@@ -289,7 +285,6 @@ export default function ProfilesClient({
                 </div>
             )}
 
-            {/* ── Pagination ── */}
             {totalPages > 1 && (
                 <div className="flex items-center justify-between px-1 py-2 text-xs text-gray-400">
                     <span>{filtered.length} résultat{filtered.length !== 1 ? "s" : ""} — page {safePage}/{totalPages}</span>
@@ -311,7 +306,6 @@ export default function ProfilesClient({
                 </div>
             )}
 
-            {/* ══ Add Side Panel ══ */}
             <SidePanel
                 open={panel.type === "add" || panel.type === "add_pin"}
                 onClose={close}
@@ -367,7 +361,6 @@ export default function ProfilesClient({
                 )}
             </SidePanel>
 
-            {/* ══ Edit Side Panel ══ */}
             <SidePanel
                 open={panel.type === "edit" || panel.type === "edit_pin"}
                 onClose={close}
