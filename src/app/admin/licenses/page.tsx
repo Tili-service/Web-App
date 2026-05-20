@@ -119,6 +119,18 @@ export default function LicensesPage() {
                                         <span className="font-semibold text-gray-900">Expiration :</span>
                                         <span className="text-gray-600 ml-1">{new Date(licence.expiration).toLocaleDateString()}</span>
                                     </p>
+                                    <p className="mb-1 text-sm">
+                                        <span className="font-semibold text-gray-900">Prochain payement :</span>
+                                        <span className="text-gray-600 ml-1">{new Date(licence.stripe.next_payment_at).toLocaleDateString()}</span>
+                                    </p>
+                                    <p className="mb-1 text-sm">
+                                        <span className="font-semibold text-gray-900">Montant :</span>
+                                        <span className="text-gray-600 ml-1">{(licence.stripe.price_amount / 100).toFixed(2)}€</span>
+                                    </p>
+                                    <p className="mb-1 text-sm">
+                                        <span className="font-semibold text-gray-900">Intervalle de facturation :</span>
+                                        <span className="text-gray-600 ml-1">{licence.stripe.price_interval}</span>
+                                    </p>
 
                                     <p className="">
                                         <span className="font-semibold text-sm text-gray-900">Statut :</span>
