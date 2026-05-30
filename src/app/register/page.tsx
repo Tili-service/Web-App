@@ -9,7 +9,6 @@ import { useRouter } from 'next/navigation';
 import createAccount from '@/lib/createAccount';
 import loginAccount from '@/lib/loginAccount';
 import { useAuth } from '@/context/auth-context';
-import { hashPassword } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 export default function RegisterPage() {
@@ -27,15 +26,14 @@ export default function RegisterPage() {
             if (data.password !== data.confirmPassword) {
                 throw new Error("Les mots de passe ne correspondent pas");
             }
-            const hashedPassword = await hashPassword(data.password as string);
             await createAccount({
                 email: data.email as string,
                 name: data.name as string,
-                password: hashedPassword,
+                password: data.password as string,
             });
             const res = await loginAccount({
                 email: data.email as string,
-                password: hashedPassword,
+                password: data.password as string,
             });
             login(res);
             toast.success("Inscription réussie", { description: "Votre compte a été créé avec succès." });

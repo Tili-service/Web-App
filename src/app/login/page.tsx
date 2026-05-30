@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import { toast } from "sonner";
 import loginAccount from '@/lib/loginAccount';
 import { useAuth } from '@/context/auth-context';
-import { hashPassword } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 export default function LoginPage() {
@@ -21,10 +20,9 @@ export default function LoginPage() {
         setIsSubmitting(true);
         try {
             const data = Object.fromEntries(formData.entries());
-            const hashedPassword = await hashPassword(data.password as string);
             const res = await loginAccount({
                 email: data.email as string,
-                password: hashedPassword,
+                password: data.password as string,
             });
             login(res);
             toast.success("Connexion réussie");
