@@ -21,10 +21,14 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
     getShops()
       .then(shops => {
         const names: Record<string, string> = {};
+        if (!shops || shops.length === 0) {
+          console.warn("No shops found");
+          return;
+        }
         (shops ?? []).forEach(s => { names[s.store_id.toString()] = s.name; });
         setShopNames(names);
       })
-      .catch(err => console.error("Erreur lors de la récupération des magasins", err));
+      .catch(err => console.error("Error occurred while fetching shops", err));
   }, []);
 
   return (
