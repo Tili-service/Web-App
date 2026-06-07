@@ -14,7 +14,7 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  if (pathname.startsWith('/admin') || pathname === '/login' || pathname === '/register') {
+  if (pathname.startsWith('/admin') || pathname === '/login' || pathname === '/register' || pathname === '/forgot-password') {
     return null;
   }
 

@@ -3,9 +3,10 @@
 import { useLoading } from "../layout";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { plans } from "@/data/plans";
 import getLicenses, { License } from "@/lib/getLicenses";
+import { handleRefundLicense } from "@/lib/refundLicense";
 import Link from "next/link";
 import { CreditCard, CheckCircle2, XCircle, Store, Calendar, Plus, Sparkles, Check } from "lucide-react";
 
@@ -21,13 +22,21 @@ export default function LicensesPage() {
     const { setIsLoading } = useLoading();
     const [licences, setLicenses] = useState<License[]>([]);
 
-    useEffect(() => {
+    const loadLicenses = useCallback(async () => {
         setIsLoading(true);
-        getLicenses()
-            .then(setLicenses)
-            .catch(console.error)
-            .finally(() => setIsLoading(false));
+        try {
+            const data = await getLicenses();
+            setLicenses(data ?? []);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
     }, [setIsLoading]);
+
+    useEffect(() => {
+        loadLicenses();
+    }, [loadLicenses]);
 
     const activeCount = licences.filter((l) => l.is_active).length;
     const linkedCount = licences.filter((l) => l.store).length;

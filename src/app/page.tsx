@@ -8,8 +8,10 @@ import {
     ArrowRight, CheckCircle2, Puzzle, Clock3, MonitorSmartphone, FileCheck,
     Zap, ShieldCheck, BarChart3, Users, ChevronRight,
 } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
 
 function Hero() {
+    const { isLoggedIn } = useAuth();
     return (
         <section className="relative overflow-hidden bg-white pt-24 pb-0">
             <div className="pointer-events-none absolute -top-40 right-0 w-[600px] h-[600px] rounded-full bg-orange-50 opacity-70 blur-3xl" />
@@ -36,10 +38,10 @@ function Hero() {
 
                     <div className="flex flex-wrap gap-3">
                         <Link
-                            href="/register"
+                            href={isLoggedIn ? "/admin" : "/register"}
                             className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm"
                         >
-                            Essayer gratuitement <ArrowRight size={16} />
+                            {isLoggedIn ? "Accéder à mon espace" : "Essayer"}<ArrowRight size={16} />
                         </Link>
                         <a
                             href="#features"
@@ -145,6 +147,7 @@ function Features() {
 }
 
 function Pricing() {
+    const { isLoggedIn } = useAuth();
     return (
         <section id="pricing" className="bg-gray-50 py-24">
             <div className="container">
@@ -209,14 +212,14 @@ function Pricing() {
                             </ul>
 
                             <Link
-                                href="/register"
+                                href={isLoggedIn ? `/admin/licenses/new?plan=${plan.param}` : "/register"}
                                 className={`inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm transition-colors ${
                                     plan.popular
                                         ? "bg-orange-500 hover:bg-orange-600 text-white"
                                         : "bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white"
                                 }`}
                             >
-                                Choisir {plan.name} <ChevronRight size={15} />
+                                {isLoggedIn ? "Acheter" : `Choisir ${plan.name}`} <ChevronRight size={15} />
                             </Link>
                         </motion.div>
                     ))}
@@ -227,6 +230,7 @@ function Pricing() {
 }
 
 function CTA() {
+    const { isLoggedIn } = useAuth();
     return (
         <section className="bg-white py-20">
             <div className="container">
@@ -247,17 +251,19 @@ function CTA() {
                         </p>
                         <div className="flex flex-wrap gap-3 justify-center">
                             <Link
-                                href="/register"
+                                href={isLoggedIn ? "/admin" : "/register"}
                                 className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-7 py-3.5 rounded-xl transition-colors text-sm"
                             >
-                                Démarrer gratuitement <ArrowRight size={16} />
+                                {isLoggedIn ? "Accéder à mon espace" : "Essayer"} <ArrowRight size={16} />
                             </Link>
-                            <Link
-                                href="/login"
-                                className="inline-flex items-center gap-2 border border-white/20 text-white/80 hover:bg-white/10 font-semibold px-7 py-3.5 rounded-xl transition-colors text-sm"
-                            >
-                                Se connecter
-                            </Link>
+                            {!isLoggedIn && (
+                                <Link
+                                    href="/login"
+                                    className="inline-flex items-center gap-2 border border-white/20 text-white/80 hover:bg-white/10 font-semibold px-7 py-3.5 rounded-xl transition-colors text-sm"
+                                >
+                                    Se connecter
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </motion.div>

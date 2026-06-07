@@ -4,13 +4,15 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
-    Plus, Pencil, X, Users, UserCog, User,
+    Plus, Pencil, Trash2, X, Users, UserCog, User,
     CircleOff, CheckCircle2, Copy, Eye, EyeOff,
     RefreshCw, Search, ChevronLeft, ChevronRight,
+    AlertTriangle,
 } from "lucide-react";
 import { Profile } from "@/lib/getProfiles";
 import createProfile, { ProfileWithPin } from "@/lib/createProfile";
 import updateProfile from "@/lib/updateProfile";
+import deleteProfile from "@/lib/deleteProfile";
 
 const PAGE_SIZE = 12;
 
@@ -43,7 +45,8 @@ type PanelState =
     | { type: "add" }
     | { type: "add_pin"; profile: ProfileWithPin }
     | { type: "edit"; profile: Profile }
-    | { type: "edit_pin"; profile: ProfileWithPin };
+    | { type: "edit_pin"; profile: ProfileWithPin }
+    | { type: "delete"; profile: Profile };
 
 export default function ProfilesClient({
     profiles,
@@ -104,9 +107,26 @@ export default function ProfilesClient({
         setPanel({ type: "edit", profile: p });
     };
 
+    const openDelete = (p: Profile) => setPanel({ type: "delete", profile: p });
+
     const generatePin = () => {
         setGeneratedPin(String(Math.floor(100000 + Math.random() * 900000)));
         setShowGenPin(false);
+    };
+
+    const handleDelete = async () => {
+        if (panel.type !== "delete") return;
+        setLoading(true);
+        try {
+            await deleteProfile(panel.profile.profile_id, storeId);
+            toast.success("Profil supprimé");
+            router.refresh();
+            close();
+        } catch (e: unknown) {
+            toast.error(e instanceof Error ? e.message : "Erreur lors de la suppression");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleAdd = async () => {
@@ -272,12 +292,20 @@ export default function ProfilesClient({
                                             <CircleOff size={13} /> Inactif
                                         </span>
                                     )}
-                                    <button
-                                        onClick={() => openEdit(p)}
-                                        className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-400 hover:text-gray-900 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-                                    >
-                                        <Pencil size={12} /> Modifier
-                                    </button>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => openEdit(p)}
+                                            className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-400 hover:text-gray-900 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                                        >
+                                            <Pencil size={12} /> Modifier
+                                        </button>
+                                        <button
+                                            onClick={() => openDelete(p)}
+                                            className="inline-flex items-center gap-1.5 text-xs font-medium text-red-400 hover:text-red-600 px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                                        >
+                                            <Trash2 size={12} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         );
@@ -304,6 +332,36 @@ export default function ProfilesClient({
                         </button>
                     </div>
                 </div>
+            )}
+
+            {panel.type === "delete" && (
+                <Overlay onClose={close}>
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+                        <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+                                <AlertTriangle size={18} className="text-red-500" />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-gray-900">Supprimer le profil</h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Supprimer <span className="font-semibold text-gray-800">{panel.profile.name}</span> ? Cette action est irréversible.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex gap-2 justify-end pt-1">
+                            <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
+                                Annuler
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                disabled={loading}
+                                className="px-4 py-2 text-sm rounded-xl bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+                            >
+                                {loading ? "Suppression…" : "Supprimer"}
+                            </button>
+                        </div>
+                    </div>
+                </Overlay>
             )}
 
             <SidePanel

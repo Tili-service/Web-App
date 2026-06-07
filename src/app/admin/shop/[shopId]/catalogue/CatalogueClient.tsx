@@ -218,6 +218,13 @@ function CategoriesSection({
 
     const handleDelete = async () => {
         if (panel.type !== "delete") return;
+        const itemCount = items.filter((i) => i.categorie_id === panel.categorie.categorie_id).length;
+        if (itemCount > 0) {
+            toast.error("Impossible de supprimer cette catégorie", {
+                description: `Elle contient ${itemCount} article${itemCount > 1 ? "s" : ""}. Déplacez ou supprimez-les d'abord.`,
+            });
+            return;
+        }
         setLoading(true);
         try {
             await deleteCategorie(panel.categorie.categorie_id, storeId);
@@ -279,7 +286,12 @@ function CategoriesSection({
                                         <button onClick={() => openEdit(cat)} className="flex-1 inline-flex items-center justify-center gap-1.5 text-gray-500 hover:text-gray-900 text-xs font-medium py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
                                             <Pencil size={12} /> Modifier
                                         </button>
-                                        <button onClick={() => openDelete(c)} className="flex-1 inline-flex items-center justify-center gap-1.5 text-red-400 hover:text-red-600 text-xs font-medium py-1.5 rounded-lg hover:bg-red-50 transition-colors">
+                                        <button
+                                            onClick={() => openDelete(c)}
+                                            disabled={itemCount > 0}
+                                            title={itemCount > 0 ? `Contient ${itemCount} article${itemCount > 1 ? "s" : ""} — déplacez-les d'abord` : undefined}
+                                            className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-medium py-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-red-400 hover:text-red-600 hover:bg-red-50 disabled:hover:bg-transparent disabled:hover:text-red-400"
+                                        >
                                             <Trash2 size={12} /> Supprimer
                                         </button>
                                     </div>
@@ -407,7 +419,7 @@ function CategoryDrillDown({
 
     const [addName, setAddName] = useState("");
     const [addPrice, setAddPrice] = useState("");
-    const [addTax, setAddTax] = useState("0.20");
+    const [addTax, setAddTax] = useState("20");
 
     const [editName, setEditName] = useState("");
     const [editPrice, setEditPrice] = useState("");
@@ -417,8 +429,16 @@ function CategoryDrillDown({
     const color = getColorById(category?.color ?? "orange");
     const CatIcon = getIconById(category?.icon ?? "tag");
 
-    const openAdd = () => { setAddName(""); setAddPrice(""); setAddTax("0.20"); setPanel({ type: "add", categoryId: category?.categorie_id }); };
-    const openEdit = (item: Item) => { setEditName(item.name); setEditPrice(item.price.toString()); setEditTax(item.tax.toString()); setEditCategoryId(item.categorie_id); setPanel({ type: "edit", item }); };
+    const openAdd = () => { setAddName(""); setAddPrice(""); setAddTax("20"); setPanel({ type: "add", categoryId: category?.categorie_id }); };
+    const openEdit = (item: Item) => {
+        const taxPercent = Number(item.tax) * 100;
+        const priceTTC = Number(item.price) * (1 + Number(item.tax));
+        setEditName(item.name);
+        setEditPrice(priceTTC.toFixed(2));
+        setEditTax(taxPercent.toFixed(0));
+        setEditCategoryId(item.categorie_id);
+        setPanel({ type: "edit", item });
+    };
     const openDelete = (item: Item) => setPanel({ type: "delete", item });
     const openMove = (item: Item) => { setEditCategoryId(item.categorie_id); setPanel({ type: "move", item }); };
     const close = () => setPanel({ type: "closed" });
@@ -427,7 +447,9 @@ function CategoryDrillDown({
         if (!addName.trim() || !addPrice) return;
         setLoading(true);
         try {
-            await createItem(storeId, { name: addName.trim(), price: parseFloat(addPrice), tax: parseFloat(addTax), categorie_id: category.categorie_id });
+            const taxDecimal = parseFloat(addTax) / 100;
+            const priceHT = parseFloat(addPrice) / (1 + taxDecimal);
+            await createItem(storeId, { name: addName.trim(), price: priceHT, tax: taxDecimal, categorie_id: category.categorie_id });
             toast.success("Article créé");
             close();
             router.refresh();
@@ -439,7 +461,9 @@ function CategoryDrillDown({
         if (panel.type !== "edit") return;
         setLoading(true);
         try {
-            await updateItem(panel.item.item_id, storeId, { name: editName.trim(), price: parseFloat(editPrice), tax: parseFloat(editTax), categorie_id: editCategoryId });
+            const taxDecimal = parseFloat(editTax) / 100;
+            const priceHT = parseFloat(editPrice) / (1 + taxDecimal);
+            await updateItem(panel.item.item_id, storeId, { name: editName.trim(), price: priceHT, tax: taxDecimal, categorie_id: editCategoryId });
             toast.success("Article mis à jour");
             close();
             router.refresh();
@@ -630,6 +654,11 @@ function AllItemsSection({
     const [sortKey, setSortKey] = useState<"name" | "price" | "category">("name");
     const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
+    const [addName, setAddName] = useState("");
+    const [addPrice, setAddPrice] = useState("");
+    const [addTax, setAddTax] = useState("20");
+    const [addCategoryId, setAddCategoryId] = useState<number>(categories[0]?.categorie_id ?? 0);
+
     const [editName, setEditName] = useState("");
     const [editPrice, setEditPrice] = useState("");
     const [editTax, setEditTax] = useState("");
@@ -657,16 +686,41 @@ function AllItemsSection({
     const getCategoryName = (id: number) => categories.find((c) => c.categorie_id === id)?.type ?? "—";
     const getCat = (id: number) => categories.find((c) => c.categorie_id === id) as CatWithMeta | undefined;
 
-    const openEdit = (item: Item) => { setEditName(item.name); setEditPrice(item.price.toString()); setEditTax(item.tax.toString()); setEditCategoryId(item.categorie_id); setPanel({ type: "edit", item }); };
+    const openAdd = () => { setAddName(""); setAddPrice(""); setAddTax("20"); setAddCategoryId(categories[0]?.categorie_id ?? 0); setPanel({ type: "add" }); };
+    const openEdit = (item: Item) => {
+        const taxPercent = Number(item.tax) * 100;
+        const priceTTC = Number(item.price) * (1 + Number(item.tax));
+        setEditName(item.name);
+        setEditPrice(priceTTC.toFixed(2));
+        setEditTax(taxPercent.toFixed(0));
+        setEditCategoryId(item.categorie_id);
+        setPanel({ type: "edit", item });
+    };
     const openDelete = (item: Item) => setPanel({ type: "delete", item });
     const openMove = (item: Item) => { setEditCategoryId(item.categorie_id); setPanel({ type: "move", item }); };
     const close = () => setPanel({ type: "closed" });
+
+    const handleAdd = async () => {
+        if (!addName.trim() || !addPrice || !addCategoryId) return;
+        setLoading(true);
+        try {
+            const taxDecimal = parseFloat(addTax) / 100;
+            const priceHT = parseFloat(addPrice) / (1 + taxDecimal);
+            await createItem(storeId, { name: addName.trim(), price: priceHT, tax: taxDecimal, categorie_id: addCategoryId });
+            toast.success("Article créé");
+            close();
+            router.refresh();
+        } catch (e: unknown) { toast.error(e instanceof Error ? e.message : "Erreur"); }
+        finally { setLoading(false); }
+    };
 
     const handleEdit = async () => {
         if (panel.type !== "edit") return;
         setLoading(true);
         try {
-            await updateItem(panel.item.item_id, storeId, { name: editName.trim(), price: parseFloat(editPrice), tax: parseFloat(editTax), categorie_id: editCategoryId });
+            const taxDecimal = parseFloat(editTax) / 100;
+            const priceHT = parseFloat(editPrice) / (1 + taxDecimal);
+            await updateItem(panel.item.item_id, storeId, { name: editName.trim(), price: priceHT, tax: taxDecimal, categorie_id: editCategoryId });
             toast.success("Article mis à jour");
             close();
             router.refresh();
@@ -719,6 +773,9 @@ function AllItemsSection({
                         <option value="all">Toutes les catégories</option>
                         {categories.map((c) => <option key={c.categorie_id} value={c.categorie_id}>{c.type}</option>)}
                     </select>
+                    <button onClick={openAdd} disabled={categories.length === 0} className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <Plus size={16} /> Nouvel article
+                    </button>
                 </div>
 
                 <p className="text-xs text-gray-400">{filtered.length} article{filtered.length !== 1 ? "s" : ""}{filterCategory !== "all" ? ` dans "${getCategoryName(filterCategory as number)}"` : ""}</p>
@@ -788,6 +845,24 @@ function AllItemsSection({
                     </div>
                 )}
             </div>
+
+            <SidePanel open={panel.type === "add"} onClose={close} title="Nouvel article" footer={
+                <>
+                    <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
+                    <button onClick={handleAdd} disabled={loading || !addName.trim() || !addPrice} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                        {loading ? "Création…" : "Créer"}
+                    </button>
+                </>
+            }>
+                <div className="space-y-5">
+                    <ItemForm name={addName} onNameChange={setAddName} price={addPrice} onPriceChange={setAddPrice} tax={addTax} onTaxChange={setAddTax} />
+                    <Field label="Catégorie">
+                        <select value={addCategoryId} onChange={(e) => setAddCategoryId(Number(e.target.value))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400 bg-white">
+                            {categories.map((c) => <option key={c.categorie_id} value={c.categorie_id}>{c.type}</option>)}
+                        </select>
+                    </Field>
+                </div>
+            </SidePanel>
 
             <SidePanel open={panel.type === "edit"} onClose={close} title="Modifier l'article" footer={
                 <>
@@ -920,31 +995,35 @@ function ItemForm({ name, onNameChange, price, onPriceChange, tax, onTaxChange }
     price: string; onPriceChange: (v: string) => void;
     tax: string; onTaxChange: (v: string) => void;
 }) {
+    const priceTTC = parseFloat(price || "0");
+    const taxPercent = parseFloat(tax || "0");
+    const priceHT = taxPercent > 0 ? priceTTC / (1 + taxPercent / 100) : priceTTC;
+
     return (
         <div className="space-y-4">
             <Field label="Nom de l'article">
                 <input type="text" value={name} onChange={(e) => onNameChange(e.target.value)} placeholder="Ex : Café Espresso" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
             </Field>
             <div className="grid grid-cols-2 gap-3">
-                <Field label="Prix HT (€)">
+                <Field label="Prix TTC (€)">
                     <div className="relative">
                         <Euro size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input type="number" step="0.01" min="0" value={price} onChange={(e) => onPriceChange(e.target.value)} placeholder="0.00" className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
                     </div>
                 </Field>
-                <Field label="TVA (décimal)">
+                <Field label="TVA (%)">
                     <div className="relative">
                         <Percent size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input type="number" step="0.01" min="0" max="1" value={tax} onChange={(e) => onTaxChange(e.target.value)} placeholder="0.20" className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
+                        <input type="number" step="0.1" min="0" max="100" value={tax} onChange={(e) => onTaxChange(e.target.value)} placeholder="20" className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
                     </div>
                 </Field>
             </div>
             {price && tax && (
                 <div className="bg-gray-50 rounded-xl px-4 py-3 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Prix TTC</span>
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Prix HT</span>
                     <span className="font-bold text-gray-900">
-                        {(parseFloat(price || "0") * (1 + parseFloat(tax || "0"))).toFixed(2)} €
-                        <span className="text-xs text-gray-400 font-normal ml-1">(TVA {(parseFloat(tax || "0") * 100).toFixed(0)}%)</span>
+                        {priceHT.toFixed(2)} €
+                        <span className="text-xs text-gray-400 font-normal ml-1">(TVA {taxPercent.toFixed(0)}%)</span>
                     </span>
                 </div>
             )}
