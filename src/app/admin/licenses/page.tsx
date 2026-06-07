@@ -8,7 +8,7 @@ import { plans } from "@/data/plans";
 import getLicenses, { License } from "@/lib/getLicenses";
 import { handleRefundLicense } from "@/lib/refundLicense";
 import Link from "next/link";
-import { CreditCard, CheckCircle2, XCircle, Store, Calendar, Plus, Sparkles, Check } from "lucide-react";
+import { CreditCard, CheckCircle2, XCircle, Store, Calendar, Plus, Sparkles, Check, X } from "lucide-react";
 
 function formatDate(d: string) {
     return new Date(d).toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
@@ -21,6 +21,8 @@ function isExpired(d: string) {
 export default function LicensesPage() {
     const { setIsLoading } = useLoading();
     const [licences, setLicenses] = useState<License[]>([]);
+    const [refundTarget, setRefundTarget] = useState<string | null>(null);
+    const [refunding, setRefunding] = useState(false);
 
     const loadLicenses = useCallback(async () => {
         setIsLoading(true);
@@ -136,15 +138,23 @@ export default function LicensesPage() {
                                         </div>
                                     </div>
 
-                                    {!licence.store && licence.is_active && (
-                                        <Link
-                                            href={`/admin/shop/new?licenceId=${licence.licence_id}`}
-                                            className="shrink-0 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5"
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        {!licence.store && licence.is_active && (
+                                            <Link
+                                                href={`/admin/shop/new?licenceId=${licence.licence_id}`}
+                                                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5"
+                                            >
+                                                <Plus size={13} />
+                                                Créer ma boutique
+                                            </Link>
+                                        )}
+                                        <button
+                                            onClick={() => setRefundTarget(licence.licence_id)}
+                                            className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 text-xs font-semibold rounded-xl transition-colors"
                                         >
-                                            <Plus size={13} />
-                                            Créer ma boutique
-                                        </Link>
-                                    )}
+                                            Rembourser
+                                        </button>
+                                    </div>
                                 </motion.div>
                             );
                         })}
@@ -218,6 +228,60 @@ export default function LicensesPage() {
                         </motion.div>
                     ))}
                 </div>
+            </div>
+            {refundTarget && (
+                <Overlay onClose={() => setRefundTarget(null)}>
+                    <ConfirmCard
+                        title="Rembourser la licence"
+                        description={<>Rembourser la licence <span className="font-semibold text-gray-900 font-mono">{refundTarget.slice(0, 8).toUpperCase()}…</span> ?</>}
+                        warning="Cette action est irréversible. La licence sera désactivée et le paiement remboursé."
+                        onClose={() => setRefundTarget(null)}
+                        onConfirm={async () => {
+                            setRefunding(true);
+                            try {
+                                await handleRefundLicense(refundTarget);
+                                setRefundTarget(null);
+                                await loadLicenses();
+                            } catch (error) {
+                                console.error("Erreur lors du remboursement:", error);
+                            } finally {
+                                setRefunding(false);
+                            }
+                        }}
+                        loading={refunding}
+                        confirmLabel="Rembourser"
+                        confirmCls="bg-red-600 hover:bg-red-700"
+                    />
+                </Overlay>
+            )}
+        </div>
+    );
+}
+
+function Overlay({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={onClose}>
+            <div onClick={(e) => e.stopPropagation()}>{children}</div>
+        </div>
+    );
+}
+
+function ConfirmCard({ title, description, warning, onClose, onConfirm, loading, confirmLabel, confirmCls }: {
+    title: string; description: React.ReactNode; warning: string; onClose: () => void; onConfirm: () => void; loading: boolean; confirmLabel: string; confirmCls: string;
+}) {
+    return (
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm flex flex-col gap-5 p-6">
+            <div className="flex items-center justify-between">
+                <h2 className="text-base font-bold text-gray-900">{title}</h2>
+                <button onClick={onClose} className="text-gray-400 hover:text-gray-700 transition-colors"><X size={18} /></button>
+            </div>
+            <div className="space-y-3">
+                <p className="text-sm text-gray-600">{description}</p>
+                <p className="text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-100">{warning}</p>
+            </div>
+            <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+                <button onClick={onClose} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
+                <button onClick={onConfirm} disabled={loading} className={`px-4 py-2 text-sm rounded-xl text-white transition-colors disabled:opacity-50 ${confirmCls}`}>{loading ? "Remboursement…" : confirmLabel}</button>
             </div>
         </div>
     );
