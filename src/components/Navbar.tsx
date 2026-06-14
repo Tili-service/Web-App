@@ -7,10 +7,16 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/UserMenu";
 import { useAuth } from "@/context/auth-context";
+import { usePathname } from "next/navigation";
 
 export const Navbar = () => {
   const { isLoggedIn } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  if (pathname.startsWith('/admin') || pathname === '/login' || pathname === '/register' || pathname === '/forgot-password') {
+    return null;
+  }
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import getShops, { Shop } from "@/lib/getShop";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Store, Calendar, Hash, Receipt, ArrowRight, Plus, CreditCard } from "lucide-react";
 
 export default function ShopPage() {
     const { setIsLoading } = useLoading();
@@ -22,78 +24,102 @@ export default function ShopPage() {
             }
         };
         fetchShops();
-
     }, [setIsLoading]);
 
+    if (!shops || shops.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center py-24 px-6">
+                <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mb-5">
+                    <Store size={30} className="text-orange-400" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Aucun commerce</h2>
+                <p className="text-gray-400 mb-8 text-center max-w-xs text-sm leading-relaxed">
+                    Vous n'avez pas encore de boutiques associées à votre compte.
+                </p>
+                <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl px-5 h-10 text-sm">
+                    <Link href="/admin/licenses" className="flex items-center gap-2">
+                        <Plus size={15} />
+                        Associer une boutique à une licence
+                    </Link>
+                </Button>
+            </div>
+        );
+    }
+
     return (
-        <div className="space-y-4">
-            {!shops || shops.length === 0 ? (
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center py-12">
-                    <p className="text-gray-500 mb-4">Vous n'avez pas de boutiques pour le moment.</p>
-                    <Button asChild variant="default" className="bg-orange-500 hover:bg-orange-600 text-white">
-                        <Link href="/admin/licenses">
-                            Associer une boutique à une licence
-                        </Link>
-                    </Button>
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Vos boutiques</h2>
+                    <p className="text-sm text-gray-400 mt-0.5">
+                        {shops.length} commerce{shops.length > 1 ? 's' : ''} enregistré{shops.length > 1 ? 's' : ''}
+                    </p>
                 </div>
-            ) : (
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Vos boutiques</h2>
-                        <Button
-                            asChild
-                            variant="default"
-                            className="bg-[#548687] hover:bg-[#426a6b] text-white"
+                <Button
+                    asChild
+                    variant="outline"
+                    className="text-sm border-gray-200 hover:bg-gray-50 rounded-xl h-9 px-4"
+                >
+                    <Link href="/admin/licenses" className="flex items-center gap-2">
+                        <CreditCard size={15} />
+                        Gérer les licences
+                    </Link>
+                </Button>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {shops.map((shop, index) => (
+                    <motion.div
+                        key={shop.store_id}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.07 }}
+                    >
+                        <Link
+                            href={`/admin/shop/${shop.store_id}/dashboard`}
+                            className="group flex flex-col bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-lg hover:border-orange-100 transition-all duration-200 cursor-pointer h-full"
                         >
-                            <Link href="/admin/licenses">
-                                Gérer mes licences
-                            </Link>
-                        </Button>
-                    </div>
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="w-11 h-11 bg-gray-50 group-hover:bg-orange-50 rounded-xl flex items-center justify-center transition-colors">
+                                    <Store size={20} className="text-gray-400 group-hover:text-orange-500 transition-colors" />
+                                </div>
+                                <span className="flex items-center gap-1 text-xs text-gray-400 group-hover:text-orange-500 transition-colors font-medium pt-1">
+                                    Accéder
+                                    <ArrowRight size={12} />
+                                </span>
+                            </div>
 
-                    <ul className="space-y-4">
-                        {shops.map((shop, index) => (
-                            <li key={index}>
-                                <Link
-                                    href={`/admin/shop/${shop.store_id}/dashboard`}
-                                    className="block p-5 border border-gray-100 rounded-xl hover:shadow-md hover:border-orange-200 transition-all duration-200 bg-white cursor-pointer group"
-                                >
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                        <div className="space-y-2 flex-1">
-                                            <div className="flex items-center gap-3">
-                                                <h3 className="text-lg font-bold text-gray-900 group-hover:text-orange-600 transition-colors">{shop.name}</h3>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 mt-2">
-                                                <p className="text-sm">
-                                                    <span className="font-semibold text-gray-700">SIRET :</span>
-                                                    <span className="text-gray-600 ml-2">{shop.siret || 'N/A'}</span>
-                                                </p>
-                                                <p className="text-sm">
-                                                    <span className="font-semibold text-gray-700">N° TVA :</span>
-                                                    <span className="text-gray-600 ml-2">{shop.numero_tva || 'N/A'}</span>
-                                                </p>
-                                                <p className="text-sm text-gray-500 mt-1">
-                                                    Créée le {new Date(shop.date_creation).toLocaleDateString('fr-FR', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric'
-                                                    })}
-                                                </p>
-                                            </div>
-                                        </div>
+                            <h3 className="text-base font-bold text-gray-900 mb-4 group-hover:text-orange-600 transition-colors">
+                                {shop.name}
+                            </h3>
 
-                                        <div className="flex-shrink-0">
-                                            <span className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 group-hover:text-orange-600 group-hover:border-orange-200 transition-colors bg-gray-50 group-hover:bg-orange-50">
-                                                Voir les détails
-                                            </span>
-                                        </div>
-                                    </div>
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
+                            <div className="mt-auto pt-4 border-t border-gray-50 space-y-2">
+                                <div className="flex items-center gap-2 text-xs">
+                                    <Hash size={12} className="text-gray-300 shrink-0" />
+                                    <span className="text-gray-400">SIRET</span>
+                                    <span className="text-gray-600 font-medium ml-auto truncate">{shop.siret || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs">
+                                    <Receipt size={12} className="text-gray-300 shrink-0" />
+                                    <span className="text-gray-400">N° TVA</span>
+                                    <span className="text-gray-600 font-medium ml-auto truncate">{shop.numero_tva || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs">
+                                    <Calendar size={12} className="text-gray-300 shrink-0" />
+                                    <span className="text-gray-400">Créée le</span>
+                                    <span className="text-gray-600 font-medium ml-auto">
+                                        {new Date(shop.date_creation).toLocaleDateString('fr-FR', {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric',
+                                        })}
+                                    </span>
+                                </div>
+                            </div>
+                        </Link>
+                    </motion.div>
+                ))}
+            </div>
         </div>
     );
 }

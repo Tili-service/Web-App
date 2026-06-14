@@ -33,7 +33,7 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
-      <div className="flex h-[calc(100vh-64px)] mt-16 bg-gray-50 font-sans text-gray-900 overflow-hidden">
+      <div className="fixed inset-0 flex bg-gray-50 font-sans text-gray-900 overflow-hidden">
 
         <Sidebar pathname={pathname} shopNames={shopNames} />
 

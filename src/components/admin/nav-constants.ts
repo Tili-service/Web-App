@@ -1,14 +1,14 @@
 import {
-  Home, Package, Phone,
+  Home, Phone, CreditCard,
   LayoutDashboard, UserCircle, ShoppingBag, MonitorSmartphone,
 } from 'lucide-react';
 
 export const MAIN_LINKS = [
-  { name: 'Mes Licenses', href: '/admin/licenses', icon: Package },
-  { name: 'Mes Commerces', href: '/admin/shop',     icon: Home },
+  { name: 'Mes Commerces', href: '/admin/shop', icon: Home },
 ];
 
 export const BOTTOM_LINKS = [
+  { name: 'Licences', href: '/admin/licenses', icon: CreditCard },
   { name: 'Support', href: 'tel:+330000000000', icon: Phone },
 ];
 
