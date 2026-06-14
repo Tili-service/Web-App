@@ -24,6 +24,8 @@ export async function loginWithPin(storeId: number, pin: string) {
     const cookieStore = await cookies();
     cookieStore.set(`profile_token_${storeId}`, data.token, {
         httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
         path: "/",
         maxAge: 2 * 60 * 60,
     });

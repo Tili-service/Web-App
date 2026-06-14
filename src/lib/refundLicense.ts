@@ -27,7 +27,8 @@ export async function handleRefundLicense(licenceId: string) {
     }
     console.log("Licence remboursée avec succès !");
 
-    } catch (err: {message: string} | unknown) {
+    } catch (err: unknown) {
         console.error("Error refunding license:", err);
+        throw err;
     }
 }
