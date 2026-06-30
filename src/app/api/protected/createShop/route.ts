@@ -41,11 +41,11 @@ export async function POST(request: NextRequest) {
             throw new Error(session.error || "Invalid session data received from server");
         }
 
-        const origin = request.headers.get("origin") || "http://localhost:3000";
-        return NextResponse.redirect(`${origin}/admin/licenses?shop_created=true`, 303);
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+        return NextResponse.redirect(`${appUrl}/admin/licenses?shop_created=true`, 303);
     } catch (error: any) {
         console.error("Erreur création boutique :", error.message);
-        const origin = request.headers.get("origin") || "http://localhost:3000";
-        return NextResponse.redirect(`${origin}/admin/licenses?error=shop_creation_failed`, 303);
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+        return NextResponse.redirect(`${appUrl}/admin/licenses?error=shop_creation_failed`, 303);
     }
 }
