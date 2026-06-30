@@ -1,7 +1,8 @@
 "use client";
 import { useLoading } from "../layout";
 import { useEffect, useState } from "react";
-import getShops, { Shop } from "@/lib/getShop";
+import { getShops } from "@/services/store.service";
+import type { Shop } from "@/lib/types";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";

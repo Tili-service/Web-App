@@ -6,8 +6,7 @@ import { useState } from 'react';
 import { toast } from "sonner";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import createAccount from '@/lib/createAccount';
-import loginAccount from '@/lib/loginAccount';
+import { createAccount, loginAccount } from '@/services/auth.service';
 import { useAuth } from '@/context/auth-context';
 import { motion } from 'framer-motion';
 

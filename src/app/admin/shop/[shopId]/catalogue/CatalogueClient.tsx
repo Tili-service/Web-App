@@ -9,14 +9,9 @@ import {
     Utensils, Music, Gift, Zap, Star, Dumbbell,
     Pizza, ShoppingBag, ChevronUp, ChevronDown,
 } from "lucide-react";
-import { Categorie } from "@/lib/getCategories";
-import { Item } from "@/lib/getItems";
-import createCategorie from "@/lib/createCategorie";
-import updateCategorie from "@/lib/updateCategorie";
-import deleteCategorie from "@/lib/deleteCategorie";
-import createItem from "@/lib/createItem";
-import updateItem from "@/lib/updateItem";
-import deleteItem from "@/lib/deleteItem";
+import { createCategorie, updateCategorie, deleteCategorie } from "@/services/category.service";
+import { createItem, updateItem, deleteItem } from "@/services/item.service";
+import type { Categorie, Item } from "@/lib/types";
 
 const ICON_OPTIONS: { id: string; Icon: React.ElementType; label: string }[] = [
     { id: "tag",      Icon: Tag,         label: "Tag"         },

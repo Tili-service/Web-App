@@ -1,5 +1,6 @@
-import getCategories, { Categorie } from "@/lib/getCategories";
-import getItems, { Item } from "@/lib/getItems";
+import { getCategories } from "@/services/category.service";
+import { getItems } from "@/services/item.service";
+import type { Categorie, Item } from "@/lib/types";
 import CatalogueClient from "./CatalogueClient";
 
 export default async function CataloguePage({

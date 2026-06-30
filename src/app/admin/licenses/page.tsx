@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useState } from "react";
 import { plans } from "@/data/plans";
-import getLicenses, { License } from "@/lib/getLicenses";
-import { handleRefundLicense } from "@/lib/refundLicense";
+import { getLicenses, handleRefundLicense } from "@/services/license.service";
+import type { License } from "@/lib/types";
 import Link from "next/link";
 import { CreditCard, CheckCircle2, XCircle, Store, Calendar, Plus, Sparkles, Check, X } from "lucide-react";
 

@@ -9,10 +9,8 @@ import {
     RefreshCw, Search, ChevronLeft, ChevronRight,
     AlertTriangle,
 } from "lucide-react";
-import { Profile } from "@/lib/getProfiles";
-import createProfile, { ProfileWithPin } from "@/lib/createProfile";
-import updateProfile from "@/lib/updateProfile";
-import deleteProfile from "@/lib/deleteProfile";
+import { createProfile, updateProfile, deleteProfile } from "@/services/profile.service";
+import type { Profile, ProfileWithPin } from "@/lib/types";
 
 const PAGE_SIZE = 12;
 
