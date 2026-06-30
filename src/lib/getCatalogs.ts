@@ -15,7 +15,7 @@ export default async function getCatalogs(storeId: number): Promise<Catalog[]> {
         throw new Error("Unauthorized: missing profile token");
     }
 
-    const res = await fetch(`${process.env.BACKEND_GO}/catalog`, {
+    const res = await fetch(`${process.env.BACKEND_GO}/catalog/store/${storeId}`, {
         headers: {
             Authorization: `Bearer ${profileToken}`,
         },

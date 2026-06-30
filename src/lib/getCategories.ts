@@ -6,7 +6,7 @@ export type Categorie = {
     type: string;
 };
 
-export default async function getCategories(storeId: number): Promise<Categorie[]> {
+export default async function getCategories(storeId: number, catalogId: number): Promise<Categorie[]> {
     const cookieStore = await cookies();
     const profileToken = cookieStore.get(`profile_token_${storeId}`)?.value;
 
@@ -14,7 +14,7 @@ export default async function getCategories(storeId: number): Promise<Categorie[
         throw new Error("Unauthorized: missing profile token");
     }
 
-    const res = await fetch(`${process.env.BACKEND_GO}/categorie`, {
+    const res = await fetch(`${process.env.BACKEND_GO}/categorie/catalog/${catalogId}`, {
         headers: {
             Authorization: `Bearer ${profileToken}`,
         },

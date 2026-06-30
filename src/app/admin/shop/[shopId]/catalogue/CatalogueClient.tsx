@@ -76,10 +76,12 @@ export default function CatalogueClient({
     categories,
     items,
     storeId,
+    catalogId,
 }: {
     categories: Categorie[];
     items: Item[];
     storeId: number;
+    catalogId: number;
 }) {
     const [activeTab, setActiveTab] = useState<Tab>("categories");
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
@@ -129,6 +131,7 @@ export default function CatalogueClient({
                             items={items.filter((i) => i.categorie_id === selectedCategoryId)}
                             categories={categories}
                             storeId={storeId}
+                            catalogId={catalogId}
                             onBack={() => setSelectedCategoryId(null)}
                         />
                     ) : (
@@ -136,6 +139,7 @@ export default function CatalogueClient({
                             categories={categories}
                             items={items}
                             storeId={storeId}
+                            catalogId={catalogId}
                             onDrillDown={setSelectedCategoryId}
                         />
                     )
@@ -153,11 +157,13 @@ function CategoriesSection({
     categories,
     items,
     storeId,
+    catalogId,
     onDrillDown,
 }: {
     categories: Categorie[];
     items: Item[];
     storeId: number;
+    catalogId: number;
     onDrillDown: (id: number) => void;
 }) {
     const router = useRouter();
@@ -195,7 +201,7 @@ function CategoriesSection({
         if (!addType.trim()) return;
         setLoading(true);
         try {
-            await createCategorie(storeId, { type: addType.trim() });
+            await createCategorie(storeId, catalogId, { type: addType.trim() });
             toast.success("Catégorie créée");
             close();
             router.refresh();
@@ -208,7 +214,7 @@ function CategoriesSection({
         if (!editType.trim()) return;
         setLoading(true);
         try {
-            await updateCategorie(panel.categorie.categorie_id, storeId, { type: editType.trim() });
+            await updateCategorie(panel.categorie.categorie_id, storeId, catalogId, { type: editType.trim() });
             toast.success("Catégorie mise à jour");
             close();
             router.refresh();
@@ -227,7 +233,7 @@ function CategoriesSection({
         }
         setLoading(true);
         try {
-            await deleteCategorie(panel.categorie.categorie_id, storeId);
+            await deleteCategorie(panel.categorie.categorie_id, storeId, catalogId);
             toast.success("Catégorie supprimée");
             close();
             router.refresh();
@@ -405,12 +411,14 @@ function CategoryDrillDown({
     items,
     categories,
     storeId,
+    catalogId,
     onBack,
 }: {
     category: CatWithMeta;
     items: Item[];
     categories: Categorie[];
     storeId: number;
+    catalogId: number;
     onBack: () => void;
 }) {
     const router = useRouter();

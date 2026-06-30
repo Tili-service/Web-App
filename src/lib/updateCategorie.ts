@@ -5,6 +5,7 @@ import { Categorie } from "./getCategories";
 export default async function updateCategorie(
     categorieId: number,
     storeId: number,
+    catalogId: number,
     data: { type: string }
 ): Promise<Categorie> {
     const cookieStore = await cookies();
@@ -14,7 +15,7 @@ export default async function updateCategorie(
         throw new Error("Unauthorized: missing profile token");
     }
 
-    const res = await fetch(`${process.env.BACKEND_GO}/categorie/${categorieId}`, {
+    const res = await fetch(`${process.env.BACKEND_GO}/categorie/catalog/${catalogId}/${categorieId}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
