@@ -9,7 +9,7 @@ export async function getCatalogs(storeId: number): Promise<Catalog[]> {
         throw new Error("Unauthorized: missing profile token");
     }
 
-    const data = await apiFetch<Catalog[]>("/catalog", {
+    const data = await apiFetch<Catalog[]>(`/catalog/store/${storeId}`, {
         token,
         cache: "no-store",
         errorMessage: "Failed to fetch catalogs",

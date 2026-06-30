@@ -1,3 +1,4 @@
+import { getCatalogs } from "@/services/catalog.service";
 import { getCategories } from "@/services/category.service";
 import { getItems } from "@/services/item.service";
 import type { Categorie, Item } from "@/lib/types";
@@ -13,11 +14,14 @@ export default async function CataloguePage({
 
     let categories: Categorie[] = [];
     let items: Item[] = [];
+    let catalogId: number = 0;
     let error: string | null = null;
 
     try {
+        const catalogs = await getCatalogs(storeId);
+        catalogId = catalogs[0]?.catalog_id ?? 0;
         [categories, items] = await Promise.all([
-            getCategories(storeId),
+            catalogId ? getCategories(storeId, catalogId) : Promise.resolve([]),
             getItems(storeId),
         ]);
     } catch (e: unknown) {
@@ -31,7 +35,7 @@ export default async function CataloguePage({
                     Erreur : {error}
                 </div>
             ) : (
-                <CatalogueClient categories={categories} items={items} storeId={storeId} />
+                <CatalogueClient categories={categories} items={items} storeId={storeId} catalogId={catalogId} />
             )}
         </div>
     );

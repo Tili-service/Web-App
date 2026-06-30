@@ -7,8 +7,9 @@ export async function POST(request: NextRequest) {
         const cookies = request.cookies;
         const token = cookies.get("auth_token")?.value;
 
-        if (!offerEntry  || typeof offerEntry !== "string") {
-            throw new Error("Missing offer parameter");
+        const VALID_OFFERS = ["mensuel", "semestriel", "annuel"];
+        if (!offerEntry || typeof offerEntry !== "string" || !VALID_OFFERS.includes(offerEntry)) {
+            throw new Error("Missing or invalid offer parameter");
         }
 
         if (!token) {
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.redirect(session.url, 303);
     } catch (error: any) {
         console.error("Erreur Stripe :", error);
-        const origin = request.headers.get("origin") || "http://localhost:3000";
-        return NextResponse.redirect(`${origin}/?error=stripe_error`, 303);
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+        return NextResponse.redirect(`${appUrl}/?error=stripe_error`, 303);
     }
 }

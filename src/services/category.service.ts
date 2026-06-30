@@ -3,13 +3,13 @@
 import { apiFetch, getProfileToken } from "@/lib/api";
 import type { Categorie } from "@/lib/types";
 
-export async function getCategories(storeId: number): Promise<Categorie[]> {
+export async function getCategories(storeId: number, catalogId: number): Promise<Categorie[]> {
     const token = await getProfileToken(storeId);
     if (!token) {
         throw new Error("Unauthorized: missing profile token");
     }
 
-    const data = await apiFetch<Categorie[]>("/categorie", {
+    const data = await apiFetch<Categorie[]>(`/categorie/catalog/${catalogId}`, {
         token,
         cache: "no-store",
         errorMessage: "Failed to fetch categories",
@@ -17,13 +17,17 @@ export async function getCategories(storeId: number): Promise<Categorie[]> {
     return Array.isArray(data) ? data : [];
 }
 
-export async function createCategorie(storeId: number, data: { type: string }): Promise<Categorie> {
+export async function createCategorie(
+    storeId: number,
+    catalogId: number,
+    data: { type: string }
+): Promise<Categorie> {
     const token = await getProfileToken(storeId);
     if (!token) {
         throw new Error("Unauthorized: missing profile token");
     }
 
-    return apiFetch<Categorie>("/categorie", {
+    return apiFetch<Categorie>(`/categorie/catalog/${catalogId}`, {
         method: "POST",
         token,
         body: data,
@@ -34,6 +38,7 @@ export async function createCategorie(storeId: number, data: { type: string }): 
 export async function updateCategorie(
     categorieId: number,
     storeId: number,
+    catalogId: number,
     data: { type: string }
 ): Promise<Categorie> {
     const token = await getProfileToken(storeId);
@@ -41,7 +46,7 @@ export async function updateCategorie(
         throw new Error("Unauthorized: missing profile token");
     }
 
-    return apiFetch<Categorie>(`/categorie/${categorieId}`, {
+    return apiFetch<Categorie>(`/categorie/catalog/${catalogId}/${categorieId}`, {
         method: "PUT",
         token,
         body: data,
@@ -49,13 +54,17 @@ export async function updateCategorie(
     });
 }
 
-export async function deleteCategorie(categorieId: number, storeId: number): Promise<void> {
+export async function deleteCategorie(
+    categorieId: number,
+    storeId: number,
+    catalogId: number
+): Promise<void> {
     const token = await getProfileToken(storeId);
     if (!token) {
         throw new Error("Unauthorized: missing profile token");
     }
 
-    await apiFetch<void>(`/categorie/${categorieId}`, {
+    await apiFetch<void>(`/categorie/catalog/${catalogId}/${categorieId}`, {
         method: "DELETE",
         token,
         errorMessage: "Failed to delete category",

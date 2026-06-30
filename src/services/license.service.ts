@@ -26,5 +26,6 @@ export async function handleRefundLicense(licenceId: string) {
         });
     } catch (err) {
         console.error("Error refunding license:", err);
+        throw err;
     }
 }
