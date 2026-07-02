@@ -6,6 +6,7 @@ export type Shop = {
     name: string,
     date_creation: string,
     numero_tva: string,
+    sumup_status?: "connected" | "disconnected",
     siret: string,
 };
 
