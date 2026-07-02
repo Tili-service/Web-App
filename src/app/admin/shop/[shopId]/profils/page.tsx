@@ -1,4 +1,5 @@
-import getProfiles, { Profile } from "@/lib/getProfiles";
+import { getProfiles } from "@/services/profile.service";
+import type { Profile } from "@/lib/types";
 import ProfilesClient from "./ProfilesClient";
 
 export default async function ProfilsPage({

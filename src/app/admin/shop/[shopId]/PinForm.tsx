@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { loginWithPin } from "@/lib/profileAuth";
+import { loginWithPin } from "@/services/auth.service";
 import { Lock, Loader2 } from "lucide-react";
 
 export default function PinForm() {
