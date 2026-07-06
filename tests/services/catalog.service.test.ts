@@ -45,7 +45,7 @@ describe("createCatalog", () => {
         mockApiFetch.mockResolvedValue({ catalog_id: 1, name: "Main", description: "" });
         await createCatalog(3, { name: "Main" });
         expect(mockApiFetch).toHaveBeenCalledWith(
-            "/catalog",
+            "/catalog/store/3",
             expect.objectContaining({ method: "POST", body: { name: "Main" } })
         );
     });
