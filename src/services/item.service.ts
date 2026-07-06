@@ -3,7 +3,7 @@
 import { apiFetch, getProfileToken } from "@/lib/api";
 import type { Item } from "@/lib/types";
 
-export async function getItems(storeId: number): Promise<Item[]> {
+export async function getItems(storeId: string): Promise<Item[]> {
     const token = await getProfileToken(storeId);
     if (!token) {
         throw new Error("Unauthorized: missing profile token");
@@ -18,8 +18,8 @@ export async function getItems(storeId: number): Promise<Item[]> {
 }
 
 export async function createItem(
-    storeId: number,
-    data: { name: string; price: number; tax: number; categorie_id: number }
+    storeId: string,
+    data: { name: string; price: number; tax: number; categorie_id: string }
 ): Promise<Item> {
     const token = await getProfileToken(storeId);
     if (!token) {
@@ -37,9 +37,9 @@ export async function createItem(
 }
 
 export async function updateItem(
-    itemId: number,
-    storeId: number,
-    data: { name?: string; price?: number; tax?: number; categorie_id?: number }
+    itemId: string,
+    storeId: string,
+    data: { name?: string; price?: number; tax?: number; categorie_id?: string }
 ): Promise<Item> {
     const token = await getProfileToken(storeId);
     if (!token) {
@@ -54,7 +54,7 @@ export async function updateItem(
     });
 }
 
-export async function deleteItem(itemId: number, storeId: number): Promise<void> {
+export async function deleteItem(itemId: string, storeId: string): Promise<void> {
     const token = await getProfileToken(storeId);
     if (!token) {
         throw new Error("Unauthorized: missing profile token");
