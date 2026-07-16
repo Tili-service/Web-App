@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
-import getShops from "@/lib/getShop";
+import { getShops } from "@/services/store.service";
 import { LoadingContext } from '@/components/admin/loading-context';
 import Sidebar from '@/components/admin/Sidebar';
 import MobileMenu from '@/components/admin/MobileMenu';

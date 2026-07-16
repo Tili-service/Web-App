@@ -2,9 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/lib/auth";
-import { getAccount } from "@/lib/getAccount";
-import { logoutAccount } from "@/lib/logoutAccount";
+import { isAuthenticated, logoutAccount } from "@/services/auth.service";
+import { getAccount } from "@/services/account.service";
 
 type User = {
   name: string;
