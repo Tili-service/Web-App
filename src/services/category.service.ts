@@ -3,7 +3,7 @@
 import { apiFetch, getProfileToken } from "@/lib/api";
 import type { Categorie } from "@/lib/types";
 
-export async function getCategories(storeId: number, catalogId: number): Promise<Categorie[]> {
+export async function getCategories(storeId: string, catalogId: string): Promise<Categorie[]> {
     const token = await getProfileToken(storeId);
     if (!token) {
         throw new Error("Unauthorized: missing profile token");
@@ -18,8 +18,8 @@ export async function getCategories(storeId: number, catalogId: number): Promise
 }
 
 export async function createCategorie(
-    storeId: number,
-    catalogId: number,
+    storeId: string,
+    catalogId: string,
     data: { type: string }
 ): Promise<Categorie> {
     const token = await getProfileToken(storeId);
@@ -36,9 +36,9 @@ export async function createCategorie(
 }
 
 export async function updateCategorie(
-    categorieId: number,
-    storeId: number,
-    catalogId: number,
+    categorieId: string,
+    storeId: string,
+    catalogId: string,
     data: { type: string }
 ): Promise<Categorie> {
     const token = await getProfileToken(storeId);
@@ -55,9 +55,9 @@ export async function updateCategorie(
 }
 
 export async function deleteCategorie(
-    categorieId: number,
-    storeId: number,
-    catalogId: number
+    categorieId: string,
+    storeId: string,
+    catalogId: string
 ): Promise<void> {
     const token = await getProfileToken(storeId);
     if (!token) {

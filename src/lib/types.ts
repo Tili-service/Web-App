@@ -4,10 +4,11 @@ export type Account = {
 };
 
 export type Shop = {
-    store_id: number;
+    store_id: string;
     name: string;
     date_creation: string;
     numero_tva: string;
+    sumup_status?: "connected" | "disconnected",
     siret: string;
 };
 
@@ -27,32 +28,32 @@ export type License = {
 };
 
 export type Catalog = {
-    catalog_id: number;
+    catalog_id: string;
     name: string;
     description: string;
 };
 
 export type Categorie = {
-    categorie_id: number;
+    categorie_id: string;
     type: string;
 };
 
 export type Item = {
-    item_id: number;
+    item_id: string;
     name: string;
     price: number;
     tax: number;
     tax_amount: number;
-    categorie_id: number;
+    categorie_id: string;
     categorie?: {
-        categorie_id: number;
+        categorie_id: string;
         type: string;
     };
 };
 
 export type Profile = {
-    profile_id: number;
-    store_id: number;
+    profile_id: string;
+    store_id: string;
     name: string;
     level_access: number;
     is_active: boolean;
