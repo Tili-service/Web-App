@@ -49,7 +49,7 @@ export async function isAuthenticated() {
     }
 }
 
-export async function loginWithPin(storeId: number, pin: string) {
+export async function loginWithPin(storeId: string, pin: string) {
     const data = await apiFetch<{ token: string; profile: { level_access: number } }>(
         "/profile/login/pin",
         {
@@ -74,7 +74,7 @@ export async function loginWithPin(storeId: number, pin: string) {
     return true;
 }
 
-export async function logoutShopProfile(storeId: number): Promise<void> {
+export async function logoutShopProfile(storeId: string): Promise<void> {
     const cookieStore = await cookies();
     cookieStore.delete(`profile_token_${storeId}`);
 }
