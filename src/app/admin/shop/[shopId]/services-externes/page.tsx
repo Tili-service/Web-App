@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, CreditCard, ShieldCheck, ShieldX, Store } from "lucide-react";
-
-import getShops from "@/lib/getShop";
+import { getShops } from "@/services/store.service";
 import { Button } from "@/components/ui/button";
 
 export default async function ServicesExternesPage({
@@ -11,11 +10,7 @@ export default async function ServicesExternesPage({
 	params: { shopId: string } | Promise<{ shopId: string }>;
 }) {
 	const { shopId } = await Promise.resolve(params);
-	const storeId = Number.parseInt(shopId, 10);
-
-	if (Number.isNaN(storeId)) {
-		notFound();
-	}
+	const storeId = String(shopId);
 
 	const shops = await getShops();
 	const shop = shops.find((item) => item.store_id === storeId);
