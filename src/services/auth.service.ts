@@ -1,7 +1,7 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { apiFetch, getAuthToken } from "@/lib/api";
+import { setAuthCookie, clearAuthCookie, setProfileCookie, clearProfileCookie } from "@/lib/cookies";
 
 export async function createAccount(data: { email: string; name: string; password: string }) {
     await apiFetch<void>("/account", {
@@ -19,21 +19,13 @@ export async function loginAccount(data: { email: string; password: string }) {
         errorMessage: "Failed to login",
     });
 
-    const cookieStore = await cookies();
-    cookieStore.set("auth_token", jsonData.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-    });
+    await setAuthCookie(jsonData.token);
 
     return jsonData;
 }
 
 export async function logoutAccount() {
-    const cookieStore = await cookies();
-    cookieStore.delete("auth_token");
+    await clearAuthCookie();
 }
 
 export async function isAuthenticated() {
@@ -63,18 +55,10 @@ export async function loginWithPin(storeId: number, pin: string) {
         throw new Error("Droits administrateur requis pour accéder à cet espace.");
     }
 
-    const cookieStore = await cookies();
-    cookieStore.set(`profile_token_${storeId}`, data.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 2 * 60 * 60,
-    });
+    await setProfileCookie(storeId, data.token);
     return true;
 }
 
 export async function logoutShopProfile(storeId: number): Promise<void> {
-    const cookieStore = await cookies();
-    cookieStore.delete(`profile_token_${storeId}`);
+    await clearProfileCookie(storeId);
 }

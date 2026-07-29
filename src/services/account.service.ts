@@ -1,7 +1,7 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { apiFetch, getAuthToken } from "@/lib/api";
+import { clearAuthCookie } from "@/lib/cookies";
 import type { Account } from "@/lib/types";
 
 export async function getAccount(): Promise<Account> {
@@ -39,6 +39,5 @@ export async function deleteAccount(): Promise<void> {
         errorMessage: "Failed to delete account",
     });
 
-    const cookieStore = await cookies();
-    cookieStore.delete("auth_token");
+    await clearAuthCookie();
 }

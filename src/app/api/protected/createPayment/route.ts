@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthToken } from "@/lib/cookies";
 
 export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
         const offerEntry = formData.get("offer");
-        const cookies = request.cookies;
-        const token = cookies.get("auth_token")?.value;
+        const token = await getAuthToken();
 
         const VALID_OFFERS = ["mensuel", "semestriel", "annuel"];
         if (!offerEntry || typeof offerEntry !== "string" || !VALID_OFFERS.includes(offerEntry)) {

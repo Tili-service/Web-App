@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthToken } from "@/lib/cookies";
 
 export async function POST(request: NextRequest) {
     try {
@@ -7,8 +8,7 @@ export async function POST(request: NextRequest) {
         const vatNumberEntry = formData.get("vatNumber");
         const siretEntry = formData.get("siret");
         const licenseIDEntry = formData.get("licenseID");
-        const cookies = request.cookies;
-        const token = cookies.get("auth_token")?.value;
+        const token = await getAuthToken();
 
         if (!shopNameEntry  || typeof shopNameEntry !== "string"
             || !vatNumberEntry || typeof vatNumberEntry !== "string"
