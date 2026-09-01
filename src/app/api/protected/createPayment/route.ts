@@ -30,10 +30,10 @@ export async function POST(request: NextRequest) {
         }
         const session = await response.json();
         if (!session || !session.url) {
-            throw new Error(session.error || "Invalid session data received from server");
+            throw new Error(session?.error || "Invalid session data received from server");
         }
         return NextResponse.redirect(session.url, 303);
-    } catch (error: any) {
+    } catch (error) {
         console.error("Erreur Stripe :", error);
         const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
         return NextResponse.redirect(`${appUrl}/?error=stripe_error`, 303);

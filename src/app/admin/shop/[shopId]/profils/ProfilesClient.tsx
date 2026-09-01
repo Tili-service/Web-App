@@ -108,7 +108,9 @@ export default function ProfilesClient({
     const openDelete = (p: Profile) => setPanel({ type: "delete", profile: p });
 
     const generatePin = () => {
-        setGeneratedPin(String(Math.floor(100000 + Math.random() * 900000)));
+        const buf = new Uint32Array(1);
+        crypto.getRandomValues(buf);
+        setGeneratedPin(String(100000 + (buf[0] % 900000)));
         setShowGenPin(false);
     };
 
@@ -190,7 +192,7 @@ export default function ProfilesClient({
                 </div>
                 <button
                     onClick={openAdd}
-                    className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
+                    className="inline-flex items-center gap-2 bg-brand-ink hover:bg-brand-ink-strong text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
                 >
                     <Plus size={15} /> Ajouter un profil
                 </button>
@@ -250,7 +252,7 @@ export default function ProfilesClient({
                     <p className="text-sm text-gray-400 mb-5">Créez des profils pour chacun de vos employés.</p>
                     <button
                         onClick={openAdd}
-                        className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
+                        className="inline-flex items-center gap-2 bg-brand-ink hover:bg-brand-ink-strong text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
                     >
                         <Plus size={15} /> Créer le premier profil
                     </button>
@@ -322,7 +324,7 @@ export default function ProfilesClient({
                             <button
                                 key={n}
                                 onClick={() => setPage(n)}
-                                className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${n === safePage ? "bg-[hsl(355,16%,20%)] text-white" : "hover:bg-gray-100"}`}
+                                className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${n === safePage ? "bg-brand-ink text-white" : "hover:bg-gray-100"}`}
                             >{n}</button>
                         ))}
                         <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={safePage === totalPages} className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-30 transition-colors">
@@ -368,13 +370,13 @@ export default function ProfilesClient({
                 title={panel.type === "add_pin" ? "Profil créé ✓" : "Nouveau profil"}
                 footer={
                     panel.type === "add_pin" ? (
-                        <button onClick={close} className="w-full px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors">
+                        <button onClick={close} className="w-full px-4 py-2 text-sm rounded-xl bg-brand-ink text-white hover:bg-brand-ink-strong transition-colors">
                             J&apos;ai noté le PIN, fermer
                         </button>
                     ) : (
                         <>
                             <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
-                            <button onClick={handleAdd} disabled={loading || !addName.trim()} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white transition-colors disabled:opacity-50">
+                            <button onClick={handleAdd} disabled={loading || !addName.trim()} className="px-4 py-2 text-sm rounded-xl bg-brand-ink hover:bg-brand-ink-strong text-white transition-colors disabled:opacity-50">
                                 {loading ? "Création…" : "Créer le profil"}
                             </button>
                         </>
@@ -429,7 +431,7 @@ export default function ProfilesClient({
                         <button
                             onClick={() => handleEdit()}
                             disabled={loading || !editName.trim()}
-                            className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white transition-colors disabled:opacity-50"
+                            className="px-4 py-2 text-sm rounded-xl bg-brand-ink hover:bg-brand-ink-strong text-white transition-colors disabled:opacity-50"
                         >
                             {loading ? "Enregistrement…" : "Enregistrer"}
                         </button>
@@ -550,7 +552,7 @@ function LevelSelect({ value, onChange }: { value: number; onChange: (v: number)
                     onClick={() => onChange(opt.value)}
                     className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl border text-xs font-medium transition-colors ${
                         value === opt.value
-                            ? "border-[hsl(355,16%,20%)] bg-[hsl(355,16%,20%)] text-white"
+                            ? "border-brand-ink bg-brand-ink text-white"
                             : "border-gray-200 hover:border-gray-300 text-gray-600 hover:bg-gray-50"
                     }`}
                 >

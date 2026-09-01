@@ -1,23 +1,26 @@
 "use server";
 
-import { apiFetch, getAuthToken } from "@/lib/api";
-import { setAuthCookie, clearAuthCookie, setProfileCookie, clearProfileCookie } from "@/lib/cookies";
+import { apiFetch } from "@/lib/api";
+import { setAuthCookie, clearAuthCookie, setProfileCookie } from "@/lib/cookies";
 
 export async function createAccount(data: { email: string; name: string; password: string }) {
     await apiFetch<void>("/account", {
         method: "POST",
         body: data,
-        errorMessage: "Failed to create account",
+        errorMessage: "Impossible de créer le compte",
     });
     return { success: true };
 }
 
 export async function loginAccount(data: { email: string; password: string }) {
-    const jsonData = await apiFetch<{ token: string; account?: unknown }>("/account/login", {
-        method: "POST",
-        body: data,
-        errorMessage: "Failed to login",
-    });
+    const jsonData = await apiFetch<{ token: string; account?: { name: string; email: string } }>(
+        "/account/login",
+        {
+            method: "POST",
+            body: data,
+            errorMessage: "Échec de la connexion. Vérifiez vos identifiants.",
+        }
+    );
 
     await setAuthCookie(jsonData.token);
 
@@ -28,26 +31,13 @@ export async function logoutAccount() {
     await clearAuthCookie();
 }
 
-export async function isAuthenticated() {
-    const token = await getAuthToken();
-    if (!token) return false;
-
-    try {
-        await apiFetch<void>("/account", { token });
-        return true;
-    } catch (error) {
-        console.error("Auth check failed", error);
-        return false;
-    }
-}
-
 export async function loginWithPin(storeId: number, pin: string) {
     const data = await apiFetch<{ token: string; profile: { level_access: number } }>(
         "/profile/login/pin",
         {
             method: "POST",
             body: { store_id: storeId, pin },
-            errorMessage: "Pin invalide",
+            errorMessage: "PIN invalide",
         }
     );
 
@@ -57,8 +47,4 @@ export async function loginWithPin(storeId: number, pin: string) {
 
     await setProfileCookie(storeId, data.token);
     return true;
-}
-
-export async function logoutShopProfile(storeId: number): Promise<void> {
-    await clearProfileCookie(storeId);
 }

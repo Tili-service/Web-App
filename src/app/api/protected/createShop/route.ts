@@ -38,13 +38,13 @@ export async function POST(request: NextRequest) {
         }
         const session = await response.json();
         if (!session) {
-            throw new Error(session.error || "Invalid session data received from server");
+            throw new Error("Invalid session data received from server");
         }
 
         const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
         return NextResponse.redirect(`${appUrl}/admin/licenses?shop_created=true`, 303);
-    } catch (error: any) {
-        console.error("Erreur création boutique :", error.message);
+    } catch (error) {
+        console.error("Erreur création boutique :", error instanceof Error ? error.message : error);
         const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
         return NextResponse.redirect(`${appUrl}/admin/licenses?error=shop_creation_failed`, 303);
     }

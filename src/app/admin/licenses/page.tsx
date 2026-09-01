@@ -8,6 +8,7 @@ import { plans } from "@/data/plans";
 import { getLicenses, handleRefundLicense } from "@/services/license.service";
 import type { License } from "@/lib/types";
 import Link from "next/link";
+import { toast } from "sonner";
 import { CreditCard, CheckCircle2, XCircle, Store, Calendar, Plus, Sparkles, Check, X } from "lucide-react";
 
 function formatDate(d: string) {
@@ -20,7 +21,7 @@ function isExpired(d: string) {
 
 export default function LicensesPage() {
     const { setIsLoading } = useLoading();
-    const [licences, setLicenses] = useState<License[]>([]);
+    const [licenses, setLicenses] = useState<License[]>([]);
     const [refundTarget, setRefundTarget] = useState<string | null>(null);
     const [refunding, setRefunding] = useState(false);
 
@@ -31,6 +32,11 @@ export default function LicensesPage() {
             setLicenses(data ?? []);
         } catch (error) {
             console.error(error);
+            if (error instanceof Error && error.message.includes("Session expirée")) {
+                window.location.assign("/login");
+                return;
+            }
+            toast.error(error instanceof Error ? error.message : "Impossible de récupérer les licences");
         } finally {
             setIsLoading(false);
         }
@@ -40,8 +46,8 @@ export default function LicensesPage() {
         loadLicenses();
     }, [loadLicenses]);
 
-    const activeCount = licences.filter((l) => l.is_active).length;
-    const linkedCount = licences.filter((l) => l.store).length;
+    const activeCount = licenses.filter((l) => l.is_active).length;
+    const linkedCount = licenses.filter((l) => l.store).length;
 
     return (
         <div className="space-y-8">
@@ -49,21 +55,21 @@ export default function LicensesPage() {
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Mes licences</h2>
                     <p className="text-sm text-gray-400 mt-0.5">
-                        {licences.length} licence{licences.length !== 1 ? "s" : ""} enregistrée{licences.length !== 1 ? "s" : ""}
+                        {licenses.length} licence{licenses.length !== 1 ? "s" : ""} enregistrée{licenses.length !== 1 ? "s" : ""}
                     </p>
                 </div>
-                <Button asChild className="bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white rounded-xl h-9 px-4 text-sm flex items-center gap-2">
+                <Button asChild className="bg-brand-ink hover:bg-brand-ink-strong text-white rounded-xl h-9 px-4 text-sm flex items-center gap-2">
                     <Link href="/admin/licenses/new" className="flex items-center gap-2">
                         <Plus size={15} /> Acheter une licence
                     </Link>
                 </Button>
             </div>
 
-            {licences.length > 0 && (
+            {licenses.length > 0 && (
                 <>
                     <div className="grid grid-cols-3 gap-4">
                         {[
-                            { label: "Total", value: licences.length, icon: CreditCard, color: "bg-gray-50 text-gray-500" },
+                            { label: "Total", value: licenses.length, icon: CreditCard, color: "bg-gray-50 text-gray-500" },
                             { label: "Actives", value: activeCount, icon: CheckCircle2, color: "bg-green-50 text-green-600" },
                             { label: "Associées", value: linkedCount, icon: Store, color: "bg-orange-50 text-orange-500" },
                         ].map(({ label, value, icon: Icon, color }) => (
@@ -80,7 +86,7 @@ export default function LicensesPage() {
                     </div>
 
                     <div className="space-y-3">
-                        {licences.map((licence, i) => {
+                        {licenses.map((licence, i) => {
                             const expired = isExpired(licence.expiration);
                             const status = !licence.is_active ? "inactive" : expired ? "expired" : "active";
 
@@ -167,11 +173,11 @@ export default function LicensesPage() {
                     <div className="flex items-center gap-2 mb-2">
                         <Sparkles size={14} className="text-orange-400" />
                         <span className="text-xs font-semibold text-orange-500 uppercase tracking-wider">
-                            {licences.length === 0 ? "Choisir un plan" : "Ajouter une licence"}
+                            {licenses.length === 0 ? "Choisir un plan" : "Ajouter une licence"}
                         </span>
                     </div>
-                    {licences.length === 0 && (
-                        <p className="text-gray-400 text-sm">Vous n'avez pas encore de licence. Choisissez un plan pour commencer.</p>
+                    {licenses.length === 0 && (
+                        <p className="text-gray-400 text-sm">Vous n&apos;avez pas encore de licence. Choisissez un plan pour commencer.</p>
                     )}
                 </div>
 
@@ -184,7 +190,7 @@ export default function LicensesPage() {
                             transition={{ delay: i * 0.1 }}
                             className={`relative flex flex-col rounded-2xl border p-6 ${
                                 plan.popular
-                                    ? "bg-[hsl(355,16%,20%)] border-[hsl(355,16%,28%)] text-white"
+                                    ? "bg-brand-ink border-sidebar-accent text-white"
                                     : "bg-white border-gray-100 text-gray-900"
                             }`}
                         >
@@ -207,9 +213,9 @@ export default function LicensesPage() {
                                 {plan.features.map((f) => (
                                     <li key={f} className={`flex items-center gap-2 text-sm ${plan.popular ? "text-white/80" : "text-gray-500"}`}>
                                         <span className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
-                                            plan.popular ? "bg-[hsl(27,97%,69%)]/20" : "bg-orange-50"
+                                            plan.popular ? "bg-sidebar-primary/20" : "bg-orange-50"
                                         }`}>
-                                            <Check size={10} className={plan.popular ? "text-[hsl(27,97%,69%)]" : "text-orange-500"} />
+                                            <Check size={10} className={plan.popular ? "text-sidebar-primary" : "text-orange-500"} />
                                         </span>
                                         {f}
                                     </li>
@@ -219,8 +225,8 @@ export default function LicensesPage() {
                                 onClick={() => (window.location.href = `/admin/licenses/new?plan=${plan.param}`)}
                                 className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
                                     plan.popular
-                                        ? "bg-[hsl(27,97%,69%)] hover:bg-[hsl(27,90%,62%)] text-[hsl(355,16%,20%)]"
-                                        : "bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white"
+                                        ? "bg-sidebar-primary hover:bg-sidebar-primary/90 text-brand-ink"
+                                        : "bg-brand-ink hover:bg-brand-ink-strong text-white"
                                 }`}
                             >
                                 Choisir {plan.name}
@@ -244,6 +250,7 @@ export default function LicensesPage() {
                                 await loadLicenses();
                             } catch (error) {
                                 console.error("Erreur lors du remboursement:", error);
+                                toast.error(error instanceof Error ? error.message : "Impossible de rembourser la licence");
                             } finally {
                                 setRefunding(false);
                             }

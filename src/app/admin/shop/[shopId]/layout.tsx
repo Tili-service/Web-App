@@ -6,10 +6,10 @@ export default async function ShopLayout({
     params,
 }: {
     children: React.ReactNode;
-    params: { shopId: string } | Promise<{ shopId: string }>;
+    params: Promise<{ shopId: string }>;
 }) {
-    const resolvedParams = await Promise.resolve(params);
-    const shopToken = await getProfileToken(resolvedParams.shopId);
+    const { shopId } = await params;
+    const shopToken = await getProfileToken(shopId);
 
     if (!shopToken) {
         return <PinForm />;

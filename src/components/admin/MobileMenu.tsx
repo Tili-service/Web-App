@@ -17,8 +17,8 @@ export default function MobileMenu({ isOpen, onClose, pathname, shopNames }: Pro
   return (
     <div className="md:hidden fixed inset-0 z-[60] flex">
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <aside className="relative w-72 max-w-[85%] bg-[hsl(355,16%,20%)] h-full flex flex-col shadow-2xl">
-        <div className="h-16 flex items-center justify-between px-5 border-b border-[hsl(355,16%,28%)]">
+      <aside className="relative w-72 max-w-[85%] bg-brand-ink h-full flex flex-col shadow-2xl">
+        <div className="h-16 flex items-center justify-between px-5 border-b border-sidebar-accent">
           <Link href="/admin" className="flex items-center gap-3" onClick={onClose}>
             <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
               <Image src="/tiliLogo.png" alt="Tili" width={20} height={20} className="w-5 h-5 object-contain" />
@@ -26,7 +26,7 @@ export default function MobileMenu({ isOpen, onClose, pathname, shopNames }: Pro
             <span className="text-white font-bold text-lg font-display">Tili</span>
           </Link>
           <button
-            className="p-1.5 text-white/50 hover:text-white hover:bg-[hsl(355,16%,28%)] rounded-lg transition-colors"
+            className="p-1.5 text-white/50 hover:text-white hover:bg-sidebar-accent rounded-lg transition-colors"
             onClick={onClose}
           >
             <X size={20} />

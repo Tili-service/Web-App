@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { createCategorie, updateCategorie, deleteCategorie } from "@/services/category.service";
 import { createItem, updateItem, deleteItem } from "@/services/item.service";
+import { round2 } from "@/lib/utils";
+import { DEFAULT_TAX_PERCENT } from "@/lib/constants";
 import type { Categorie, Item } from "@/lib/types";
 
 const ICON_OPTIONS: { id: string; Icon: React.ElementType; label: string }[] = [
@@ -126,7 +128,6 @@ export default function CatalogueClient({
                             items={items.filter((i) => i.categorie_id === selectedCategoryId)}
                             categories={categories}
                             storeId={storeId}
-                            catalogId={catalogId}
                             onBack={() => setSelectedCategoryId(null)}
                         />
                     ) : (
@@ -168,13 +169,9 @@ function CategoriesSection({
 
     // Add form state
     const [addType, setAddType] = useState("");
-    const [addIcon, setAddIcon] = useState("tag");
-    const [addColor, setAddColor] = useState("orange");
 
     // Edit form state
     const [editType, setEditType] = useState("");
-    const [editIcon, setEditIcon] = useState("tag");
-    const [editColor, setEditColor] = useState("orange");
 
     const filtered = useMemo(() => {
         const q = search.trim().toLowerCase();
@@ -182,11 +179,9 @@ function CategoriesSection({
         return categories.filter((c) => c.type.toLowerCase().includes(q));
     }, [categories, search]);
 
-    const openAdd = () => { setAddType(""); setAddIcon("tag"); setAddColor("orange"); setPanel({ type: "add" }); };
+    const openAdd = () => { setAddType(""); setPanel({ type: "add" }); };
     const openEdit = (c: CatWithMeta) => {
         setEditType(c.type);
-        setEditIcon(c.icon ?? "tag");
-        setEditColor(c.color ?? "orange");
         setPanel({ type: "edit", categorie: c });
     };
     const openDelete = (c: Categorie) => setPanel({ type: "delete", categorie: c });
@@ -244,7 +239,7 @@ function CategoriesSection({
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                         <input type="text" placeholder="Rechercher une catégorie…" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
                     </div>
-                    <button onClick={openAdd} className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                    <button onClick={openAdd} className="inline-flex items-center gap-2 bg-brand-ink hover:bg-brand-ink-strong text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
                         <Plus size={16} /> Nouvelle catégorie
                     </button>
                 </div>
@@ -254,7 +249,7 @@ function CategoriesSection({
                         <Tag size={40} className="mx-auto mb-3 opacity-30" />
                         <p className="text-sm">{categories.length === 0 ? "Aucune catégorie. Créez-en une !" : "Aucun résultat."}</p>
                         {categories.length === 0 && (
-                            <button onClick={openAdd} className="mt-4 inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors hover:bg-[hsl(355,16%,16%)]">
+                            <button onClick={openAdd} className="mt-4 inline-flex items-center gap-2 bg-brand-ink text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors hover:bg-brand-ink-strong">
                                 <Plus size={15} /> Créer la première catégorie
                             </button>
                         )}
@@ -310,7 +305,7 @@ function CategoriesSection({
                 footer={
                     <>
                         <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
-                        <button onClick={handleAdd} disabled={loading || !addType.trim()} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                        <button onClick={handleAdd} disabled={loading || !addType.trim()} className="px-4 py-2 text-sm rounded-xl bg-brand-ink text-white hover:bg-brand-ink-strong transition-colors disabled:opacity-50">
                             {loading ? "Création…" : "Créer"}
                         </button>
                     </>
@@ -320,25 +315,9 @@ function CategoriesSection({
                     <Field label="Nom de la catégorie">
                         <input type="text" value={addType} onChange={(e) => setAddType(e.target.value)} placeholder="Ex : Boissons, Snacks…" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
                     </Field>
-                    <Field label="Icône">
-                        <div className="grid grid-cols-7 gap-1.5">
-                            {ICON_OPTIONS.map((opt) => (
-                                <button key={opt.id} type="button" onClick={() => setAddIcon(opt.id)} title={opt.label} className={`h-9 w-9 rounded-lg flex items-center justify-center transition-colors ${addIcon === opt.id ? "bg-[hsl(355,16%,20%)] text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}>
-                                    <opt.Icon size={15} />
-                                </button>
-                            ))}
-                        </div>
-                    </Field>
-                    <Field label="Couleur">
-                        <div className="flex gap-2 flex-wrap">
-                            {COLOR_OPTIONS.map((c) => (
-                                <button key={c.id} type="button" onClick={() => setAddColor(c.id)} className={`w-8 h-8 rounded-full ${c.active} transition-all ${addColor === c.id ? "ring-2 ring-offset-2 ring-gray-400 scale-110" : "opacity-70 hover:opacity-100"}`} />
-                            ))}
-                        </div>
-                    </Field>
                     <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
-                        <div className={`h-12 w-12 rounded-xl ${getColorById(addColor).bg} flex items-center justify-center`}>
-                            {(() => { const I = getIconById(addIcon); return <I size={22} className={getColorById(addColor).text} />; })()}
+                        <div className="h-12 w-12 rounded-xl bg-orange-100 flex items-center justify-center">
+                            <Tag size={22} className="text-orange-500" />
                         </div>
                         <div>
                             <p className="font-semibold text-gray-900 text-sm">{addType || "Nom de la catégorie"}</p>
@@ -355,7 +334,7 @@ function CategoriesSection({
                 footer={
                     <>
                         <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
-                        <button onClick={handleEdit} disabled={loading || !editType.trim()} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                        <button onClick={handleEdit} disabled={loading || !editType.trim()} className="px-4 py-2 text-sm rounded-xl bg-brand-ink text-white hover:bg-brand-ink-strong transition-colors disabled:opacity-50">
                             {loading ? "Enregistrement…" : "Enregistrer"}
                         </button>
                     </>
@@ -365,25 +344,9 @@ function CategoriesSection({
                     <Field label="Nom de la catégorie">
                         <input type="text" value={editType} onChange={(e) => setEditType(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
                     </Field>
-                    <Field label="Icône">
-                        <div className="grid grid-cols-7 gap-1.5">
-                            {ICON_OPTIONS.map((opt) => (
-                                <button key={opt.id} type="button" onClick={() => setEditIcon(opt.id)} title={opt.label} className={`h-9 w-9 rounded-lg flex items-center justify-center transition-colors ${editIcon === opt.id ? "bg-[hsl(355,16%,20%)] text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}>
-                                    <opt.Icon size={15} />
-                                </button>
-                            ))}
-                        </div>
-                    </Field>
-                    <Field label="Couleur">
-                        <div className="flex gap-2 flex-wrap">
-                            {COLOR_OPTIONS.map((c) => (
-                                <button key={c.id} type="button" onClick={() => setEditColor(c.id)} className={`w-8 h-8 rounded-full ${c.active} transition-all ${editColor === c.id ? "ring-2 ring-offset-2 ring-gray-400 scale-110" : "opacity-70 hover:opacity-100"}`} />
-                            ))}
-                        </div>
-                    </Field>
                     <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
-                        <div className={`h-12 w-12 rounded-xl ${getColorById(editColor).bg} flex items-center justify-center`}>
-                            {(() => { const I = getIconById(editIcon); return <I size={22} className={getColorById(editColor).text} />; })()}
+                        <div className="h-12 w-12 rounded-xl bg-orange-100 flex items-center justify-center">
+                            <Tag size={22} className="text-orange-500" />
                         </div>
                         <div>
                             <p className="font-semibold text-gray-900 text-sm">{editType || "Nom"}</p>
@@ -406,14 +369,12 @@ function CategoryDrillDown({
     items,
     categories,
     storeId,
-    catalogId,
     onBack,
 }: {
     category: CatWithMeta;
     items: Item[];
     categories: Categorie[];
     storeId: number;
-    catalogId: number;
     onBack: () => void;
 }) {
     const router = useRouter();
@@ -422,7 +383,7 @@ function CategoryDrillDown({
 
     const [addName, setAddName] = useState("");
     const [addPrice, setAddPrice] = useState("");
-    const [addTax, setAddTax] = useState("20");
+    const [addTax, setAddTax] = useState(String(DEFAULT_TAX_PERCENT));
 
     const [editName, setEditName] = useState("");
     const [editPrice, setEditPrice] = useState("");
@@ -451,7 +412,7 @@ function CategoryDrillDown({
         setLoading(true);
         try {
             const taxDecimal = parseFloat(addTax) / 100;
-            const priceHT = parseFloat(addPrice) / (1 + taxDecimal);
+            const priceHT = round2(parseFloat(addPrice) / (1 + taxDecimal));
             await createItem(storeId, { name: addName.trim(), price: priceHT, tax: taxDecimal, categorie_id: category.categorie_id });
             toast.success("Article créé");
             close();
@@ -465,7 +426,7 @@ function CategoryDrillDown({
         setLoading(true);
         try {
             const taxDecimal = parseFloat(editTax) / 100;
-            const priceHT = parseFloat(editPrice) / (1 + taxDecimal);
+            const priceHT = round2(parseFloat(editPrice) / (1 + taxDecimal));
             await updateItem(panel.item.item_id, storeId, { name: editName.trim(), price: priceHT, tax: taxDecimal, categorie_id: editCategoryId });
             toast.success("Article mis à jour");
             close();
@@ -505,7 +466,7 @@ function CategoryDrillDown({
                     <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
                         <ArrowLeft size={15} /> Toutes les catégories
                     </button>
-                    <button onClick={openAdd} className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                    <button onClick={openAdd} className="inline-flex items-center gap-2 bg-brand-ink hover:bg-brand-ink-strong text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
                         <Plus size={16} /> Ajouter un article
                     </button>
                 </div>
@@ -524,7 +485,7 @@ function CategoryDrillDown({
                     <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-10 text-center text-gray-400">
                         <Package size={40} className="mx-auto mb-3 opacity-30" />
                         <p className="text-sm mb-4">Aucun article dans cette catégorie.</p>
-                        <button onClick={openAdd} className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors hover:bg-[hsl(355,16%,16%)]">
+                        <button onClick={openAdd} className="inline-flex items-center gap-2 bg-brand-ink text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors hover:bg-brand-ink-strong">
                             <Plus size={15} /> Ajouter le premier article
                         </button>
                     </div>
@@ -579,7 +540,7 @@ function CategoryDrillDown({
             <SidePanel open={panel.type === "add"} onClose={close} title="Nouvel article" footer={
                 <>
                     <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
-                    <button onClick={handleAdd} disabled={loading || !addName.trim() || !addPrice} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                    <button onClick={handleAdd} disabled={loading || !addName.trim() || !addPrice} className="px-4 py-2 text-sm rounded-xl bg-brand-ink text-white hover:bg-brand-ink-strong transition-colors disabled:opacity-50">
                         {loading ? "Création…" : "Créer"}
                     </button>
                 </>
@@ -590,7 +551,7 @@ function CategoryDrillDown({
             <SidePanel open={panel.type === "edit"} onClose={close} title="Modifier l'article" footer={
                 <>
                     <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
-                    <button onClick={handleEdit} disabled={loading || !editName.trim() || !editPrice} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                    <button onClick={handleEdit} disabled={loading || !editName.trim() || !editPrice} className="px-4 py-2 text-sm rounded-xl bg-brand-ink text-white hover:bg-brand-ink-strong transition-colors disabled:opacity-50">
                         {loading ? "Enregistrement…" : "Enregistrer"}
                     </button>
                 </>
@@ -601,7 +562,7 @@ function CategoryDrillDown({
             <SidePanel open={panel.type === "move"} onClose={close} title="Déplacer l'article" footer={
                 <>
                     <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
-                    <button onClick={handleMove} disabled={loading} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                    <button onClick={handleMove} disabled={loading} className="px-4 py-2 text-sm rounded-xl bg-brand-ink text-white hover:bg-brand-ink-strong transition-colors disabled:opacity-50">
                         {loading ? "Déplacement…" : "Déplacer"}
                     </button>
                 </>
@@ -616,7 +577,7 @@ function CategoryDrillDown({
                                 const CI = getIconById(c.icon ?? "tag");
                                 const isCurrent = c.categorie_id === (panel.type === "move" ? panel.item.categorie_id : 0);
                                 return (
-                                    <button key={c.categorie_id} type="button" onClick={() => setEditCategoryId(c.categorie_id)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm transition-colors ${editCategoryId === c.categorie_id ? "border-[hsl(355,16%,20%)] bg-[hsl(355,16%,20%)]/5" : "border-gray-200 hover:border-gray-300"} ${isCurrent ? "opacity-50 cursor-default" : ""}`} disabled={isCurrent}>
+                                    <button key={c.categorie_id} type="button" onClick={() => setEditCategoryId(c.categorie_id)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm transition-colors ${editCategoryId === c.categorie_id ? "border-brand-ink bg-brand-ink/5" : "border-gray-200 hover:border-gray-300"} ${isCurrent ? "opacity-50 cursor-default" : ""}`} disabled={isCurrent}>
                                         <div className={`h-7 w-7 rounded-lg ${col.bg} flex items-center justify-center flex-shrink-0`}>
                                             <CI size={13} className={col.text} />
                                         </div>
@@ -659,7 +620,7 @@ function AllItemsSection({
 
     const [addName, setAddName] = useState("");
     const [addPrice, setAddPrice] = useState("");
-    const [addTax, setAddTax] = useState("20");
+    const [addTax, setAddTax] = useState(String(DEFAULT_TAX_PERCENT));
     const [addCategoryId, setAddCategoryId] = useState<number>(categories[0]?.categorie_id ?? 0);
 
     const [editName, setEditName] = useState("");
@@ -708,7 +669,7 @@ function AllItemsSection({
         setLoading(true);
         try {
             const taxDecimal = parseFloat(addTax) / 100;
-            const priceHT = parseFloat(addPrice) / (1 + taxDecimal);
+            const priceHT = round2(parseFloat(addPrice) / (1 + taxDecimal));
             await createItem(storeId, { name: addName.trim(), price: priceHT, tax: taxDecimal, categorie_id: addCategoryId });
             toast.success("Article créé");
             close();
@@ -722,7 +683,7 @@ function AllItemsSection({
         setLoading(true);
         try {
             const taxDecimal = parseFloat(editTax) / 100;
-            const priceHT = parseFloat(editPrice) / (1 + taxDecimal);
+            const priceHT = round2(parseFloat(editPrice) / (1 + taxDecimal));
             await updateItem(panel.item.item_id, storeId, { name: editName.trim(), price: priceHT, tax: taxDecimal, categorie_id: editCategoryId });
             toast.success("Article mis à jour");
             close();
@@ -776,7 +737,7 @@ function AllItemsSection({
                         <option value="all">Toutes les catégories</option>
                         {categories.map((c) => <option key={c.categorie_id} value={c.categorie_id}>{c.type}</option>)}
                     </select>
-                    <button onClick={openAdd} disabled={categories.length === 0} className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button onClick={openAdd} disabled={categories.length === 0} className="inline-flex items-center gap-2 bg-brand-ink hover:bg-brand-ink-strong text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         <Plus size={16} /> Nouvel article
                     </button>
                 </div>
@@ -852,7 +813,7 @@ function AllItemsSection({
             <SidePanel open={panel.type === "add"} onClose={close} title="Nouvel article" footer={
                 <>
                     <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
-                    <button onClick={handleAdd} disabled={loading || !addName.trim() || !addPrice} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                    <button onClick={handleAdd} disabled={loading || !addName.trim() || !addPrice} className="px-4 py-2 text-sm rounded-xl bg-brand-ink text-white hover:bg-brand-ink-strong transition-colors disabled:opacity-50">
                         {loading ? "Création…" : "Créer"}
                     </button>
                 </>
@@ -870,7 +831,7 @@ function AllItemsSection({
             <SidePanel open={panel.type === "edit"} onClose={close} title="Modifier l'article" footer={
                 <>
                     <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
-                    <button onClick={handleEdit} disabled={loading || !editName.trim() || !editPrice} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                    <button onClick={handleEdit} disabled={loading || !editName.trim() || !editPrice} className="px-4 py-2 text-sm rounded-xl bg-brand-ink text-white hover:bg-brand-ink-strong transition-colors disabled:opacity-50">
                         {loading ? "Enregistrement…" : "Enregistrer"}
                     </button>
                 </>
@@ -888,7 +849,7 @@ function AllItemsSection({
             <SidePanel open={panel.type === "move"} onClose={close} title="Déplacer l'article" footer={
                 <>
                     <button onClick={close} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Annuler</button>
-                    <button onClick={handleMove} disabled={loading} className="px-4 py-2 text-sm rounded-xl bg-[hsl(355,16%,20%)] text-white hover:bg-[hsl(355,16%,16%)] transition-colors disabled:opacity-50">
+                    <button onClick={handleMove} disabled={loading} className="px-4 py-2 text-sm rounded-xl bg-brand-ink text-white hover:bg-brand-ink-strong transition-colors disabled:opacity-50">
                         {loading ? "Déplacement…" : "Déplacer"}
                     </button>
                 </>
@@ -903,7 +864,7 @@ function AllItemsSection({
                                 const CI = getIconById(c.icon ?? "tag");
                                 const isCurrent = c.categorie_id === (panel.type === "move" ? panel.item.categorie_id : 0);
                                 return (
-                                    <button key={c.categorie_id} type="button" onClick={() => setEditCategoryId(c.categorie_id)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm transition-colors ${editCategoryId === c.categorie_id ? "border-[hsl(355,16%,20%)] bg-[hsl(355,16%,20%)]/5" : "border-gray-200 hover:border-gray-300"} ${isCurrent ? "opacity-50 cursor-default" : ""}`} disabled={isCurrent}>
+                                    <button key={c.categorie_id} type="button" onClick={() => setEditCategoryId(c.categorie_id)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm transition-colors ${editCategoryId === c.categorie_id ? "border-brand-ink bg-brand-ink/5" : "border-gray-200 hover:border-gray-300"} ${isCurrent ? "opacity-50 cursor-default" : ""}`} disabled={isCurrent}>
                                         <div className={`h-7 w-7 rounded-lg ${col.bg} flex items-center justify-center flex-shrink-0`}>
                                             <CI size={13} className={col.text} />
                                         </div>
