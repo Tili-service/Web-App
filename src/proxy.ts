@@ -21,7 +21,9 @@ export default async function proxy(request: NextRequest) {
             throw new Error("Invalid token");
         }
     } catch {
-        return NextResponse.redirect(new URL("/login", request.url));
+        const response = NextResponse.redirect(new URL("/login", request.url));
+        response.cookies.delete("auth_token");
+        return response;
     }
 
     return NextResponse.next();

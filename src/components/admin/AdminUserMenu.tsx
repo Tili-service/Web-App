@@ -23,7 +23,7 @@ export default function AdminUserMenu() {
                 onClick={() => setOpen(!open)}
                 className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl hover:bg-gray-100 transition-colors text-sm"
             >
-                <div className="w-7 h-7 rounded-full bg-[hsl(355,16%,20%)] flex items-center justify-center">
+                <div className="w-7 h-7 rounded-full bg-brand-ink flex items-center justify-center">
                     <UserCircle2 size={16} className="text-white" />
                 </div>
                 <span className="hidden sm:block font-medium text-gray-700 max-w-[120px] truncate">

@@ -27,7 +27,7 @@ function Hero() {
                         <span className="text-orange-600 text-xs font-semibold uppercase tracking-widest">Logiciel de caisse nouvelle génération</span>
                     </div>
 
-                    <h1 className="text-5xl lg:text-6xl font-display font-bold leading-[1.1] mb-6 text-[hsl(355,16%,20%)]">
+                    <h1 className="text-5xl lg:text-6xl font-display font-bold leading-[1.1] mb-6 text-brand-ink">
                         Gérez vos commerces{" "}
                         <span className="text-orange-500">simplement.</span>
                     </h1>
@@ -39,7 +39,7 @@ function Hero() {
                     <div className="flex flex-wrap gap-3">
                         <Link
                             href={isLoggedIn ? "/admin" : "/register"}
-                            className="inline-flex items-center gap-2 bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm"
+                            className="inline-flex items-center gap-2 bg-brand-ink hover:bg-brand-ink-strong text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm"
                         >
                             {isLoggedIn ? "Accéder à mon espace" : "Essayer"}<ArrowRight size={16} />
                         </Link>
@@ -58,7 +58,7 @@ function Hero() {
                             { value: "NF525", label: "certifié" },
                         ].map((s) => (
                             <div key={s.label}>
-                                <p className="text-xl font-bold font-display text-[hsl(355,16%,20%)]">{s.value}</p>
+                                <p className="text-xl font-bold font-display text-brand-ink">{s.value}</p>
                                 <p className="text-xs text-gray-400">{s.label}</p>
                             </div>
                         ))}
@@ -103,7 +103,7 @@ const FEATURES = [
 
 function Features() {
     return (
-        <section id="features" className="bg-[hsl(355,16%,20%)] py-24">
+        <section id="features" className="bg-brand-ink py-24">
             <div className="container">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -157,10 +157,10 @@ function Pricing() {
                     viewport={{ once: true }}
                     className="text-center mb-14"
                 >
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[hsl(355,16%,20%)]/8 border border-[hsl(355,16%,20%)]/10 mb-5">
-                        <span className="text-[hsl(355,16%,20%)] text-xs font-semibold uppercase tracking-widest">Tarifs</span>
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-ink/8 border border-brand-ink/10 mb-5">
+                        <span className="text-brand-ink text-xs font-semibold uppercase tracking-widest">Tarifs</span>
                     </div>
-                    <h2 className="text-4xl font-display font-bold text-[hsl(355,16%,20%)] mb-4">
+                    <h2 className="text-4xl font-display font-bold text-brand-ink mb-4">
                         Simples et transparents
                     </h2>
                     <p className="text-gray-500 max-w-xl mx-auto text-base">
@@ -178,7 +178,7 @@ function Pricing() {
                             transition={{ delay: i * 0.12 }}
                             className={`relative rounded-2xl p-8 flex flex-col transition-all duration-300 ${
                                 plan.popular
-                                    ? "bg-[hsl(355,16%,20%)] text-white shadow-2xl scale-[1.03]"
+                                    ? "bg-brand-ink text-white shadow-2xl scale-[1.03]"
                                     : "bg-white border border-gray-100 shadow-sm hover:shadow-md"
                             }`}
                         >
@@ -216,7 +216,7 @@ function Pricing() {
                                 className={`inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm transition-colors ${
                                     plan.popular
                                         ? "bg-orange-500 hover:bg-orange-600 text-white"
-                                        : "bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white"
+                                        : "bg-brand-ink hover:bg-brand-ink-strong text-white"
                                 }`}
                             >
                                 {isLoggedIn ? "Acheter" : `Choisir ${plan.name}`} <ChevronRight size={15} />
@@ -238,7 +238,7 @@ function CTA() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="bg-[hsl(355,16%,20%)] rounded-3xl px-8 py-16 text-center relative overflow-hidden"
+                    className="bg-brand-ink rounded-3xl px-8 py-16 text-center relative overflow-hidden"
                 >
                     <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-white/5" />
                     <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-white/5" />
@@ -274,7 +274,7 @@ function CTA() {
 
 function Footer() {
     return (
-        <footer className="bg-[hsl(355,16%,20%)] py-10">
+        <footer className="bg-brand-ink py-10">
             <div className="container flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-2.5">
                     <Image src="/tiliLogo.png" alt="Tili" width={32} height={32} className="h-8 w-auto brightness-0 invert opacity-80" />

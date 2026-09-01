@@ -1,52 +1,34 @@
 "use server";
 
-import { cookies } from "next/headers";
-import { apiFetch, getAuthToken } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
+import { setAuthCookie, clearAuthCookie, setProfileCookie } from "@/lib/cookies";
 
 export async function createAccount(data: { email: string; name: string; password: string }) {
     await apiFetch<void>("/account", {
         method: "POST",
         body: data,
-        errorMessage: "Failed to create account",
+        errorMessage: "Impossible de créer le compte",
     });
     return { success: true };
 }
 
 export async function loginAccount(data: { email: string; password: string }) {
-    const jsonData = await apiFetch<{ token: string; account?: unknown }>("/account/login", {
-        method: "POST",
-        body: data,
-        errorMessage: "Failed to login",
-    });
+    const jsonData = await apiFetch<{ token: string; account?: { name: string; email: string } }>(
+        "/account/login",
+        {
+            method: "POST",
+            body: data,
+            errorMessage: "Échec de la connexion. Vérifiez vos identifiants.",
+        }
+    );
 
-    const cookieStore = await cookies();
-    cookieStore.set("auth_token", jsonData.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-    });
+    await setAuthCookie(jsonData.token);
 
     return jsonData;
 }
 
 export async function logoutAccount() {
-    const cookieStore = await cookies();
-    cookieStore.delete("auth_token");
-}
-
-export async function isAuthenticated() {
-    const token = await getAuthToken();
-    if (!token) return false;
-
-    try {
-        await apiFetch<void>("/account", { token });
-        return true;
-    } catch (error) {
-        console.error("Auth check failed", error);
-        return false;
-    }
+    await clearAuthCookie();
 }
 
 export async function loginWithPin(storeId: number, pin: string) {
@@ -55,7 +37,7 @@ export async function loginWithPin(storeId: number, pin: string) {
         {
             method: "POST",
             body: { store_id: storeId, pin },
-            errorMessage: "Pin invalide",
+            errorMessage: "PIN invalide",
         }
     );
 
@@ -63,18 +45,6 @@ export async function loginWithPin(storeId: number, pin: string) {
         throw new Error("Droits administrateur requis pour accéder à cet espace.");
     }
 
-    const cookieStore = await cookies();
-    cookieStore.set(`profile_token_${storeId}`, data.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 2 * 60 * 60,
-    });
+    await setProfileCookie(storeId, data.token);
     return true;
-}
-
-export async function logoutShopProfile(storeId: number): Promise<void> {
-    const cookieStore = await cookies();
-    cookieStore.delete(`profile_token_${storeId}`);
 }

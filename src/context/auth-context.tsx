@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isAuthenticated, logoutAccount } from "@/services/auth.service";
+import { logoutAccount } from "@/services/auth.service";
 import { getAccount } from "@/services/account.service";
 
 type User = {
@@ -14,7 +14,7 @@ type AuthContextType = {
   user: User | null;
   isLoggedIn: boolean;
   isLoading: boolean;
-  login: (userData: any) => void;
+  login: (userData: { account?: User }) => void;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 };
@@ -38,23 +38,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const checkAuth = async () => {
-    setIsLoading(true);
-    const authenticated = await isAuthenticated();
-    setIsLoggedIn(authenticated);
-    if (authenticated) {
-      await fetchUser();
-    } else {
-      setUser(null);
-    }
-    setIsLoading(false);
-  };
-
   useEffect(() => {
-    checkAuth();
+    let cancelled = false;
+    getAccount()
+      .then((data) => {
+        if (cancelled) return;
+        setUser(data);
+        setIsLoggedIn(true);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setUser(null);
+        setIsLoggedIn(false);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const login = (userData: any) => {
+  const login = (userData: { account?: User }) => {
     setIsLoggedIn(true);
     if (userData.account) {
         setUser(userData.account);

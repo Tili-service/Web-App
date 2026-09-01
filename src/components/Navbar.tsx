@@ -44,7 +44,7 @@ export const Navbar = () => {
             <>
               <a href="/register">
                 <Button variant="hero" size="default">
-                  S'inscrire
+                  S&apos;inscrire
                 </Button>
               </a>
               <a href="/login">
@@ -108,7 +108,7 @@ export const Navbar = () => {
               <div className="flex flex-col gap-3">
                 <a href="/register" onClick={closeMenu} className="w-full">
                   <Button variant="hero" size="default" className="w-full">
-                    S'inscrire
+                    S&apos;inscrire
                   </Button>
                 </a>
                 <a href="/login" onClick={closeMenu} className="w-full">

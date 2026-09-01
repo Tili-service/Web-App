@@ -5,9 +5,9 @@ import ProfilesClient from "./ProfilesClient";
 export default async function ProfilsPage({
     params,
 }: {
-    params: { shopId: string } | Promise<{ shopId: string }>;
+    params: Promise<{ shopId: string }>;
 }) {
-    const { shopId } = await Promise.resolve(params);
+    const { shopId } = await params;
     const storeId = parseInt(shopId, 10);
 
     let profiles: Profile[] = [];

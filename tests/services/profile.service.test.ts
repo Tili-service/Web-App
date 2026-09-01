@@ -19,10 +19,10 @@ beforeEach(() => {
 describe("profile.service auth guard", () => {
     it("throws when token missing", async () => {
         mockGetProfileToken.mockResolvedValue(undefined);
-        await expect(getProfiles(1)).rejects.toThrow("Unauthorized");
-        await expect(createProfile(1, { name: "x", level_access: 1 })).rejects.toThrow("Unauthorized");
-        await expect(updateProfile(3, 1, { name: "x" })).rejects.toThrow("Unauthorized");
-        await expect(deleteProfile(3, 1)).rejects.toThrow("Unauthorized");
+        await expect(getProfiles(1)).rejects.toThrow("Session boutique expirée");
+        await expect(createProfile(1, { name: "x", level_access: 1 })).rejects.toThrow("Session boutique expirée");
+        await expect(updateProfile(3, 1, { name: "x" })).rejects.toThrow("Session boutique expirée");
+        await expect(deleteProfile(3, 1)).rejects.toThrow("Session boutique expirée");
         expect(mockApiFetch).not.toHaveBeenCalled();
     });
 });

@@ -1,0 +1,2 @@
+export const DEFAULT_TAX_RATE = 0.2;
+export const DEFAULT_TAX_PERCENT = DEFAULT_TAX_RATE * 100;

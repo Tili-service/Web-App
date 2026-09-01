@@ -19,8 +19,8 @@ beforeEach(() => {
 describe("license.service auth guard", () => {
     it("throws when token missing", async () => {
         mockGetAuthToken.mockResolvedValue(undefined);
-        await expect(getLicenses()).rejects.toThrow("Unauthorized");
-        await expect(handleRefundLicense("lic 1")).rejects.toThrow("Unauthorized");
+        await expect(getLicenses()).rejects.toThrow("Session expirée");
+        await expect(handleRefundLicense("lic 1")).rejects.toThrow("Session expirée");
         expect(mockApiFetch).not.toHaveBeenCalled();
     });
 });

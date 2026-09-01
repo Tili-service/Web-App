@@ -10,21 +10,17 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@/lib/api", () => ({
     apiFetch: vi.fn(),
-    getAuthToken: vi.fn(),
 }));
 
-import { apiFetch, getAuthToken } from "@/lib/api";
-import {
-    createAccount,
-    loginAccount,
-    logoutAccount,
-    isAuthenticated,
-    loginWithPin,
-    logoutShopProfile,
-} from "@/services/auth.service";
+import { apiFetch } from "@/lib/api";
+import { createAccount, loginAccount, logoutAccount, loginWithPin } from "@/services/auth.service";
 
 const mockApiFetch = vi.mocked(apiFetch);
-const mockGetAuthToken = vi.mocked(getAuthToken);
+
+const jwtWithExp = (expInSeconds: number) => {
+    const payload = Buffer.from(JSON.stringify({ exp: expInSeconds })).toString("base64url");
+    return `header.${payload}.sig`;
+};
 
 beforeEach(() => {
     vi.clearAllMocks();
@@ -40,7 +36,7 @@ describe("createAccount", () => {
 });
 
 describe("loginAccount", () => {
-    it("stores auth_token cookie (httpOnly, 7d) and returns body", async () => {
+    it("stores auth_token cookie (httpOnly, 24h fallback for opaque token) and returns body", async () => {
         mockApiFetch.mockResolvedValue({ token: "jwt" });
         const res = await loginAccount({ email: "a@b.c", password: "p" });
 
@@ -48,8 +44,18 @@ describe("loginAccount", () => {
         expect(cookieStore.set).toHaveBeenCalledWith(
             "auth_token",
             "jwt",
-            expect.objectContaining({ httpOnly: true, maxAge: 60 * 60 * 24 * 7, path: "/" })
+            expect.objectContaining({ httpOnly: true, maxAge: 60 * 60 * 24, path: "/" })
         );
+    });
+
+    it("derives cookie maxAge from the JWT exp claim", async () => {
+        const token = jwtWithExp(Math.floor(Date.now() / 1000) + 600);
+        mockApiFetch.mockResolvedValue({ token });
+        await loginAccount({ email: "a@b.c", password: "p" });
+
+        const [, , opts] = cookieStore.set.mock.calls[0];
+        expect(opts.maxAge).toBeGreaterThan(590);
+        expect(opts.maxAge).toBeLessThanOrEqual(600);
     });
 });
 
@@ -60,35 +66,14 @@ describe("logoutAccount", () => {
     });
 });
 
-describe("isAuthenticated", () => {
-    it("false when no token", async () => {
-        mockGetAuthToken.mockResolvedValue(undefined);
-        await expect(isAuthenticated()).resolves.toBe(false);
-        expect(mockApiFetch).not.toHaveBeenCalled();
-    });
-
-    it("true when /account check succeeds", async () => {
-        mockGetAuthToken.mockResolvedValue("jwt");
-        mockApiFetch.mockResolvedValue(undefined);
-        await expect(isAuthenticated()).resolves.toBe(true);
-    });
-
-    it("false when /account check throws", async () => {
-        vi.spyOn(console, "error").mockImplementation(() => {});
-        mockGetAuthToken.mockResolvedValue("jwt");
-        mockApiFetch.mockRejectedValue(new Error("401"));
-        await expect(isAuthenticated()).resolves.toBe(false);
-    });
-});
-
 describe("loginWithPin", () => {
-    it("sets profile_token_{storeId} cookie (2h) for manager", async () => {
+    it("sets profile_token_{storeId} cookie (12h fallback for opaque token) for manager", async () => {
         mockApiFetch.mockResolvedValue({ token: "ptok", profile: { level_access: 1 } });
         await expect(loginWithPin(42, "1234")).resolves.toBe(true);
         expect(cookieStore.set).toHaveBeenCalledWith(
             "profile_token_42",
             "ptok",
-            expect.objectContaining({ maxAge: 2 * 60 * 60 })
+            expect.objectContaining({ maxAge: 12 * 60 * 60 })
         );
     });
 
@@ -96,12 +81,5 @@ describe("loginWithPin", () => {
         mockApiFetch.mockResolvedValue({ token: "ptok", profile: { level_access: 3 } });
         await expect(loginWithPin(42, "1234")).rejects.toThrow(/administrateur/);
         expect(cookieStore.set).not.toHaveBeenCalled();
-    });
-});
-
-describe("logoutShopProfile", () => {
-    it("deletes the store-scoped profile cookie", async () => {
-        await logoutShopProfile(7);
-        expect(cookieStore.delete).toHaveBeenCalledWith("profile_token_7");
     });
 });
