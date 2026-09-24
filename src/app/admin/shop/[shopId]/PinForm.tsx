@@ -18,7 +18,7 @@ export default function PinForm() {
         setLoading(true);
 
         try {
-            await loginWithPin(parseInt(params.shopId as string, 10), pin);
+            await loginWithPin(params.shopId as string, pin);
             router.refresh();
             window.dispatchEvent(new CustomEvent("shop-auth-change", { detail: { shopId: params.shopId } }));
         } catch (err: any) {

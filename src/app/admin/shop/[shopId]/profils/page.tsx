@@ -8,7 +8,7 @@ export default async function ProfilsPage({
     params: { shopId: string } | Promise<{ shopId: string }>;
 }) {
     const { shopId } = await Promise.resolve(params);
-    const storeId = parseInt(shopId, 10);
+    const storeId = String(shopId);
 
     let profiles: Profile[] = [];
     let error: string | null = null;

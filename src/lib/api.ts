@@ -5,7 +5,7 @@ export async function getAuthToken(): Promise<string | undefined> {
     return cookieStore.get("auth_token")?.value;
 }
 
-export async function getProfileToken(storeId: number): Promise<string | undefined> {
+export async function getProfileToken(storeId: string): Promise<string | undefined> {
     const cookieStore = await cookies();
     return cookieStore.get(`profile_token_${storeId}`)?.value;
 }

@@ -47,12 +47,15 @@ type PanelState =
     | { type: "delete"; profile: Profile };
 
 export default function ProfilesClient({
-    profiles,
+    profiles: rawProfiles,
     storeId,
 }: {
-    profiles: Profile[];
-    storeId: number;
+    profiles: Profile[] | null | undefined;
+    storeId: string;
 }) {
+    // C'est ici qu'on s'assure que profiles est TOUJOURS un tableau, même si le serveur renvoie null
+    const profiles = rawProfiles || [];
+
     const router = useRouter();
     const [panel, setPanel] = useState<PanelState>({ type: "closed" });
     const [loading, setLoading] = useState(false);
@@ -64,7 +67,8 @@ export default function ProfilesClient({
     const [page, setPage] = useState(1);
 
     const filtered = useMemo(() => {
-        let rows = profiles;
+        let rows = profiles; 
+        
         const q = search.trim().toLowerCase();
         if (q) rows = rows.filter((p) => p.name.toLowerCase().includes(q));
         if (filterRole !== "all") rows = rows.filter((p) => p.level_access === filterRole);
@@ -157,7 +161,7 @@ export default function ProfilesClient({
             router.refresh();
             if (generatedPin) {
                 const fake: ProfileWithPin = {
-                    profile_id: panel.type === "edit" ? panel.profile.profile_id : 0,
+                    profile_id: panel.type === "edit" ? panel.profile.profile_id : "0",
                     store_id: panel.type === "edit" ? panel.profile.store_id : storeId,
                     name: editName.trim(),
                     pin: generatedPin,

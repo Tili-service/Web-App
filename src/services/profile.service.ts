@@ -3,7 +3,7 @@
 import { apiFetch, getProfileToken } from "@/lib/api";
 import type { Profile, ProfileWithPin } from "@/lib/types";
 
-export async function getProfiles(storeId: number): Promise<Profile[]> {
+export async function getProfiles(storeId: string): Promise<Profile[]> {
     const token = await getProfileToken(storeId);
     if (!token) {
         throw new Error("Unauthorized: missing profile token");
@@ -16,7 +16,7 @@ export async function getProfiles(storeId: number): Promise<Profile[]> {
 }
 
 export async function createProfile(
-    storeId: number,
+    storeId: string,
     data: { name: string; level_access: number }
 ): Promise<ProfileWithPin> {
     const token = await getProfileToken(storeId);
@@ -33,8 +33,8 @@ export async function createProfile(
 }
 
 export async function updateProfile(
-    profileId: number,
-    storeId: number,
+    profileId: string,
+    storeId: string,
     data: { name?: string; pin?: string; level_access?: number; is_active?: boolean }
 ): Promise<Profile> {
     const token = await getProfileToken(storeId);
@@ -50,7 +50,7 @@ export async function updateProfile(
     });
 }
 
-export async function deleteProfile(profileId: number, storeId: number): Promise<void> {
+export async function deleteProfile(profileId: string, storeId: string): Promise<void> {
     const token = await getProfileToken(storeId);
     if (!token) {
         throw new Error("Unauthorized: missing profile token");

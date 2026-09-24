@@ -3,7 +3,7 @@
 import { apiFetch, getProfileToken } from "@/lib/api";
 import type { Catalog } from "@/lib/types";
 
-export async function getCatalogs(storeId: number): Promise<Catalog[]> {
+export async function getCatalogs(storeId: string): Promise<Catalog[]> {
     const token = await getProfileToken(storeId);
     if (!token) {
         throw new Error("Unauthorized: missing profile token");
@@ -18,7 +18,7 @@ export async function getCatalogs(storeId: number): Promise<Catalog[]> {
 }
 
 export async function createCatalog(
-    storeId: number,
+    storeId: string,
     data: { name: string; description?: string }
 ): Promise<Catalog> {
     const token = await getProfileToken(storeId);
@@ -26,7 +26,7 @@ export async function createCatalog(
         throw new Error("Unauthorized: missing profile token");
     }
 
-    return apiFetch<Catalog>("/catalog", {
+    return apiFetch<Catalog>(`/catalog/store/${storeId}`, {
         method: "POST",
         token,
         body: data,
@@ -35,8 +35,8 @@ export async function createCatalog(
 }
 
 export async function updateCatalog(
-    catalogId: number,
-    storeId: number,
+    catalogId: string,
+    storeId: string,
     data: { name?: string; description?: string }
 ): Promise<Catalog> {
     const token = await getProfileToken(storeId);
@@ -52,7 +52,7 @@ export async function updateCatalog(
     });
 }
 
-export async function deleteCatalog(catalogId: number, storeId: number): Promise<void> {
+export async function deleteCatalog(catalogId: string, storeId: string): Promise<void> {
     const token = await getProfileToken(storeId);
     if (!token) {
         throw new Error("Unauthorized: missing profile token");
