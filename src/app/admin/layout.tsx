@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
-import getShops from "@/lib/getShop";
+import { getShops } from "@/services/store.service";
 import { LoadingContext } from '@/components/admin/loading-context';
 import Sidebar from '@/components/admin/Sidebar';
 import MobileMenu from '@/components/admin/MobileMenu';
@@ -21,15 +21,19 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
     getShops()
       .then(shops => {
         const names: Record<string, string> = {};
-        shops.forEach(s => { names[s.store_id.toString()] = s.name; });
+        if (!shops || shops.length === 0) {
+          console.warn("No shops found");
+          return;
+        }
+        (shops ?? []).forEach(s => { names[s.store_id.toString()] = s.name; });
         setShopNames(names);
       })
-      .catch(err => console.error("Erreur lors de la récupération des magasins", err));
+      .catch(err => console.error("Error occurred while fetching shops", err));
   }, []);
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
-      <div className="flex h-[calc(100vh-64px)] mt-16 bg-gray-50 font-sans text-gray-900 overflow-hidden">
+      <div className="fixed inset-0 flex bg-gray-50 font-sans text-gray-900 overflow-hidden">
 
         <Sidebar pathname={pathname} shopNames={shopNames} />
 
