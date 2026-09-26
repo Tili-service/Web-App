@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { getProfileToken } from "@/lib/cookies";
 import PinForm from "./PinForm";
 
 export default async function ShopLayout({
@@ -6,11 +6,10 @@ export default async function ShopLayout({
     params,
 }: {
     children: React.ReactNode;
-    params: { shopId: string } | Promise<{ shopId: string }>;
+    params: Promise<{ shopId: string }>;
 }) {
-    const resolvedParams = await Promise.resolve(params);
-    const cookieStore = await cookies();
-    const shopToken = cookieStore.get(`profile_token_${resolvedParams.shopId}`)?.value;
+    const { shopId } = await params;
+    const shopToken = await getProfileToken(shopId);
 
     if (!shopToken) {
         return <PinForm />;

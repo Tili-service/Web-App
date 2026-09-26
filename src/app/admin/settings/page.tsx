@@ -9,7 +9,6 @@ import { getAccount, updateAccount, deleteAccount } from "@/services/account.ser
 import { useLoading } from "../layout";
 import { useAuth } from "@/context/auth-context";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 type AccountData = {
     name: string;
@@ -17,7 +16,6 @@ type AccountData = {
 
 export default function SettingsPage() {
     const { setIsLoading } = useLoading();
-    const router = useRouter();
     const { refreshUser, logout } = useAuth();
     const {
         register,
@@ -50,9 +48,13 @@ export default function SettingsPage() {
             await updateAccount(data);
             await refreshUser();
             toast.success("Compte mis à jour avec succès.");
-        } catch (error: any) {
+        } catch (error) {
             console.error(error);
-            toast.error(error.message || "Une erreur est survenue lors de la mise à jour.");
+            if (error instanceof Error && error.message.includes("Session expirée")) {
+                window.location.assign("/login");
+                return;
+            }
+            toast.error(error instanceof Error ? error.message : "Une erreur est survenue lors de la mise à jour.");
         }
     };
 
@@ -65,9 +67,9 @@ export default function SettingsPage() {
             try {
                 await deleteAccount();
                 logout();
-            } catch (error: any) {
+            } catch (error) {
                 console.error(error);
-                toast.error(error.message || "Impossible de supprimer le compte.");
+                toast.error(error instanceof Error ? error.message : "Impossible de supprimer le compte.");
             }
         }
     };
@@ -116,7 +118,7 @@ export default function SettingsPage() {
             <div className="bg-red-50 p-8 rounded-2xl border border-red-100">
                 <h3 className="text-lg font-bold text-red-700 mb-2">Zone de danger</h3>
                 <p className="text-sm text-red-600/80 mb-6">
-                    Une fois votre compte supprimé, il n'y a pas de retour en arrière. S'il vous plaît, soyez certain.
+                    Une fois votre compte supprimé, il n&apos;y a pas de retour en arrière. S&apos;il vous plaît, soyez certain.
                 </p>
                 <Button 
                     variant="destructive" 

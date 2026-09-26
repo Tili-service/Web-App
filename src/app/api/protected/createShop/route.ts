@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthToken } from "@/lib/cookies";
 
 export async function POST(request: NextRequest) {
     try {
@@ -7,8 +8,7 @@ export async function POST(request: NextRequest) {
         const vatNumberEntry = formData.get("vatNumber");
         const siretEntry = formData.get("siret");
         const licenseIDEntry = formData.get("licenseID");
-        const cookies = request.cookies;
-        const token = cookies.get("auth_token")?.value;
+        const token = await getAuthToken();
 
         if (!shopNameEntry  || typeof shopNameEntry !== "string"
             || !vatNumberEntry || typeof vatNumberEntry !== "string"
@@ -38,13 +38,13 @@ export async function POST(request: NextRequest) {
         }
         const session = await response.json();
         if (!session) {
-            throw new Error(session.error || "Invalid session data received from server");
+            throw new Error("Invalid session data received from server");
         }
 
         const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
         return NextResponse.redirect(`${appUrl}/admin/licenses?shop_created=true`, 303);
-    } catch (error: any) {
-        console.error("Erreur création boutique :", error.message);
+    } catch (error) {
+        console.error("Erreur création boutique :", error instanceof Error ? error.message : error);
         const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
         return NextResponse.redirect(`${appUrl}/admin/licenses?error=shop_creation_failed`, 303);
     }

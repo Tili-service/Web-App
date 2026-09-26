@@ -8,7 +8,7 @@ type Props = {
 
 export default function BottomLinks({ pathname, onItemClick }: Props) {
   return (
-    <div className="px-3 py-3 border-t border-[hsl(355,16%,28%)] space-y-0.5">
+    <div className="px-3 py-3 border-t border-sidebar-accent space-y-0.5">
       {BOTTOM_LINKS.map(({ name, href, icon: Icon }) => (
         <Link
           key={name}
@@ -16,8 +16,8 @@ export default function BottomLinks({ pathname, onItemClick }: Props) {
           onClick={onItemClick}
           className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
             pathname.startsWith(href)
-              ? 'bg-[hsl(27,97%,69%)]/15 text-[hsl(27,97%,69%)]'
-              : 'text-white/60 hover:bg-[hsl(355,16%,28%)] hover:text-white'
+              ? 'bg-sidebar-primary/15 text-sidebar-primary'
+              : 'text-white/60 hover:bg-sidebar-accent hover:text-white'
           }`}
         >
           <Icon size={18} />

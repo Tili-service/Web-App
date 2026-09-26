@@ -2,24 +2,21 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { Store, Building2, Hash, ShieldCheck, Loader2 } from "lucide-react";
 
 function NewShopContent() {
     const params = useSearchParams();
     const router = useRouter();
     const licenseID = params.get("licenceId");
-    const [isChecking, setIsChecking] = useState(true);
 
     useEffect(() => {
         if (!licenseID) {
             router.push("/admin/licenses");
-        } else {
-            setIsChecking(false);
         }
     }, [licenseID, router]);
 
-    if (isChecking) {
+    if (!licenseID) {
         return (
             <div className="flex justify-center items-center h-[60vh]">
                 <Loader2 className="animate-spin text-orange-500" size={32} />

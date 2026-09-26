@@ -6,12 +6,12 @@ import type { Profile, ProfileWithPin } from "@/lib/types";
 export async function getProfiles(storeId: number): Promise<Profile[]> {
     const token = await getProfileToken(storeId);
     if (!token) {
-        throw new Error("Unauthorized: missing profile token");
+        throw new Error("Session boutique expirée. Reconnectez-vous avec votre PIN.");
     }
 
     return apiFetch<Profile[]>(`/profile/allProfilesByStoreId/${storeId}`, {
         token,
-        errorMessage: "Failed to fetch profiles",
+        errorMessage: "Impossible de récupérer les profils",
     });
 }
 
@@ -21,14 +21,14 @@ export async function createProfile(
 ): Promise<ProfileWithPin> {
     const token = await getProfileToken(storeId);
     if (!token) {
-        throw new Error("Unauthorized: missing profile token");
+        throw new Error("Session boutique expirée. Reconnectez-vous avec votre PIN.");
     }
 
     return apiFetch<ProfileWithPin>("/profile", {
         method: "POST",
         token,
         body: data,
-        errorMessage: "Failed to create profile",
+        errorMessage: "Impossible de créer le profil",
     });
 }
 
@@ -39,26 +39,26 @@ export async function updateProfile(
 ): Promise<Profile> {
     const token = await getProfileToken(storeId);
     if (!token) {
-        throw new Error("Unauthorized: missing profile token");
+        throw new Error("Session boutique expirée. Reconnectez-vous avec votre PIN.");
     }
 
     return apiFetch<Profile>(`/profile/updateProfile/${profileId}/${storeId}`, {
         method: "PUT",
         token,
         body: data,
-        errorMessage: "Failed to update profile",
+        errorMessage: "Impossible de modifier le profil",
     });
 }
 
 export async function deleteProfile(profileId: number, storeId: number): Promise<void> {
     const token = await getProfileToken(storeId);
     if (!token) {
-        throw new Error("Unauthorized: missing profile token");
+        throw new Error("Session boutique expirée. Reconnectez-vous avec votre PIN.");
     }
 
     await apiFetch<void>(`/profile/${profileId}`, {
         method: "DELETE",
         token,
-        errorMessage: "Failed to delete profile",
+        errorMessage: "Impossible de supprimer le profil",
     });
 }

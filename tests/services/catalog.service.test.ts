@@ -19,10 +19,10 @@ beforeEach(() => {
 describe("catalog.service auth guard", () => {
     it("throws when token missing", async () => {
         mockGetProfileToken.mockResolvedValue(undefined);
-        await expect(getCatalogs(1)).rejects.toThrow("Unauthorized");
-        await expect(createCatalog(1, { name: "x" })).rejects.toThrow("Unauthorized");
-        await expect(updateCatalog(2, 1, { name: "x" })).rejects.toThrow("Unauthorized");
-        await expect(deleteCatalog(2, 1)).rejects.toThrow("Unauthorized");
+        await expect(getCatalogs(1)).rejects.toThrow("Session boutique expirée");
+        await expect(createCatalog(1, { name: "x" })).rejects.toThrow("Session boutique expirée");
+        await expect(updateCatalog(2, 1, { name: "x" })).rejects.toThrow("Session boutique expirée");
+        await expect(deleteCatalog(2, 1)).rejects.toThrow("Session boutique expirée");
         expect(mockApiFetch).not.toHaveBeenCalled();
     });
 });
@@ -41,11 +41,11 @@ describe("getCatalogs", () => {
 });
 
 describe("createCatalog", () => {
-    it("POSTs /catalog with body", async () => {
+    it("POSTs /catalog/store/:storeId with body", async () => {
         mockApiFetch.mockResolvedValue({ catalog_id: 1, name: "Main", description: "" });
         await createCatalog(3, { name: "Main" });
         expect(mockApiFetch).toHaveBeenCalledWith(
-            "/catalog",
+            "/catalog/store/3",
             expect.objectContaining({ method: "POST", body: { name: "Main" } })
         );
     });

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Puzzle, Clock3, MonitorSmartphone, FileCheck } from "lucide-react";
 
@@ -78,9 +79,9 @@ const Features = () => (
             Tili est conçu pour respecter la réglementation française et sécuriser vos transactions au quotidien.
           </p>
           <div className="flex items-center gap-4">
-            <img src="logo-sumup.png" alt="SumUp" className="h-7 w-auto object-contain" />
-            <img src="logo-mypos.png" alt="myPOS Go" className="h-7 w-auto object-contain" />
-            <img src="logo-ingenico.png" alt="Ingenico" className="h-7 w-auto object-contain" />
+            <Image src="/logo-sumup.png" alt="SumUp" width={2516} height={731} className="h-7 w-auto object-contain" />
+            <Image src="/logo-mypos.png" alt="myPOS Go" width={164} height={208} className="h-7 w-auto object-contain" />
+            <Image src="/logo-ingenico.png" alt="Ingenico" width={1024} height={354} className="h-7 w-auto object-contain" />
           </div>
         </motion.div>
 
@@ -90,9 +91,11 @@ const Features = () => (
           viewport={{ once: true }}
           className="relative"
         >
-          <img
-            src="tili-mockup-NF.png"
+          <Image
+            src="/tili-mockup-NF.png"
             alt="Interface Tili"
+            width={1024}
+            height={1024}
             className="w-full max-w-xl mx-auto rounded-2xl shadow-warm"
           />
         </motion.div>

@@ -27,9 +27,9 @@ beforeEach(() => {
 describe("account.service auth guard", () => {
     it("throws when not authenticated", async () => {
         mockGetAuthToken.mockResolvedValue(undefined);
-        await expect(getAccount()).rejects.toThrow("Not authenticated");
-        await expect(updateAccount({ name: "X" })).rejects.toThrow("Not authenticated");
-        await expect(deleteAccount()).rejects.toThrow("Not authenticated");
+        await expect(getAccount()).rejects.toThrow("Session expirée");
+        await expect(updateAccount({ name: "X" })).rejects.toThrow("Session expirée");
+        await expect(deleteAccount()).rejects.toThrow("Session expirée");
         expect(mockApiFetch).not.toHaveBeenCalled();
     });
 });

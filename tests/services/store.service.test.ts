@@ -19,7 +19,7 @@ beforeEach(() => {
 describe("getShops", () => {
     it("throws when token missing", async () => {
         mockGetAuthToken.mockResolvedValue(undefined);
-        await expect(getShops()).rejects.toThrow("Unauthorized");
+        await expect(getShops()).rejects.toThrow("Session expirée");
         expect(mockApiFetch).not.toHaveBeenCalled();
     });
 

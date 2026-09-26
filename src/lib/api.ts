@@ -1,14 +1,4 @@
-import { cookies } from "next/headers";
-
-export async function getAuthToken(): Promise<string | undefined> {
-    const cookieStore = await cookies();
-    return cookieStore.get("auth_token")?.value;
-}
-
-export async function getProfileToken(storeId: number): Promise<string | undefined> {
-    const cookieStore = await cookies();
-    return cookieStore.get(`profile_token_${storeId}`)?.value;
-}
+export { getAuthToken, getProfileToken } from "@/lib/cookies";
 
 type ApiFetchOptions = {
     method?: "GET" | "POST" | "PUT" | "DELETE";
