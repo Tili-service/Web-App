@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { FolderPlus, Loader2 } from "lucide-react";
 import { createCatalog } from "@/services/catalog.service";
 
-export default function CreateCatalogPrompt({ storeId }: { storeId: number }) {
+export default function CreateCatalogPrompt({ storeId }: { storeId: string }) {
     const router = useRouter();
     const [name, setName] = useState("Catalogue principal");
     const [loading, setLoading] = useState(false);

@@ -51,7 +51,7 @@ export default function ProfilesClient({
     storeId,
 }: {
     profiles: Profile[];
-    storeId: number;
+    storeId: string;
 }) {
     const router = useRouter();
     const [panel, setPanel] = useState<PanelState>({ type: "closed" });
@@ -159,7 +159,7 @@ export default function ProfilesClient({
             router.refresh();
             if (generatedPin) {
                 const fake: ProfileWithPin = {
-                    profile_id: panel.type === "edit" ? panel.profile.profile_id : 0,
+                    profile_id: panel.type === "edit" ? panel.profile.profile_id : "",
                     store_id: panel.type === "edit" ? panel.profile.store_id : storeId,
                     name: editName.trim(),
                     pin: generatedPin,
