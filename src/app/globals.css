@@ -27,7 +27,7 @@
   --color-accent-foreground: hsl(var(--accent-foreground));
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
-  
+
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -40,6 +40,11 @@
   --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
   --color-sidebar-border: hsl(var(--sidebar-border));
   --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  --color-brand-ink: hsl(var(--brand-ink));
+  --color-brand-ink-strong: hsl(var(--brand-ink-strong));
+  --color-brand-orange: hsl(var(--brand-orange));
+  --color-brand-orange-strong: hsl(var(--brand-orange-strong));
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -79,6 +84,10 @@
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 355 16% 30%;
     --sidebar-ring: 27 97% 69%;
+    --brand-ink: 355 16% 20%;
+    --brand-ink-strong: 355 16% 16%;
+    --brand-orange: 25 95% 53%;
+    --brand-orange-strong: 21 90% 48%;
     --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'DM Sans', sans-serif;
     --gradient-warm: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));

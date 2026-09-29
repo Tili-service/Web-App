@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Suspense, useState } from "react";
 import { CheckCircle2, CreditCard, Loader2, ArrowLeft, ShieldCheck, Zap } from "lucide-react";
 import { plans } from "@/data/plans";
+import { DEFAULT_TAX_RATE } from "@/lib/constants";
 import Link from "next/link";
 
 function NewLicenseContent() {
@@ -14,7 +15,7 @@ function NewLicenseContent() {
 
     const selected = plans.find((p) => p.param === selectedPlan) ?? plans[0];
     const priceHT = parseFloat(selected.price);
-    const priceTTC = priceHT * 1.2;
+    const priceTTC = priceHT * (1 + DEFAULT_TAX_RATE);
 
     return (
         <div className="space-y-6 pb-10">
@@ -51,7 +52,7 @@ function NewLicenseContent() {
                                         transition={{ delay: i * 0.07 }}
                                         className={`relative flex flex-col text-left rounded-2xl border-2 p-5 transition-all duration-200 ${
                                             isSelected
-                                                ? "border-[hsl(355,16%,20%)] bg-[hsl(355,16%,20%)]"
+                                                ? "border-brand-ink bg-brand-ink"
                                                 : "border-gray-100 bg-white hover:border-gray-200"
                                         }`}
                                     >
@@ -127,7 +128,7 @@ function NewLicenseContent() {
 
                             <button
                                 type="submit"
-                                className="w-full bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+                                className="w-full bg-brand-ink hover:bg-brand-ink-strong text-white py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2"
                             >
                                 <Zap size={15} /> Passer au paiement
                             </button>

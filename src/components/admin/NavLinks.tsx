@@ -28,8 +28,8 @@ export default function NavLinks({ pathname, shopNames, onItemClick }: Props) {
               onClick={onItemClick}
               className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
                 isActive
-                  ? 'bg-[hsl(27,97%,69%)]/15 text-[hsl(27,97%,69%)]'
-                  : 'text-white/60 hover:bg-[hsl(355,16%,28%)] hover:text-white'
+                  ? 'bg-sidebar-primary/15 text-sidebar-primary'
+                  : 'text-white/60 hover:bg-sidebar-accent hover:text-white'
               }`}
             >
               <div className="flex items-center gap-3">

@@ -47,7 +47,7 @@ export default function RegisterPage() {
 
     return (
         <div className="h-screen flex overflow-hidden">
-            <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative bg-[hsl(355,16%,20%)] flex-col justify-between p-12 overflow-hidden">
+            <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative bg-brand-ink flex-col justify-between p-12 overflow-hidden">
                 <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/5" />
                 <div className="absolute top-1/2 -right-40 w-96 h-96 rounded-full bg-white/5" />
                 <div className="absolute -bottom-24 left-1/4 w-72 h-72 rounded-full bg-white/5" />
@@ -84,7 +84,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="flex-1 flex flex-col bg-white overflow-y-auto">
-                <div className="lg:hidden relative bg-[hsl(355,16%,20%)] px-5 pt-2.5 pb-4 overflow-hidden">
+                <div className="lg:hidden relative bg-brand-ink px-5 pt-2.5 pb-4 overflow-hidden">
                     <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
                     <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-orange-500/15" />
                     <div className="absolute top-1/2 right-8 w-16 h-16 rounded-full bg-white/5" />
@@ -183,9 +183,9 @@ export default function RegisterPage() {
                         <div className="flex items-center gap-2.5 pt-1">
                             <input type="checkbox" id="terms" required className="w-4 h-4 rounded accent-orange-500 flex-shrink-0 cursor-pointer" />
                             <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
-                                J'accepte les{" "}
-                                <button type="button" onClick={() => setShowCGU(true)} className="text-[hsl(355,16%,20%)] font-medium hover:underline">
-                                    conditions d'utilisation
+                                J&apos;accepte les{" "}
+                                <button type="button" onClick={() => setShowCGU(true)} className="text-brand-ink font-medium hover:underline">
+                                    conditions d&apos;utilisation
                                 </button>
                             </label>
                         </div>
@@ -193,7 +193,7 @@ export default function RegisterPage() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full mt-2 bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+                            className="w-full mt-2 bg-brand-ink hover:bg-brand-ink-strong text-white py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                             {isSubmitting ? "Création du compte…" : (
                                 <> Créer mon compte <ArrowRight size={16} /> </>
@@ -203,7 +203,7 @@ export default function RegisterPage() {
 
                     <p className="text-center text-sm text-gray-500 mt-6">
                         Vous avez déjà un compte ?{" "}
-                        <Link href="/login" className="text-[hsl(355,16%,20%)] font-semibold hover:underline">Se connecter</Link>
+                        <Link href="/login" className="text-brand-ink font-semibold hover:underline">Se connecter</Link>
                     </p>
                 </motion.div>
                 </div>
@@ -213,16 +213,16 @@ export default function RegisterPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowCGU(false)}>
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                            <h2 className="text-base font-bold text-gray-900">Conditions Générales d'Utilisation</h2>
+                            <h2 className="text-base font-bold text-gray-900">Conditions Générales d&apos;Utilisation</h2>
                             <button type="button" onClick={() => setShowCGU(false)} className="text-gray-400 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-100 transition-colors">
                                 <X size={18} />
                             </button>
                         </div>
                         <div className="overflow-y-auto px-6 py-5 text-sm text-gray-700 space-y-4 flex-1">
-                            <p>Conditions d'utilisation de Tili — à compléter.</p>
+                            <p>Conditions d&apos;utilisation de Tili — à compléter.</p>
                         </div>
                         <div className="px-6 py-4 border-t border-gray-100">
-                            <button type="button" onClick={() => setShowCGU(false)} className="w-full bg-[hsl(355,16%,20%)] text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-[hsl(355,16%,16%)] transition-colors">
+                            <button type="button" onClick={() => setShowCGU(false)} className="w-full bg-brand-ink text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-ink-strong transition-colors">
                                 Fermer
                             </button>
                         </div>
