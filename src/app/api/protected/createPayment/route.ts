@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthToken } from "@/lib/cookies";
 
 export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
         const offerEntry = formData.get("offer");
-        const cookies = request.cookies;
-        const token = cookies.get("auth_token")?.value;
+        const token = await getAuthToken();
 
         const VALID_OFFERS = ["mensuel", "semestriel", "annuel"];
         if (!offerEntry || typeof offerEntry !== "string" || !VALID_OFFERS.includes(offerEntry)) {
@@ -30,10 +30,10 @@ export async function POST(request: NextRequest) {
         }
         const session = await response.json();
         if (!session || !session.url) {
-            throw new Error(session.error || "Invalid session data received from server");
+            throw new Error(session?.error || "Invalid session data received from server");
         }
         return NextResponse.redirect(session.url, 303);
-    } catch (error: any) {
+    } catch (error) {
         console.error("Erreur Stripe :", error);
         const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
         return NextResponse.redirect(`${appUrl}/?error=stripe_error`, 303);

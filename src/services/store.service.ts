@@ -6,9 +6,9 @@ import type { Shop } from "@/lib/types";
 export async function getShops(): Promise<Shop[]> {
     const token = await getAuthToken();
     if (!token) {
-        throw new Error("Unauthorized: missing auth token");
+        throw new Error("Session expirée. Reconnectez-vous.");
     }
 
-    const data = await apiFetch<Shop[]>("/store/me", { token, errorMessage: "Failed to fetch shops" });
+    const data = await apiFetch<Shop[]>("/store/me", { token, errorMessage: "Impossible de récupérer les boutiques" });
     return Array.isArray(data) ? data : [];
 }

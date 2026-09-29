@@ -1,13 +1,12 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getProfileToken, clearProfileCookie } from "@/lib/cookies";
 
 export async function GET(
     _req: Request,
     { params }: { params: Promise<{ shopId: string }> }
 ) {
     const { shopId } = await params;
-    const cookieStore = await cookies();
-    const profileToken = cookieStore.get(`profile_token_${shopId}`)?.value;
+    const profileToken = await getProfileToken(shopId);
 
     if (!profileToken) {
         return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -33,8 +32,6 @@ export async function DELETE(
     { params }: { params: Promise<{ shopId: string }> }
 ) {
     const { shopId } = await params;
-    const cookieStore = await cookies();
-    cookieStore.delete(`profile_token_${shopId}`);
-    cookieStore.delete(`profile_name_${shopId}`);
+    await clearProfileCookie(shopId);
     return NextResponse.json({ ok: true });
 }

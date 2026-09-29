@@ -1,36 +1,23 @@
 "use client";
 
 import Image from 'next/image';
-import { Mail, ArrowLeft, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { useState } from 'react';
+import { Mail, ArrowLeft, Sparkles, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from "sonner";
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export default function ForgotPasswordPage() {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
-    const [email, setEmail] = useState('');
-
-    const submitForm = async (formData: FormData) => {
-        setIsSubmitting(true);
-        try {
-            const data = Object.fromEntries(formData.entries());
-            setEmail(data.email as string);
-            // TODO: call backend reset-password endpoint when available
-            setSubmitted(true);
-        } catch {
-            toast.error("Une erreur s'est produite", {
-                description: "Impossible d'envoyer le lien de réinitialisation. Réessayez plus tard.",
-            });
-        } finally {
-            setIsSubmitting(false);
-        }
+    // Pas encore d'endpoint backend de réinitialisation par email — on ne simule pas d'envoi.
+    const submitForm = () => {
+        toast.info("Fonctionnalité bientôt disponible", {
+            description:
+                "La réinitialisation par email n'est pas encore active. Contactez le support Tili pour réinitialiser votre mot de passe.",
+        });
     };
 
     return (
         <div className="h-screen flex overflow-hidden">
-            <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative bg-[hsl(355,16%,20%)] flex-col justify-between p-12 overflow-hidden">
+            <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative bg-brand-ink flex-col justify-between p-12 overflow-hidden">
                 <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/5" />
                 <div className="absolute top-1/2 -right-40 w-96 h-96 rounded-full bg-white/5" />
                 <div className="absolute -bottom-24 left-1/4 w-72 h-72 rounded-full bg-white/5" />
@@ -66,7 +53,7 @@ export default function ForgotPasswordPage() {
             </div>
 
             <div className="flex-1 flex flex-col bg-white overflow-y-auto">
-                <div className="lg:hidden relative bg-[hsl(355,16%,20%)] px-5 pt-2.5 pb-4 overflow-hidden">
+                <div className="lg:hidden relative bg-brand-ink px-5 pt-2.5 pb-4 overflow-hidden">
                     <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
                     <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-orange-500/15" />
                     <div className="absolute top-1/2 right-8 w-16 h-16 rounded-full bg-white/5" />
@@ -93,13 +80,9 @@ export default function ForgotPasswordPage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4 }}
                     >
-                        <AnimatePresence mode="wait">
-                            {!submitted ? (
                                 <motion.div
-                                    key="form"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0, y: -8 }}
                                     transition={{ duration: 0.3 }}
                                 >
                                     <div className="mb-8">
@@ -113,7 +96,7 @@ export default function ForgotPasswordPage() {
                                         className="space-y-5"
                                         onSubmit={(e) => {
                                             e.preventDefault();
-                                            submitForm(new FormData(e.currentTarget));
+                                            submitForm();
                                         }}
                                     >
                                         <div>
@@ -134,17 +117,10 @@ export default function ForgotPasswordPage() {
 
                                         <button
                                             type="submit"
-                                            disabled={isSubmitting}
-                                            className="w-full bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] disabled:opacity-60 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-sm mt-2 cursor-pointer"
+                                            className="w-full bg-brand-ink hover:bg-brand-ink-strong text-white py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-sm mt-2 cursor-pointer"
                                         >
-                                            {isSubmitting ? (
-                                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            ) : (
-                                                <>
-                                                    Envoyer le lien
-                                                    <ArrowRight size={16} />
-                                                </>
-                                            )}
+                                            Envoyer le lien
+                                            <ArrowRight size={16} />
                                         </button>
                                     </form>
 
@@ -155,46 +131,6 @@ export default function ForgotPasswordPage() {
                                         </Link>
                                     </p>
                                 </motion.div>
-                            ) : (
-                                <motion.div
-                                    key="success"
-                                    initial={{ opacity: 0, y: 12 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.4 }}
-                                    className="text-center"
-                                >
-                                    <div className="flex justify-center mb-6">
-                                        <div className="w-16 h-16 rounded-2xl bg-green-50 flex items-center justify-center">
-                                            <CheckCircle2 size={32} className="text-green-500" />
-                                        </div>
-                                    </div>
-                                    <h2 className="text-3xl font-bold font-display text-gray-900 mb-3">Email envoyé !</h2>
-                                    <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
-                                        Si un compte est associé à{' '}
-                                        <span className="font-medium text-gray-700">{email}</span>,
-                                        vous recevrez un lien de réinitialisation dans quelques instants.
-                                    </p>
-                                    <p className="text-gray-400 text-xs mt-4">
-                                        Pensez à vérifier vos spams si vous ne le voyez pas.
-                                    </p>
-
-                                    <div className="mt-8 space-y-3">
-                                        <button
-                                            onClick={() => setSubmitted(false)}
-                                            className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-xl font-semibold transition-all duration-200 text-sm cursor-pointer"
-                                        >
-                                            Renvoyer un lien
-                                        </button>
-                                        <Link
-                                            href="/login"
-                                            className="w-full bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] text-white py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-sm"
-                                        >
-                                            Retour à la connexion
-                                        </Link>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
                     </motion.div>
                 </div>
             </div>

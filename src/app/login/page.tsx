@@ -37,7 +37,7 @@ export default function LoginPage() {
 
     return (
         <div className="h-screen flex overflow-hidden">
-            <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative bg-[hsl(355,16%,20%)] flex-col justify-between p-12 overflow-hidden">
+            <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative bg-brand-ink flex-col justify-between p-12 overflow-hidden">
                 <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/5" />
                 <div className="absolute top-1/2 -right-40 w-96 h-96 rounded-full bg-white/5" />
                 <div className="absolute -bottom-24 left-1/4 w-72 h-72 rounded-full bg-white/5" />
@@ -74,7 +74,7 @@ export default function LoginPage() {
             </div>
 
             <div className="flex-1 flex flex-col bg-white overflow-y-auto">
-                <div className="lg:hidden relative bg-[hsl(355,16%,20%)] px-5 pt-2.5 pb-4 overflow-hidden">
+                <div className="lg:hidden relative bg-brand-ink px-5 pt-2.5 pb-4 overflow-hidden">
                     <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
                     <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-orange-500/15" />
                     <div className="absolute top-1/2 right-8 w-16 h-16 rounded-full bg-white/5" />
@@ -159,7 +159,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full bg-[hsl(355,16%,20%)] hover:bg-[hsl(355,16%,16%)] disabled:opacity-60 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-sm mt-2 cursor-pointer"
+                            className="w-full bg-brand-ink hover:bg-brand-ink-strong disabled:opacity-60 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-sm mt-2 cursor-pointer"
                         >
                             {isSubmitting ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -173,9 +173,9 @@ export default function LoginPage() {
                     </form>
 
                     <p className="mt-6 text-center text-sm text-gray-500">
-                        Vous n'avez pas de compte ?{' '}
+                        Vous n&apos;avez pas de compte ?{' '}
                         <Link href="/register" className="text-orange-600 hover:text-orange-700 font-semibold transition-colors">
-                            S'inscrire
+                            S&apos;inscrire
                         </Link>
                     </p>
                 </motion.div>

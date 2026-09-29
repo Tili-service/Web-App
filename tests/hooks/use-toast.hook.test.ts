@@ -2,6 +2,8 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useToast } from "@/hooks/use-toast";
 
+type ToastHandle = ReturnType<ReturnType<typeof useToast>["toast"]>;
+
 afterEach(() => {
     vi.useRealTimers();
 });
@@ -21,7 +23,7 @@ describe("useToast", () => {
     it("returned update() mutates the live toast", () => {
         const { result } = renderHook(() => useToast());
 
-        let handle: { id: string; update: (p: any) => void };
+        let handle: ToastHandle;
         act(() => {
             handle = result.current.toast({ title: "A" });
         });
@@ -35,7 +37,7 @@ describe("useToast", () => {
     it("dismiss() flips the toast to closed", () => {
         const { result } = renderHook(() => useToast());
 
-        let handle: { id: string; dismiss: () => void };
+        let handle: ToastHandle;
         act(() => {
             handle = result.current.toast({ title: "A" });
         });

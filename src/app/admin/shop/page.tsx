@@ -35,7 +35,7 @@ export default function ShopPage() {
                 </div>
                 <h2 className="text-xl font-bold text-gray-900 mb-2">Aucun commerce</h2>
                 <p className="text-gray-400 mb-8 text-center max-w-xs text-sm leading-relaxed">
-                    Vous n'avez pas encore de boutiques associées à votre compte.
+                    Vous n&apos;avez pas encore de boutiques associées à votre compte.
                 </p>
                 <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl px-5 h-10 text-sm">
                     <Link href="/admin/licenses" className="flex items-center gap-2">
