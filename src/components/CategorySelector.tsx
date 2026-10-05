@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Plus, BookOpen, X } from "lucide-react";
 import { createCatalog } from "@/services/catalog.service";
+import { Catalog } from "@/lib/types";
 
-export default function CatalogSelector({ storeId, existingCatalogs }: { storeId: string, existingCatalogs: any[] }) {
+export default function CatalogSelector({ storeId, existingCatalogs }: { storeId: string, existingCatalogs: Catalog[] }) {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);

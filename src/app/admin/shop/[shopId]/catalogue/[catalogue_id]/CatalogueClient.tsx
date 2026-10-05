@@ -129,6 +129,7 @@ export default function CatalogueClient({
                             categories={categories}
                             storeId={storeId}
                             onBack={() => setSelectedCategoryId(null)}
+                            catalogId={catalogId}
                         />
                     ) : (
                         <CategoriesSection
@@ -375,6 +376,7 @@ function CategoryDrillDown({
     items: Item[];
     categories: Categorie[];
     storeId: string;
+    catalogId: string;
     onBack: () => void;
 }) {
     const router = useRouter();
@@ -621,7 +623,7 @@ function AllItemsSection({
     const [addName, setAddName] = useState("");
     const [addPrice, setAddPrice] = useState("");
     const [addTax, setAddTax] = useState(String(DEFAULT_TAX_PERCENT));
-    const [addCategoryId, setAddCategoryId] = useState<string>(categories[0]?.categorie_id ?? 0);
+    const [addCategoryId, setAddCategoryId] = useState<string>(categories[0]?.categorie_id);
 
     const [editName, setEditName] = useState("");
     const [editPrice, setEditPrice] = useState("");
