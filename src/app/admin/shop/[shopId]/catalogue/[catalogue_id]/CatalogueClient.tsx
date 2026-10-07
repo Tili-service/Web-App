@@ -129,7 +129,6 @@ export default function CatalogueClient({
                             categories={categories}
                             storeId={storeId}
                             onBack={() => setSelectedCategoryId(null)}
-                            catalogId={catalogId}
                         />
                     ) : (
                         <CategoriesSection
@@ -376,7 +375,6 @@ function CategoryDrillDown({
     items: Item[];
     categories: Categorie[];
     storeId: string;
-    catalogId: string;
     onBack: () => void;
 }) {
     const router = useRouter();
@@ -390,7 +388,7 @@ function CategoryDrillDown({
     const [editName, setEditName] = useState("");
     const [editPrice, setEditPrice] = useState("");
     const [editTax, setEditTax] = useState("");
-    const [editCategoryId, setEditCategoryId] = useState<string>("0");
+    const [editCategoryId, setEditCategoryId] = useState<string>("");
 
     const color = getColorById(category?.color ?? "orange");
     const CatIcon = getIconById(category?.icon ?? "tag");
@@ -577,7 +575,7 @@ function CategoryDrillDown({
                                 const c = cat as CatWithMeta;
                                 const col = getColorById(c.color ?? "orange");
                                 const CI = getIconById(c.icon ?? "tag");
-                                const isCurrent = c.categorie_id === (panel.type === "move" ? panel.item.categorie_id : "0");
+                                const isCurrent = c.categorie_id === (panel.type === "move" ? panel.item.categorie_id : 0);
                                 return (
                                     <button key={c.categorie_id} type="button" onClick={() => setEditCategoryId(c.categorie_id)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm transition-colors ${editCategoryId === c.categorie_id ? "border-brand-ink bg-brand-ink/5" : "border-gray-200 hover:border-gray-300"} ${isCurrent ? "opacity-50 cursor-default" : ""}`} disabled={isCurrent}>
                                         <div className={`h-7 w-7 rounded-lg ${col.bg} flex items-center justify-center flex-shrink-0`}>
@@ -623,12 +621,12 @@ function AllItemsSection({
     const [addName, setAddName] = useState("");
     const [addPrice, setAddPrice] = useState("");
     const [addTax, setAddTax] = useState(String(DEFAULT_TAX_PERCENT));
-    const [addCategoryId, setAddCategoryId] = useState<string>(categories[0]?.categorie_id);
+    const [addCategoryId, setAddCategoryId] = useState<string>(categories[0]?.categorie_id ?? "");
 
     const [editName, setEditName] = useState("");
     const [editPrice, setEditPrice] = useState("");
     const [editTax, setEditTax] = useState("");
-    const [editCategoryId, setEditCategoryId] = useState<string>("0");
+    const [editCategoryId, setEditCategoryId] = useState<string>("");
 
     const filtered = useMemo(() => {
         let result = items;
@@ -639,7 +637,7 @@ function AllItemsSection({
             let cmp = 0;
             if (sortKey === "name") cmp = a.name.localeCompare(b.name);
             else if (sortKey === "price") cmp = Number(a.price) - Number(b.price);
-            else if (sortKey === "category") cmp = a.categorie_id.localeCompare(b.categorie_id);
+            else if (sortKey === "category") cmp = (categories.find((c) => c.categorie_id === a.categorie_id)?.type ?? "").localeCompare(categories.find((c) => c.categorie_id === b.categorie_id)?.type ?? "");
             return sortDir === "asc" ? cmp : -cmp;
         });
     }, [items, search, filterCategory, sortKey, sortDir]);
@@ -652,7 +650,7 @@ function AllItemsSection({
     const getCategoryName = (id: string) => categories.find((c) => c.categorie_id === id)?.type ?? "—";
     const getCat = (id: string) => categories.find((c) => c.categorie_id === id) as CatWithMeta | undefined;
 
-    const openAdd = () => { setAddName(""); setAddPrice(""); setAddTax("20"); setAddCategoryId(categories[0]?.categorie_id); setPanel({ type: "add" }); };
+    const openAdd = () => { setAddName(""); setAddPrice(""); setAddTax("20"); setAddCategoryId(categories[0]?.categorie_id ?? 0); setPanel({ type: "add" }); };
     const openEdit = (item: Item) => {
         const taxPercent = Number(item.tax) * 100;
         const priceTTC = Number(item.price) * (1 + Number(item.tax));
@@ -735,7 +733,7 @@ function AllItemsSection({
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                         <input type="text" placeholder="Rechercher un article…" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400" />
                     </div>
-                    <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value === "all" ? "all" : String(e.target.value))} className="text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-200 bg-white">
+                    <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value === "all" ? "all" : e.target.value)} className="text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-200 bg-white">
                         <option value="all">Toutes les catégories</option>
                         {categories.map((c) => <option key={c.categorie_id} value={c.categorie_id}>{c.type}</option>)}
                     </select>
@@ -823,7 +821,7 @@ function AllItemsSection({
                 <div className="space-y-5">
                     <ItemForm name={addName} onNameChange={setAddName} price={addPrice} onPriceChange={setAddPrice} tax={addTax} onTaxChange={setAddTax} />
                     <Field label="Catégorie">
-                        <select value={addCategoryId} onChange={(e) => setAddCategoryId(String(e.target.value))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400 bg-white">
+                        <select value={addCategoryId} onChange={(e) => setAddCategoryId(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400 bg-white">
                             {categories.map((c) => <option key={c.categorie_id} value={c.categorie_id}>{c.type}</option>)}
                         </select>
                     </Field>
@@ -841,7 +839,7 @@ function AllItemsSection({
                 <div className="space-y-5">
                     <ItemForm name={editName} onNameChange={setEditName} price={editPrice} onPriceChange={setEditPrice} tax={editTax} onTaxChange={setEditTax} />
                     <Field label="Catégorie">
-                        <select value={editCategoryId} onChange={(e) => setEditCategoryId(String(e.target.value))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400 bg-white">
+                        <select value={editCategoryId} onChange={(e) => setEditCategoryId(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400 bg-white">
                             {categories.map((c) => <option key={c.categorie_id} value={c.categorie_id}>{c.type}</option>)}
                         </select>
                     </Field>

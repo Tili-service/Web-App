@@ -8,7 +8,7 @@ export default async function ProfilsPage({
     params: Promise<{ shopId: string }>;
 }) {
     const { shopId } = await params;
-    const storeId = String(shopId);
+    const storeId = shopId;
 
     let profiles: Profile[] = [];
     let error: string | null = null;

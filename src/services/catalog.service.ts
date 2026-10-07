@@ -44,7 +44,7 @@ export async function updateCatalog(
         throw new Error("Session boutique expirée. Reconnectez-vous avec votre PIN.");
     }
 
-    return apiFetch<Catalog>(`/catalog/${catalogId}`, {
+    return apiFetch<Catalog>(`/catalog/store/${storeId}/${catalogId}`, {
         method: "PUT",
         token,
         body: data,
@@ -58,7 +58,7 @@ export async function deleteCatalog(catalogId: string, storeId: string): Promise
         throw new Error("Session boutique expirée. Reconnectez-vous avec votre PIN.");
     }
 
-    await apiFetch<void>(`/catalog/${catalogId}`, {
+    await apiFetch<void>(`/catalog/store/${storeId}/${catalogId}`, {
         method: "DELETE",
         token,
         errorMessage: "Impossible de supprimer le catalogue",
