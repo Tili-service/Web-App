@@ -3,7 +3,7 @@ import { getCategories } from "@/services/category.service";
 import { getItems } from "@/services/item.service";
 import type { Catalog, Categorie, Item } from "@/lib/types";
 import CatalogSwitcher from "./CatalogSwitcher";
-import CatalogueClient from "./CatalogueClient";
+import CatalogueClient from "./[catalogue_id]/CatalogueClient";
 import CreateCatalogPrompt from "./CreateCatalogPrompt";
 
 export default async function CataloguePage({

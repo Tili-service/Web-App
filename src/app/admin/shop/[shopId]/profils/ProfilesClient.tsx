@@ -47,12 +47,14 @@ type PanelState =
     | { type: "delete"; profile: Profile };
 
 export default function ProfilesClient({
-    profiles,
+    profiles: rawProfiles,
     storeId,
 }: {
     profiles: Profile[];
     storeId: string;
 }) {
+    const profiles = rawProfiles || [];
+
     const router = useRouter();
     const [panel, setPanel] = useState<PanelState>({ type: "closed" });
     const [loading, setLoading] = useState(false);
