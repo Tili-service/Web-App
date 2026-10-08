@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
   const [shopNames, setShopNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    getShops()
+    const loadShops = () => getShops()
       .then(shops => {
         const names: Record<string, string> = {};
         if (!shops || shops.length === 0) {
@@ -29,6 +29,10 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
         setShopNames(names);
       })
       .catch(err => console.error("Error occurred while fetching shops", err));
+
+    loadShops();
+    window.addEventListener("shop-updated", loadShops);
+    return () => window.removeEventListener("shop-updated", loadShops);
   }, []);
 
   return (

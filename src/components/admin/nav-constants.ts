@@ -1,6 +1,6 @@
 import {
   Home, Phone, CreditCard,
-  LayoutDashboard, UserCircle, ShoppingBag, MonitorSmartphone, KeySquare
+  LayoutDashboard, UserCircle, ShoppingBag, MonitorSmartphone, KeySquare, Settings
 } from 'lucide-react';
 
 export const MAIN_LINKS = [
@@ -18,4 +18,5 @@ export const getShopSubLinks = (shopId: string) => [
   { name: 'Catalogue',         href: `/admin/shop/${shopId}/catalogue`, icon: ShoppingBag },
   { name: 'Configuration TPE', href: `/admin/shop/${shopId}/pos`,       icon: MonitorSmartphone },
   { name: 'Services externes', href: `/admin/shop/${shopId}/services-externes`, icon: KeySquare },
+  { name: 'Paramètres',        href: `/admin/shop/${shopId}/parametres`, icon: Settings },
 ];
